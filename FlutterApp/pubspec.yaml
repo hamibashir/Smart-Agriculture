@@ -1,0 +1,55 @@
+name: smart_agriculture
+description: Smart AI-Powered Agriculture System for Pakistani Farmers
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # UI & Icons
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.0.10
+  
+  # State Management
+  provider: ^6.1.2
+  
+  # HTTP & API
+  http: ^1.2.1
+  dio: ^5.4.3
+  
+  # Local Storage
+  shared_preferences: ^2.2.3
+  
+  # Charts & Visualization
+  fl_chart: ^0.68.0
+  
+  # Date & Time
+  intl: ^0.19.0
+  
+  # Icons
+  font_awesome_flutter: ^10.7.0
+  
+  # Loading & Animations
+  shimmer: ^3.0.0
+  lottie: ^3.1.2
+  
+  # Utils
+  url_launcher: ^6.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+  
+  # Assets
+  # assets:
+  #   - assets/images/
+  #   - assets/icons/
