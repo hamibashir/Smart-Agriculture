@@ -11,6 +11,9 @@ class IrrigationLog {
   final double? soilMoistureBefore;
   final double? soilMoistureAfter;
   final String pumpStatus;
+  final int? initiatedBy;
+  final String? notes;
+  final DateTime? createdAt;
 
   IrrigationLog({
     required this.logId,
@@ -25,6 +28,9 @@ class IrrigationLog {
     this.soilMoistureBefore,
     this.soilMoistureAfter,
     required this.pumpStatus,
+    this.initiatedBy,
+    this.notes,
+    this.createdAt,
   });
 
   factory IrrigationLog.fromJson(Map<String, dynamic> json) {
@@ -47,6 +53,9 @@ class IrrigationLog {
           ? double.tryParse(json['soil_moisture_after'].toString()) 
           : null,
       pumpStatus: json['pump_status'],
+      initiatedBy: json['initiated_by'],
+      notes: json['notes'],
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
     );
   }
 }

@@ -55,7 +55,11 @@ class SensorReading {
   final double? humidity;
   final double? lightIntensity;
   final double? rainfall;
+  final double? waterFlowRate;
+  final double? batteryVoltage;
+  final int? signalStrength;
   final DateTime readingTimestamp;
+  final DateTime? createdAt;
 
   SensorReading({
     required this.readingId,
@@ -65,7 +69,11 @@ class SensorReading {
     this.humidity,
     this.lightIntensity,
     this.rainfall,
+    this.waterFlowRate,
+    this.batteryVoltage,
+    this.signalStrength,
     required this.readingTimestamp,
+    this.createdAt,
   });
 
   factory SensorReading.fromJson(Map<String, dynamic> json) {
@@ -87,7 +95,19 @@ class SensorReading {
       rainfall: json['rainfall'] != null 
           ? double.tryParse(json['rainfall'].toString()) 
           : null,
+      waterFlowRate: json['water_flow_rate'] != null 
+          ? double.tryParse(json['water_flow_rate'].toString()) 
+          : null,
+      batteryVoltage: json['battery_voltage'] != null 
+          ? double.tryParse(json['battery_voltage'].toString()) 
+          : null,
+      signalStrength: json['signal_strength'] != null 
+          ? int.tryParse(json['signal_strength'].toString()) 
+          : null,
       readingTimestamp: DateTime.parse(json['reading_timestamp']),
+      createdAt: json['created_at'] != null 
+          ? DateTime.parse(json['created_at']) 
+          : null,
     );
   }
 }
