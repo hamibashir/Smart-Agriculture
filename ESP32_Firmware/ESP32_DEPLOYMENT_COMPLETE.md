@@ -48,14 +48,71 @@ const char* serverURL = "http://YOUR_SERVER_IP:5000";
 const char* deviceId = "ESP32_001";
 ```
 
-### Step 3: Database Registration
-```sql
--- Run this SQL command
-INSERT INTO sensors (field_id, sensor_type, device_id, sensor_model, 
-                    installation_date, location_description, is_active)
-VALUES (1, 'combined', 'ESP32_001', 'ESP32 Multi-Sensor', CURDATE(), 
-        'Field monitoring station', TRUE);
+### Step 3: Database Setup
+
+**1. Import Database Schema (if not already done):**
+- Open phpMyAdmin: `http://localhost/phpmyadmin`
+- Create database `smart_agriculture` (if it doesn't exist)
+- Import the `smart_agriculture.sql` file from the `Database` folder
+- This will create all 12 tables with indexes and constraints
+
+**2. Configure Backend Environment:**
+Create `.env` file in `Backend` folder:
+```env
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=smart_agriculture
+DB_PORT=3306
+PORT=5000
+JWT_SECRET=your-secret-key-here
+NODE_ENV=development
 ```
+
+**3. Register Sensor in Database:**
+
+**Option A: Using phpMyAdmin (Recommended for XAMPP users)**
+1. Open phpMyAdmin → Select `smart_agriculture` database
+2. Click on `sensors` table → Insert tab
+3. Fill in the form:
+   - `field_id`: Select your field ID (check `fields` table first)
+   - `sensor_type`: Select `combined` (for multi-sensor ESP32)
+   - `device_id`: Enter `ESP32_001` (must match ESP32 code exactly!)
+   - `sensor_model`: Enter `ESP32 + DHT11 + YL-69`
+   - `installation_date`: Select today's date
+   - `location_description`: Enter location details
+   - `is_active`: Check (1 = active)
+   - Leave other fields as default (0.00 or NULL)
+
+**Option B: Using SQL Command**
+```sql
+-- First, check available fields
+SELECT field_id, field_name, user_id FROM fields;
+
+-- Then register your sensor (replace field_id with actual value)
+INSERT INTO sensors (
+    field_id, 
+    sensor_type, 
+    device_id, 
+    sensor_model, 
+    installation_date, 
+    location_description,
+    is_active
+) VALUES (
+    6,                          -- Replace with your field_id
+    'combined',                 -- Options: 'soil_moisture','temperature','humidity','light','rain','water_flow','combined'
+    'ESP32_001',                -- Must match deviceId in ESP32 code EXACTLY (case-sensitive!)
+    'ESP32 + DHT11 + YL-69',    -- Sensor model description
+    CURDATE(),                  -- Installation date
+    'Field center, near main gate',  -- Location description
+    1                           -- is_active (1 = active, 0 = inactive)
+);
+```
+
+**Important:** 
+- The `device_id` must exactly match the `deviceId` in your ESP32 code (case-sensitive!)
+- Sensor must be linked to a valid `field_id` that exists in `fields` table
+- Use `'combined'` sensor type for multi-sensor ESP32 devices
 
 ### Step 4: Upload Firmware
 1. **Install Libraries**: ArduinoJson, DHT sensor library
@@ -95,11 +152,34 @@ node test_integration.js
 ```
 
 ### Test 3: Verify Database
+
+**Using phpMyAdmin:**
+- Open phpMyAdmin → Select `smart_agriculture` database
+- Click on `sensor_readings` table → Browse tab
+- Sort by `reading_timestamp` descending
+- Verify new readings appear every 30 seconds
+
+**Using SQL:**
 ```sql
-SELECT sr.*, s.device_id FROM sensor_readings sr 
-JOIN sensors s ON sr.sensor_id = s.sensor_id 
-WHERE s.device_id = 'ESP32_001' 
-ORDER BY sr.reading_timestamp DESC LIMIT 5;
+-- View recent sensor readings for your device
+SELECT sr.*, s.device_id, s.sensor_type, f.field_name
+FROM sensor_readings sr 
+JOIN sensors s ON sr.sensor_id = s.sensor_id
+JOIN fields f ON s.field_id = f.field_id
+WHERE s.device_id = 'ESP32_001'  -- Replace with your device_id
+ORDER BY sr.reading_timestamp DESC 
+LIMIT 10;
+
+-- Verify sensor registration
+SELECT sensor_id, device_id, field_id, sensor_type, is_active, 
+       sensor_model, installation_date
+FROM sensors 
+WHERE device_id = 'ESP32_001';  -- Replace with your device_id
+
+-- Check all sensors in database
+SELECT sensor_id, device_id, field_id, sensor_type, is_active 
+FROM sensors 
+ORDER BY sensor_id DESC;
 ```
 
 ### Test 4: Mobile App Verification
@@ -153,14 +233,36 @@ reading_timestamp: 2025-11-13 19:37:00
 
 Your integration is **100% successful** when:
 
+### Configuration
+- [ ] Database `smart_agriculture` exists and schema is imported
+- [ ] Backend `.env` file configured correctly
+- [ ] Sensor registered in `sensors` table with matching `device_id`
+- [ ] WiFi credentials configured in ESP32 code
+- [ ] Backend server URL matches your computer's IP
+
+### Hardware & Firmware
 - [ ] ESP32 connects to WiFi automatically
 - [ ] Sensor readings appear in Serial Monitor
+- [ ] All sensors working (DHT11, soil, rain, light)
+- [ ] Pump control working (if applicable)
+
+### Backend & Database
+- [ ] Backend server running (`npm start` in Backend folder)
+- [ ] Database connection successful (check console logs)
 - [ ] HTTP POST requests succeed (Status 200/201)
-- [ ] Database receives and stores readings
+- [ ] Data appears in `sensor_readings` table
+- [ ] Recent readings linked to correct `sensor_id`
+
+### Mobile App
 - [ ] Flutter app displays real-time data
-- [ ] Web dashboard shows updated statistics
+- [ ] Data refreshes automatically
+- [ ] No connection errors
+- [ ] Dashboard shows updated statistics
+
+### Advanced Features
 - [ ] Battery monitoring works correctly
 - [ ] Alerts trigger based on thresholds
+- [ ] Irrigation logs are created (if applicable)
 
 ## 🔧 Advanced Configuration
 
@@ -245,9 +347,22 @@ const float BATTERY_LOW_THRESHOLD = 3.2;     // Low battery alert
 ```
 Sensor not found with this device ID
 ```
-- Run sensor registration SQL
-- Verify device_id matches exactly
-- Check sensor is marked active
+- ✅ Verify `device_id` matches exactly (case-sensitive!)
+- ✅ Check sensor is registered: `SELECT * FROM sensors WHERE device_id = 'ESP32_001';`
+- ✅ Verify sensor is active: `is_active = 1`
+- ✅ Check field exists: `SELECT field_id FROM fields WHERE field_id = X;`
+- ✅ Verify backend can connect to database (check `.env` file)
+- ✅ Ensure database `smart_agriculture` exists and schema is loaded
+
+**XAMPP/MySQL Connection Issues:**
+```
+❌ Database connection failed
+```
+- ✅ Check MySQL is running in XAMPP Control Panel
+- ✅ Verify `.env` file in `Backend` folder has correct credentials
+- ✅ For XAMPP: `DB_PASSWORD` is usually empty (leave blank)
+- ✅ Test connection: `mysql -u root -p` in command prompt
+- ✅ Verify database exists: `SHOW DATABASES;` should show `smart_agriculture`
 
 ## 🎊 Congratulations!
 
@@ -263,7 +378,45 @@ Your ESP32 devices will now:
 
 **Your Smart Agriculture System is now PRODUCTION-READY for real-world deployment!** 🌾📱🚀
 
+## 📋 Database Schema Reference
+
+Your system uses the `smart_agriculture` database with these key tables:
+
+### Key Tables:
+- **`users`** - Farmer accounts and authentication
+- **`fields`** - Land plots/fields owned by farmers
+- **`sensors`** - IoT device registry (where ESP32 devices are registered)
+- **`sensor_readings`** - Real-time sensor data from ESP32 (populated every 30 seconds)
+- **`irrigation_logs`** - Irrigation history and automation logs
+- **`alerts`** - Notifications and warnings
+- **`crop_recommendations`** - AI-generated crop suggestions
+
+### Important Fields:
+- **`sensors.device_id`** - Must match ESP32 `deviceId` exactly (UNIQUE, case-sensitive)
+- **`sensors.field_id`** - Links sensor to a field (must exist in `fields` table)
+- **`sensors.sensor_type`** - Options: `'combined'`, `'soil_moisture'`, `'temperature'`, `'humidity'`, `'light'`, `'rain'`, `'water_flow'`
+- **`sensors.is_active`** - Must be `1` for sensor to receive data (default: `1`)
+
+### Sample Queries:
+```sql
+-- Check all registered sensors
+SELECT sensor_id, device_id, field_id, sensor_type, is_active FROM sensors;
+
+-- View recent readings for a device
+SELECT * FROM sensor_readings sr
+JOIN sensors s ON sr.sensor_id = s.sensor_id
+WHERE s.device_id = 'ESP32_001'
+ORDER BY sr.reading_timestamp DESC LIMIT 10;
+
+-- Count readings per device
+SELECT s.device_id, COUNT(*) as reading_count 
+FROM sensor_readings sr
+JOIN sensors s ON sr.sensor_id = s.sensor_id
+GROUP BY s.device_id;
+```
+
 ---
-**Deployment Date**: November 13, 2025  
+**Deployment Date**: November 16, 2025  
+**Database**: smart_agriculture (XAMPP/MySQL)  
 **System Status**: 100% Complete & Integrated  
 **Next Steps**: Deploy to field and monitor operations!

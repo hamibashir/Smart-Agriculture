@@ -81,32 +81,86 @@ Before the ESP32 can send data, you must register the sensor in the database:
    - Use the Flutter app's sensor registration feature, OR
    - Insert directly into database:
 
+**Option 1: Using phpMyAdmin (Recommended for XAMPP users)**
+1. Open phpMyAdmin: `http://localhost/phpmyadmin`
+2. Select database: `smart_agriculture`
+3. Click on `sensors` table → Insert tab
+4. Fill in the form:
+   - `field_id`: Select your field ID (check existing fields first)
+   - `sensor_type`: Select `combined` (or appropriate type)
+   - `device_id`: Enter `ESP32_001` (must match ESP32 code exactly)
+   - `sensor_model`: Enter `ESP32 + DHT11 + YL-69`
+   - `installation_date`: Select today's date
+   - `location_description`: Enter location details
+   - `is_active`: Check (1)
+   - Leave other fields as default
+
+**Option 2: Using SQL Command**
 ```sql
+-- First, check available fields for your user
+SELECT field_id, field_name, user_id FROM fields WHERE user_id = 5;
+
+-- Then insert sensor (replace field_id with your actual field_id)
 INSERT INTO sensors (
     field_id, 
     sensor_type, 
     device_id, 
     sensor_model, 
     installation_date, 
-    location_description
+    location_description,
+    is_active
 ) VALUES (
-    1,                          -- Replace with your field_id
-    'combined',                 -- Sensor type
-    'ESP32_001',                -- Must match deviceId in code!
+    6,                          -- Replace with your field_id (check fields table first!)
+    'combined',                 -- Sensor type options: 'soil_moisture','temperature','humidity','light','rain','water_flow','combined'
+    'ESP32_001',                -- Must match deviceId in ESP32 code EXACTLY! (case-sensitive)
     'ESP32 + DHT11 + YL-69',    -- Sensor model description
     CURDATE(),                  -- Installation date
-    'Field center, near main gate'  -- Location description
+    'Field center, near main gate',  -- Location description
+    1                           -- is_active (1 = active, 0 = inactive)
 );
 ```
 
-**Important:** The `device_id` in the database **must exactly match** the `deviceId` in your ESP32 code!
+**Important Notes:**
+- The `device_id` in the database **must exactly match** the `deviceId` in your ESP32 code (case-sensitive!)
+- Available sensor types: `'soil_moisture'`, `'temperature'`, `'humidity'`, `'light'`, `'rain'`, `'water_flow'`, `'combined'`
+- Use `'combined'` if your ESP32 has multiple sensors (most common)
+- Check existing fields: `SELECT * FROM fields;` to see available `field_id` values
+- Check existing sensors: `SELECT sensor_id, device_id, field_id FROM sensors;` to verify registration
 
-### Step 5: Verify Database Connection
+### Step 5: Set Up Database
 
-Test your backend database connection:
-- Start backend server: `cd Backend && npm start`
-- Check health endpoint: `http://localhost:5000/health`
-- Verify database connection appears in backend logs
+**Important:** Your database must already exist with the `smart_agriculture` schema loaded.
+
+1. **Import Database Schema** (if not already done):
+   - Open phpMyAdmin or MySQL client
+   - Create database `smart_agriculture` (if it doesn't exist)
+   - Import the `smart_agriculture.sql` file from the `Database` folder
+   - This will create all tables and sample data
+
+2. **Configure Backend Environment Variables**:
+   Create a `.env` file in the `Backend` folder:
+   ```env
+   DB_HOST=localhost
+   DB_USER=root
+   DB_PASSWORD=your_xampp_mysql_password
+   DB_NAME=smart_agriculture
+   DB_PORT=3306
+   PORT=5000
+   JWT_SECRET=your-secret-key-here
+   NODE_ENV=development
+   ```
+   
+   **For XAMPP users:**
+   - `DB_HOST=localhost` or `127.0.0.1`
+   - `DB_USER=root` (default XAMPP user)
+   - `DB_PASSWORD=` (usually empty for XAMPP, or your MySQL password)
+   - `DB_PORT=3306` (default MySQL port)
+
+3. **Verify Database Connection**:
+   - Start backend server: `cd Backend && npm start`
+   - Check health endpoint: `http://localhost:5000/health`
+   - Look for "✅ Database connected successfully" in console
+   - Verify database connection appears in backend logs
 
 ## 📤 Upload Code to ESP32
 
@@ -134,10 +188,32 @@ Test your backend database connection:
 
 1. **Check Backend Logs**: Watch your backend server console for incoming requests
 2. **Verify Data in Database**:
+   
+   **Using phpMyAdmin:**
+   - Open phpMyAdmin → Select `smart_agriculture` database
+   - Click on `sensor_readings` table → Browse tab
+   - Sort by `reading_timestamp` descending
+   - Verify new readings appear every 30 seconds
+   
+   **Using SQL:**
    ```sql
+   -- View recent sensor readings
    SELECT * FROM sensor_readings 
    ORDER BY reading_timestamp DESC 
    LIMIT 10;
+   
+   -- View readings for your specific device
+   SELECT sr.*, s.device_id, s.sensor_type 
+   FROM sensor_readings sr
+   JOIN sensors s ON sr.sensor_id = s.sensor_id
+   WHERE s.device_id = 'ESP32_001'  -- Replace with your device_id
+   ORDER BY sr.reading_timestamp DESC 
+   LIMIT 10;
+   
+   -- Verify sensor is registered correctly
+   SELECT sensor_id, device_id, field_id, sensor_type, is_active 
+   FROM sensors 
+   WHERE device_id = 'ESP32_001';  -- Replace with your device_id
    ```
 3. **Check Flutter App**: 
    - Open your Flutter app
@@ -218,10 +294,12 @@ Test your backend database connection:
 - Backend returns: `"Sensor not found with this device ID"`
 
 **Solutions:**
-- ✅ Verify `device_id` in ESP32 code matches database exactly
-- ✅ Check sensor is registered in `sensors` table
+- ✅ Verify `device_id` in ESP32 code matches database exactly (case-sensitive!)
+- ✅ Check sensor is registered in `sensors` table: `SELECT * FROM sensors WHERE device_id = 'ESP32_001';`
 - ✅ Verify `device_id` has no extra spaces or special characters
-- ✅ Run: `SELECT device_id FROM sensors;` to see registered devices
+- ✅ Check sensor is active: `SELECT device_id, is_active FROM sensors;` (is_active should be 1)
+- ✅ Run: `SELECT device_id, sensor_id, field_id FROM sensors;` to see all registered devices
+- ✅ Verify field exists: `SELECT field_id, field_name FROM fields WHERE field_id = X;` (replace X with your field_id)
 
 ### Problem: DHT Sensor Reading Errors
 
@@ -242,10 +320,13 @@ Test your backend database connection:
 - Flutter app shows no readings
 
 **Solutions:**
-- ✅ Verify `sensor_id` in database matches what Flutter app expects
-- ✅ Check Flutter app API URL matches backend
-- ✅ Refresh Flutter app data
+- ✅ Verify sensor is linked to the correct field: `SELECT s.sensor_id, s.field_id, s.device_id, f.field_name FROM sensors s JOIN fields f ON s.field_id = f.field_id;`
+- ✅ Check Flutter app API URL matches backend (should be `http://YOUR_IP:5000/api`)
+- ✅ Ensure you're viewing the correct field in Flutter app
+- ✅ Refresh Flutter app data (pull to refresh)
 - ✅ Check backend logs for any errors
+- ✅ Verify user authentication in Flutter app (user must be logged in)
+- ✅ Check sensor belongs to logged-in user's field
 
 ## 📊 Data Flow
 
@@ -312,18 +393,43 @@ For multiple devices:
 
 ## ✅ Verification Checklist
 
-- [ ] WiFi credentials configured correctly
-- [ ] Backend server URL matches your server IP
-- [ ] Device ID matches database sensor registration
-- [ ] Backend server is running and accessible
-- [ ] Database connection is working
-- [ ] Sensor registered in `sensors` table
+### Configuration
+- [ ] WiFi credentials configured correctly in ESP32 code
+- [ ] Backend server URL matches your computer's local IP (e.g., `http://192.168.27.50:5000`)
+- [ ] Device ID in ESP32 code matches database sensor registration exactly
+- [ ] Backend `.env` file configured with correct database credentials
+
+### Database Setup
+- [ ] Database `smart_agriculture` exists in MySQL/XAMPP
+- [ ] Database schema imported from `smart_agriculture.sql`
+- [ ] Sensor registered in `sensors` table with correct `device_id`
+- [ ] Sensor is linked to a valid `field_id`
+- [ ] Sensor `is_active` field is set to `1` (active)
+
+### Backend Server
+- [ ] Backend server is running (`npm start` in Backend folder)
+- [ ] Database connection successful (check console for "✅ Database connected successfully")
+- [ ] Health endpoint accessible: `http://localhost:5000/health`
+- [ ] Backend accessible from ESP32 network (check firewall settings)
+
+### ESP32 Hardware
 - [ ] ESP32 firmware uploaded successfully
+- [ ] All required libraries installed (WiFi, HTTPClient, ArduinoJson, DHT)
 - [ ] Serial monitor shows successful WiFi connection
-- [ ] Serial monitor shows successful data transmission
-- [ ] Backend logs show incoming requests
-- [ ] Data appears in `sensor_readings` table
+- [ ] Serial monitor shows IP address assigned
+- [ ] Serial monitor shows "Data sent to backend successfully!" every 30 seconds
+
+### Data Verification
+- [ ] Backend logs show incoming POST requests to `/api/sensors/reading`
+- [ ] Data appears in `sensor_readings` table (check phpMyAdmin or SQL)
+- [ ] Recent readings have correct `sensor_id` linked to your device
+- [ ] Sensor readings include all expected fields (soil_moisture, temperature, humidity, etc.)
+
+### Mobile App
 - [ ] Flutter app displays sensor data
+- [ ] Data refreshes automatically or on pull-to-refresh
+- [ ] Sensor readings show correct timestamps
+- [ ] No connection errors in Flutter app
 
 ## 📞 Support
 
