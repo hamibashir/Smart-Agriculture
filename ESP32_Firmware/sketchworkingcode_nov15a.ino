@@ -1,5 +1,28 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
 #include <DHT.h>
 
+// ============================================
+// WiFi Configuration - UPDATE THESE VALUES!
+// ============================================
+const char* ssid = "YOUR_WIFI_SSID";           // Your WiFi network name
+const char* password = "YOUR_WIFI_PASSWORD";    // Your WiFi password
+
+// ============================================
+// Backend API Configuration - UPDATE YOUR SERVER IP!
+// ============================================
+const char* serverURL = "http://192.168.27.50:5000";  // Your backend server IP (same as Flutter app)
+const char* apiEndpoint = "/api/sensors/reading";
+
+// ============================================
+// Device Configuration - UPDATE THIS!
+// ============================================
+const char* deviceId = "ESP32_001";  // Unique device ID (must match database sensor device_id)
+
+// ============================================
+// Pin Definitions
+// ============================================
 #define SOIL_PIN 34
 #define RAIN_PIN 35
 #define LIGHT_PIN 32
@@ -9,24 +32,38 @@
 #define DHT_TYPE DHT11
 DHT dht(DHT_PIN, DHT_TYPE);
 
+// ============================================
+// Sensor Thresholds
+// ============================================
 #define SOIL_DRY_THRESHOLD 2500
 #define RAIN_THRESHOLD 2000
 #define LIGHT_DARK_THRESHOLD 3000
 
-#define READING_INTERVAL 2000
+// ============================================
+// Timing Configuration
+// ============================================
+#define READING_INTERVAL 2000          // Local reading interval (2 seconds)
+#define BACKEND_SEND_INTERVAL 30000    // Send to backend every 30 seconds
 #define PUMP_MIN_RUN_TIME 1500
 
 unsigned long lastReadTime = 0;
+unsigned long lastBackendSendTime = 0;
 unsigned long pumpStartTime = 0;
 bool pumpRunning = false;
 
+// WiFi connection tracking
+bool wifiConnected = false;
+
 void setup() {
   Serial.begin(115200);
-  delay(20000);
-  Serial.println("\n=================================");
-  Serial.println("ESP32 Smart Irrigation System");
-  Serial.println("=================================\n");
+  delay(2000);
   
+  Serial.println("\n🌾 ========================================");
+  Serial.println("🌾  ESP32 Smart Irrigation System");
+  Serial.println("🌾  Backend Integration Enabled");
+  Serial.println("🌾 ========================================\n");
+  
+  // Initialize sensors
   dht.begin();
   Serial.println("✓ DHT Sensor initialized");
   
@@ -36,13 +73,44 @@ void setup() {
   
   Serial.println("✓ Analog sensors ready");
   
-  Serial.println("\nSystem ready! Starting readings...\n");
+  // Connect to WiFi
+  Serial.println("\n📶 Connecting to WiFi...");
+  connectToWiFi();
+  
+  if (wifiConnected) {
+    Serial.println("✅ WiFi connected successfully!");
+    Serial.print("📍 IP Address: ");
+    Serial.println(WiFi.localIP());
+    Serial.print("📶 Signal Strength: ");
+    Serial.print(WiFi.RSSI());
+    Serial.println(" dBm");
+    Serial.print("🔑 Device ID: ");
+    Serial.println(deviceId);
+    Serial.print("🌐 Backend URL: ");
+    Serial.println(serverURL);
+  } else {
+    Serial.println("⚠️  WiFi connection failed. System will work locally only.");
+  }
+  
+  Serial.println("\n✅ System ready! Starting readings...\n");
   delay(1000);
 }
 
 void loop() {
   unsigned long currentTime = millis();
   
+  // Check WiFi connection periodically
+  if (WiFi.status() != WL_CONNECTED) {
+    if (wifiConnected) {
+      Serial.println("⚠️  WiFi disconnected. Attempting to reconnect...");
+      wifiConnected = false;
+    }
+    connectToWiFi();
+  } else {
+    wifiConnected = true;
+  }
+  
+  // Local sensor readings and pump control (every 2 seconds)
   if (currentTime - lastReadTime >= READING_INTERVAL) {
     lastReadTime = currentTime;
     
@@ -57,8 +125,27 @@ void loop() {
     controlPump(soilValue, rainValue, lightValue);
   }
   
-  if (pumpRunning && (currentTime - pumpStartTime >= PUMP_MIN_RUN_TIME)) {
+  // Send data to backend (every 30 seconds)
+  if (wifiConnected && (currentTime - lastBackendSendTime >= BACKEND_SEND_INTERVAL)) {
+    lastBackendSendTime = currentTime;
+    
+    int soilValue = readSoilMoisture();
+    int rainValue = readRainSensor();
+    int lightValue = readLightSensor();
+    float temperature = readTemperature();
+    float humidity = readHumidity();
+    
+    // Send sensor data to backend
+    bool success = sendSensorDataToBackend(soilValue, rainValue, lightValue, temperature, humidity);
+    
+    if (success) {
+      Serial.println("✅ Data sent to backend successfully!\n");
+    } else {
+      Serial.println("❌ Failed to send data to backend\n");
+    }
   }
+  
+  delay(100); // Small delay to prevent watchdog issues
 }
 
 int readSoilMoisture() {
@@ -184,4 +271,133 @@ void turnPumpOn() {
 void turnPumpOff() {
   digitalWrite(RELAY_PIN, LOW);
   pumpRunning = false;
+}
+
+// ============================================
+// WiFi Connection Function
+// ============================================
+void connectToWiFi() {
+  if (WiFi.status() == WL_CONNECTED) {
+    wifiConnected = true;
+    return;
+  }
+  
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  
+  Serial.print("🔗 Connecting to WiFi");
+  unsigned long startTime = millis();
+  
+  while (WiFi.status() != WL_CONNECTED && (millis() - startTime < 15000)) {
+    delay(500);
+    Serial.print(".");
+  }
+  
+  if (WiFi.status() == WL_CONNECTED) {
+    wifiConnected = true;
+    Serial.println();
+  } else {
+    wifiConnected = false;
+    Serial.println("\n❌ WiFi connection failed");
+  }
+}
+
+// ============================================
+// Convert Sensor Values to Backend Format
+// ============================================
+float convertSoilMoistureToPercentage(int rawValue) {
+  // ESP32 ADC is 12-bit (0-4095)
+  // Higher raw value = drier soil (less moisture)
+  // Lower raw value = wetter soil (more moisture)
+  // Convert to percentage: 0% = very dry, 100% = very wet
+  // Invert the mapping: 4095 (dry) -> 0%, 0 (wet) -> 100%
+  float percentage = map(rawValue, 0, 4095, 100, 0);
+  return constrain(percentage, 0, 100);
+}
+
+float convertRainToPercentage(int rawValue) {
+  // Lower raw value = more rain detected
+  // Convert to percentage: 0% = heavy rain, 100% = no rain
+  float percentage = map(rawValue, 0, 4095, 0, 100);
+  return constrain(percentage, 0, 100);
+}
+
+float convertLightToPercentage(int rawValue) {
+  // Convert to percentage: 0% = dark, 100% = bright
+  float percentage = map(rawValue, 0, 4095, 0, 100);
+  return constrain(percentage, 0, 100);
+}
+
+// ============================================
+// Send Sensor Data to Backend API
+// ============================================
+bool sendSensorDataToBackend(int soilRaw, int rainRaw, int lightRaw, float temp, float hum) {
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("❌ WiFi not connected. Cannot send data.");
+    return false;
+  }
+  
+  HTTPClient http;
+  String fullURL = String(serverURL) + String(apiEndpoint);
+  
+  http.begin(fullURL);
+  http.addHeader("Content-Type", "application/json");
+  http.setTimeout(5000); // 5 second timeout
+  
+  // Convert sensor readings to backend format
+  float soilMoisture = convertSoilMoistureToPercentage(soilRaw);
+  float rainfall = convertRainToPercentage(rainRaw); // Higher = less rain (inverted)
+  float lightIntensity = convertLightToPercentage(lightRaw);
+  
+  // Convert temperature from Fahrenheit to Celsius if needed
+  float tempCelsius = temp;
+  if (temp != -999) {
+    // Assuming DHT11 reads in Celsius by default, but if your readings are in Fahrenheit:
+    // tempCelsius = (temp - 32) * 5.0 / 9.0;
+  }
+  
+  // Create JSON payload matching backend API format
+  StaticJsonDocument<512> doc;
+  doc["device_id"] = deviceId;
+  
+  // Add sensor values (always send soil moisture and light, others only if valid)
+  doc["soil_moisture"] = soilMoisture;
+  doc["light_intensity"] = lightIntensity;
+  
+  // Add temperature and humidity only if valid readings
+  if (temp != -999) {
+    doc["temperature"] = tempCelsius;
+  }
+  if (hum != -999) {
+    doc["humidity"] = hum;
+  }
+  
+  doc["rainfall"] = (100.0 - rainfall); // Invert: 0% = no rain, 100% = heavy rain
+  doc["water_flow_rate"] = 0.0; // Not measured, set to 0
+  doc["signal_strength"] = WiFi.RSSI();
+  
+  String jsonString;
+  serializeJson(doc, jsonString);
+  
+  Serial.println("📤 Sending sensor data to backend...");
+  Serial.printf("🌐 URL: %s\n", fullURL.c_str());
+  Serial.printf("📦 Payload: %s\n", jsonString.c_str());
+  
+  // Send POST request
+  int httpResponseCode = http.POST(jsonString);
+  
+  bool success = false;
+  if (httpResponseCode > 0) {
+    String response = http.getString();
+    Serial.printf("📥 Response Code: %d\n", httpResponseCode);
+    Serial.printf("📝 Response: %s\n", response.c_str());
+    
+    success = (httpResponseCode == 200 || httpResponseCode == 201);
+  } else {
+    Serial.printf("❌ HTTP Error: %d\n", httpResponseCode);
+    Serial.printf("❌ Error: %s\n", http.errorToString(httpResponseCode).c_str());
+  }
+  
+  http.end();
+  return success;
 }
