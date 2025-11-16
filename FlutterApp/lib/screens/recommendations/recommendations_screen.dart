@@ -194,7 +194,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
   }
 
   Widget _buildRecommendationCard(CropRecommendation rec) {
-    final confidencePercent = (rec.confidenceScore * 100).toInt();
+    final confidencePercent = ((rec.confidenceScore ?? 0.0) * 100).toInt();
     
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
