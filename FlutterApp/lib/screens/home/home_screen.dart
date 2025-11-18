@@ -5,6 +5,8 @@ import '../irrigation/irrigation_screen.dart';
 import '../recommendations/recommendations_screen.dart';
 import '../alerts/alerts_screen.dart';
 import '../profile/profile_screen.dart';
+import '../test_field/test_field_screen.dart';
+import '../sensor_management/sensor_binding_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -64,13 +66,43 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Add a floating action button for quick access to test field
+    final isTestFieldTab = _currentIndex == 0; // Only show on dashboard
+    final fab = isTestFieldTab
+        ? FloatingActionButton.extended(
+            onPressed: () {
+              Navigator.pushNamed(context, TestFieldScreen.routeName);
+            },
+            icon: const Icon(Icons.science, color: Colors.white),
+            label: const Text('Test Field'),
+            backgroundColor: Colors.green,
+            heroTag: 'test_field_fab',
+          )
+        : null;
+
+    // Add a sensor management button to the app bar
+    final appBar = AppBar(
+      title: const Text('Smart Agriculture'),
+      actions: [
+        if (_currentIndex == 0) // Only show on dashboard
+          IconButton(
+            icon: const Icon(Icons.settings_input_component),
+            tooltip: 'Manage Sensors',
+            onPressed: () {
+              Navigator.pushNamed(context, SensorBindingScreen.routeName);
+            },
+          ),
+      ],
+    );
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
+      appBar: appBar,
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
       ),
+      floatingActionButton: fab,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {

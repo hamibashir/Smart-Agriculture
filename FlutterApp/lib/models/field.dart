@@ -12,6 +12,7 @@ class Field {
   final DateTime? expectedHarvestDate;
   final bool isActive;
   final DateTime createdAt;
+  final DateTime? updatedAt;
 
   Field({
     required this.fieldId,
@@ -27,6 +28,7 @@ class Field {
     this.expectedHarvestDate,
     required this.isActive,
     required this.createdAt,
+    this.updatedAt,
   });
 
   factory Field.fromJson(Map<String, dynamic> json) {
@@ -50,8 +52,9 @@ class Field {
       expectedHarvestDate: json['expected_harvest_date'] != null 
           ? DateTime.parse(json['expected_harvest_date']) 
           : null,
-      isActive: json['is_active'] == 1 || json['is_active'] == true,
+isActive: json['is_active'] == 1 || json['is_active'] == true,
       createdAt: DateTime.parse(json['created_at']),
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
     );
   }
 

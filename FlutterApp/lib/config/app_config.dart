@@ -10,7 +10,7 @@ class AppConfig {
   
   // 3. For Physical Device (use your computer's local IP address)
   // Find your IP: Windows (ipconfig), Mac/Linux (ifconfig)
-  static const String apiBaseUrl = 'http://192.168.253.50:5000/api';
+  static const String apiBaseUrl = 'http://192.168.64.50:5000/api';
   
   // 4. For Production (use your deployed backend URL)
   // static const String apiBaseUrl = 'https://your-domain.com/api';

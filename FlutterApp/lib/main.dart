@@ -4,6 +4,8 @@ import 'config/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
+import 'screens/test_field/test_field_screen.dart';
+import 'screens/sensor_management/sensor_binding_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,6 +28,8 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (context) => const LoginScreen(),
           '/home': (context) => const HomeScreen(),
+          TestFieldScreen.routeName: (context) => const TestFieldScreen(),
+          SensorBindingScreen.routeName: (context) => const SensorBindingScreen(),
         },
       ),
     );

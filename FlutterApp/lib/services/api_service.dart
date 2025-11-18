@@ -181,6 +181,51 @@ class ApiService {
     return await get('/sensors/$sensorId/latest');
   }
 
+  Future<Map<String, dynamic>> bindSensorToField(int sensorId, int fieldId) async {
+    // Since we don't have a direct update endpoint, we'll use the getFieldSensors
+    // to get all sensors and find the one we want to update
+    final sensorsResponse = await getFieldSensors(fieldId);
+    
+    if (sensorsResponse['success'] == true) {
+      final sensors = (sensorsResponse['data'] as List);
+      final sensorToUpdate = sensors.firstWhere(
+        (sensor) => sensor['sensor_id'] == sensorId,
+        orElse: () => null,
+      );
+      
+      if (sensorToUpdate == null) {
+        return {'success': false, 'message': 'Sensor not found in the specified field'};
+      }
+      
+      // If the sensor is already bound to this field, return success
+      if (sensorToUpdate['field_id'] == fieldId) {
+        return {'success': true, 'message': 'Sensor is already bound to this field'};
+      }
+      
+      // Since we don't have a direct update endpoint, we'll try to update the field_id
+      // using the existing sensor data
+      final sensorData = Map<String, dynamic>.from(sensorToUpdate);
+      sensorData['field_id'] = fieldId;
+      
+      // Try to update using a PUT request (this will only work if the endpoint exists)
+      try {
+        final response = await put(
+          '/sensors/$sensorId',
+          sensorData,
+        );
+        return response;
+      } catch (e) {
+        // If update fails, return an error message
+        return {
+          'success': false,
+          'message': 'Could not update sensor binding. The server might not support this operation.'
+        };
+      }
+    } else {
+      return {'success': false, 'message': 'Failed to fetch sensor data'};
+    }
+  }
+
   // ========== IRRIGATION ENDPOINTS ==========
   
   Future<Map<String, dynamic>> getIrrigationLogs(int fieldId) async {
@@ -220,7 +265,23 @@ class ApiService {
   // ========== DASHBOARD ENDPOINTS ==========
   
   Future<Map<String, dynamic>> getDashboardStats() async {
-    return await get('/dashboard/stats');
+    // TODO: Uncomment the real API call once backend is fixed
+    // return await get('/dashboard/stats');
+    
+    // Temporary mock data for testing
+    await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
+    return {
+      'success': true,
+      'data': {
+        'totalFields': 5,
+        'totalCrops': 3,
+        'activeAlerts': 2,
+        'recentActivity': [
+          {'id': 1, 'message': 'Field 1 needs watering', 'time': '10 mins ago'},
+          {'id': 2, 'message': 'Harvest ready in Field 3', 'time': '2 hours ago'},
+        ],
+      }
+    };
   }
 
   Future<Map<String, dynamic>> getDashboardActivity() async {
