@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:provider/provider.dart';
 import '../../models/sensor.dart';
 import '../../services/api_service.dart';
@@ -20,21 +21,35 @@ class _TestFieldScreenState extends State<TestFieldScreen> {
   bool _isLoading = true;
   String? _error;
 
+  Timer? _timer;
+
   @override
   void initState() {
     super.initState();
     _loadSensorData();
+    // Start polling every 3 seconds
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      _loadSensorData(isRefresh: true);
+    });
   }
 
-  Future<void> _loadSensorData() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadSensorData({bool isRefresh = false}) async {
+    if (!isRefresh) {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+    }
 
     try {
-      // Get all sensors for field_id 10
-      final sensorsResponse = await _apiService.getFieldSensors(10);
+      // Get all sensors for field_id 6 (where Sensor 14 is located)
+      final sensorsResponse = await _apiService.getFieldSensors(6);
       if (sensorsResponse['success'] == true) {
         final sensors = (sensorsResponse['data'] as List)
             .map((sensor) => Sensor.fromJson(sensor))
@@ -80,6 +95,33 @@ class _TestFieldScreenState extends State<TestFieldScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Test Field Sensor Data'),
+        actions: [
+          if (!_isLoading && _error == null)
+            Container(
+              margin: const EdgeInsets.only(right: 16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.greenAccent,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  const Text(
+                    'LIVE',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
       body: _isLoading
           ? const LoadingShimmer()
@@ -99,7 +141,7 @@ class _TestFieldScreenState extends State<TestFieldScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Field ID: 10',
+                          'Field ID: 6',
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         const SizedBox(height: 24),
@@ -202,6 +244,12 @@ class _TestFieldScreenState extends State<TestFieldScreen> {
               Icons.lightbulb_outline,
               Colors.amber,
             ),
+          _buildMetricCard(
+            'Raining',
+            'N/A',
+            Icons.cloudy_snowing, // Or Icons.water
+            Colors.blueGrey,
+          ),
         ],
       ),
     ];
@@ -253,7 +301,7 @@ class _TestFieldScreenState extends State<TestFieldScreen> {
                 final reading = _readings[index];
                 return ListTile(
                   title: Text(
-                    '${reading.readingTimestamp.toLocal().toString().substring(0, 16)}',
+                    '${reading.timestamp.toLocal().toString().substring(0, 16)}',
                   ),
                   subtitle: Text(
                     'Temp: ${reading.temperature?.toStringAsFixed(1) ?? 'N/A'}°C • '

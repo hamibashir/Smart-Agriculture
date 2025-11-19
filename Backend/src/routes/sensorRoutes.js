@@ -1,10 +1,11 @@
 import express from 'express';
-import { 
-  getSensorsByField, 
-  getSensorReadings, 
-  getLatestReading, 
+import {
+  getSensorsByField,
+  getSensorReadings,
+  getLatestReading,
   createSensorReading,
-  createSensor 
+  createSensor,
+  updateSensor
 } from '../controllers/sensorController.js';
 import { authenticateToken } from '../middleware/auth.js';
 
@@ -20,5 +21,6 @@ router.get('/field/:fieldId', getSensorsByField);
 router.get('/:sensorId/readings', getSensorReadings);
 router.get('/:sensorId/latest', getLatestReading);
 router.post('/', createSensor);
+router.put('/:sensorId', updateSensor);
 
 export default router;

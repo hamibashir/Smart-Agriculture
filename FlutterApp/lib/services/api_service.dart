@@ -202,23 +202,17 @@ class ApiService {
         return {'success': true, 'message': 'Sensor is already bound to this field'};
       }
       
-      // Since we don't have a direct update endpoint, we'll try to update the field_id
-      // using the existing sensor data
-      final sensorData = Map<String, dynamic>.from(sensorToUpdate);
-      sensorData['field_id'] = fieldId;
-      
-      // Try to update using a PUT request (this will only work if the endpoint exists)
+      // Use the new PUT endpoint to update the sensor
       try {
         final response = await put(
           '/sensors/$sensorId',
-          sensorData,
+          {'field_id': fieldId},
         );
         return response;
       } catch (e) {
-        // If update fails, return an error message
         return {
           'success': false,
-          'message': 'Could not update sensor binding. The server might not support this operation.'
+          'message': 'Failed to bind sensor: $e'
         };
       }
     } else {
@@ -265,23 +259,7 @@ class ApiService {
   // ========== DASHBOARD ENDPOINTS ==========
   
   Future<Map<String, dynamic>> getDashboardStats() async {
-    // TODO: Uncomment the real API call once backend is fixed
-    // return await get('/dashboard/stats');
-    
-    // Temporary mock data for testing
-    await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
-    return {
-      'success': true,
-      'data': {
-        'totalFields': 5,
-        'totalCrops': 3,
-        'activeAlerts': 2,
-        'recentActivity': [
-          {'id': 1, 'message': 'Field 1 needs watering', 'time': '10 mins ago'},
-          {'id': 2, 'message': 'Harvest ready in Field 3', 'time': '2 hours ago'},
-        ],
-      }
-    };
+    return await get('/dashboard/stats');
   }
 
   Future<Map<String, dynamic>> getDashboardActivity() async {

@@ -50,63 +50,38 @@ class Sensor {
 class SensorReading {
   final int readingId;
   final int sensorId;
+  final DateTime timestamp;
   final double? soilMoisture;
   final double? temperature;
   final double? humidity;
   final double? lightIntensity;
-  final double? rainfall;
-  final double? waterFlowRate;
-  final double? batteryVoltage;
-  final int? signalStrength;
-  final DateTime readingTimestamp;
-  final DateTime? createdAt;
 
   SensorReading({
     required this.readingId,
     required this.sensorId,
+    required this.timestamp,
     this.soilMoisture,
     this.temperature,
     this.humidity,
     this.lightIntensity,
-    this.rainfall,
-    this.waterFlowRate,
-    this.batteryVoltage,
-    this.signalStrength,
-    required this.readingTimestamp,
-    this.createdAt,
   });
 
   factory SensorReading.fromJson(Map<String, dynamic> json) {
     return SensorReading(
       readingId: json['reading_id'],
       sensorId: json['sensor_id'],
+      timestamp: DateTime.parse(json['reading_time']),
       soilMoisture: json['soil_moisture'] != null 
-          ? double.tryParse(json['soil_moisture'].toString()) 
+          ? double.parse(json['soil_moisture'].toString()) 
           : null,
       temperature: json['temperature'] != null 
-          ? double.tryParse(json['temperature'].toString()) 
+          ? double.parse(json['temperature'].toString()) 
           : null,
       humidity: json['humidity'] != null 
-          ? double.tryParse(json['humidity'].toString()) 
+          ? double.parse(json['humidity'].toString()) 
           : null,
       lightIntensity: json['light_intensity'] != null 
-          ? double.tryParse(json['light_intensity'].toString()) 
-          : null,
-      rainfall: json['rainfall'] != null 
-          ? double.tryParse(json['rainfall'].toString()) 
-          : null,
-      waterFlowRate: json['water_flow_rate'] != null 
-          ? double.tryParse(json['water_flow_rate'].toString()) 
-          : null,
-      batteryVoltage: json['battery_voltage'] != null 
-          ? double.tryParse(json['battery_voltage'].toString()) 
-          : null,
-      signalStrength: json['signal_strength'] != null 
-          ? int.tryParse(json['signal_strength'].toString()) 
-          : null,
-      readingTimestamp: DateTime.parse(json['reading_timestamp']),
-      createdAt: json['created_at'] != null 
-          ? DateTime.parse(json['created_at']) 
+          ? double.parse(json['light_intensity'].toString()) 
           : null,
     );
   }

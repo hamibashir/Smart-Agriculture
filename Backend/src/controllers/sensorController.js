@@ -60,7 +60,7 @@ export const getSensorReadings = async (req, res) => {
     const [readings] = await pool.query(
       `SELECT * FROM sensor_readings 
        WHERE sensor_id = ? 
-       ORDER BY reading_timestamp DESC 
+       ORDER BY reading_time DESC 
        LIMIT ? OFFSET ?`,
       [sensorId, parseInt(limit), parseInt(offset)]
     );
@@ -100,7 +100,7 @@ export const getLatestReading = async (req, res) => {
     const [readings] = await pool.query(
       `SELECT * FROM sensor_readings 
        WHERE sensor_id = ? 
-       ORDER BY reading_timestamp DESC 
+       ORDER BY reading_time DESC 
        LIMIT 1`,
       [sensorId]
     );
@@ -126,11 +126,7 @@ export const createSensorReading = async (req, res) => {
       soil_moisture,
       temperature,
       humidity,
-      light_intensity,
-      rainfall,
-      water_flow_rate,
-      battery_voltage,
-      signal_strength
+      light_intensity
     } = req.body;
 
     if (!device_id) {
@@ -157,19 +153,10 @@ export const createSensorReading = async (req, res) => {
 
     // Insert reading
     const [result] = await pool.query(
-      `INSERT INTO sensor_readings (sensor_id, soil_moisture, temperature, humidity, light_intensity, rainfall, water_flow_rate, battery_voltage, signal_strength) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [sensor.sensor_id, soil_moisture, temperature, humidity, light_intensity, rainfall, water_flow_rate, battery_voltage, signal_strength]
+      `INSERT INTO sensor_readings (sensor_id, soil_moisture, temperature, humidity, light_intensity) 
+       VALUES (?, ?, ?, ?, ?)`,
+      [sensor.sensor_id, soil_moisture, temperature, humidity, light_intensity]
     );
-
-    // Update sensor battery level if provided
-    if (battery_voltage) {
-      const battery_percentage = (battery_voltage / 4.2) * 100; // Assuming 4.2V is 100%
-      await pool.query(
-        'UPDATE sensors SET battery_level = ? WHERE sensor_id = ?',
-        [battery_percentage, sensor.sensor_id]
-      );
-    }
 
     res.status(201).json({
       success: true,
@@ -240,7 +227,92 @@ export const createSensor = async (req, res) => {
       data: sensors[0]
     });
   } catch (error) {
-    console.error('Create sensor error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
+
+// Update sensor (e.g. bind to field)
+export const updateSensor = async (req, res) => {
+  try {
+    const { sensorId } = req.params;
+    const { field_id, sensor_name, is_active } = req.body;
+
+    // Verify sensor exists
+    const [sensors] = await pool.query(
+      'SELECT * FROM sensors WHERE sensor_id = ?',
+      [sensorId]
+    );
+
+    if (sensors.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Sensor not found'
+      });
+    }
+
+    // If field_id is provided, verify it belongs to user
+    if (field_id) {
+      const [fields] = await pool.query(
+        'SELECT * FROM fields WHERE field_id = ? AND user_id = ?',
+        [field_id, req.user.user_id]
+      );
+
+      if (fields.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Field not found or does not belong to you'
+        });
+      }
+    }
+
+    const updates = [];
+    const params = [];
+
+    if (field_id !== undefined) {
+      updates.push('field_id = ?');
+      params.push(field_id);
+    }
+
+    if (sensor_name) {
+      updates.push('sensor_name = ?');
+      params.push(sensor_name);
+    }
+
+    if (is_active !== undefined) {
+      updates.push('is_active = ?');
+      params.push(is_active);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No updates provided'
+      });
+    }
+
+    updates.push('updated_at = NOW()');
+    params.push(sensorId);
+
+    await pool.query(
+      `UPDATE sensors SET ${updates.join(', ')} WHERE sensor_id = ?`,
+      params
+    );
+
+    const [updatedSensors] = await pool.query(
+      'SELECT * FROM sensors WHERE sensor_id = ?',
+      [sensorId]
+    );
+
+    res.json({
+      success: true,
+      message: 'Sensor updated successfully',
+      data: updatedSensors[0]
+    });
+  } catch (error) {
+    console.error('Update sensor error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'
