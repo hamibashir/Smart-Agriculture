@@ -1,0 +1,927 @@
+% ----------------------------------------------------------
+% Smart AI Powered Agriculture System - FYP Chapters 1 & 2
+% LaTeX Report following CUST FYP Template
+% ----------------------------------------------------------
+\documentclass[12pt,a4paper]{report}
+
+% ----------------------------------------------------------
+% Packages
+% ----------------------------------------------------------
+\usepackage{times}          % Times New Roman-like font
+\usepackage{setspace}       % Line spacing
+\usepackage{geometry}       % Margins
+\usepackage{graphicx}       % Figures
+\usepackage{array}          % Tables
+\usepackage{longtable}      % Long tables (if needed)
+\usepackage{caption}        % Better captions
+\usepackage{fancyhdr}       % Headers/footers
+\usepackage{titlesec}       % Chapter/section formatting
+\usepackage{tocloft}        % ToC, LoF, LoT formatting
+\usepackage{hyperref}       % Clickable refs
+\usepackage{float}          % [H] float modifier
+\usepackage{enumitem}       % Better lists
+\usepackage[english]{babel}
+\usepackage{booktabs}       % Professional table formatting
+\usepackage{tabularx}        % Flexible table columns
+\usepackage{multirow}       % Multi-row cells in tables
+
+% ----------------------------------------------------------
+% Page Setup (as per template)
+% Left – 1.25 inches, Right/Top/Bottom – 1 inch
+% Line spacing 1.5
+% ----------------------------------------------------------
+\geometry{
+    left=1.25in,
+    right=1in,
+    top=1in,
+    bottom=1in
+}
+\onehalfspacing
+
+% ----------------------------------------------------------
+% Header Style: Chapter title (left), Page number (right)
+% ----------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\fancyfoot{} % Clear footer
+
+% ----------------------------------------------------------
+% Hyperref Setup
+% ----------------------------------------------------------
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=black,
+    urlcolor=black,
+    citecolor=black,
+    pdftitle={Smart AI Powered Agriculture System - FYP Report},
+    pdfauthor={Muhammad Awais, Hamza Bashir, Junaid Amin}
+}
+
+% ----------------------------------------------------------
+% Chapter Title Formatting (simple & template-friendly)
+% ----------------------------------------------------------
+\titleformat{\chapter}{\normalfont\huge\bfseries}{\thechapter}{1em}{}
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+
+% ----------------------------------------------------------
+% Section and Subsection Formatting
+% ----------------------------------------------------------
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{10pt}{4pt}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{8pt}{3pt}
+
+% ----------------------------------------------------------
+% Caption Formatting
+% ----------------------------------------------------------
+\captionsetup{font=small, labelfont=bf, format=hang, justification=centering}
+\captionsetup[table]{position=top, skip=10pt}
+\captionsetup[figure]{position=bottom, skip=10pt}
+
+% ----------------------------------------------------------
+% Table Formatting
+% ----------------------------------------------------------
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{0.5em}
+
+% ----------------------------------------------------------
+% Document Starts
+% ----------------------------------------------------------
+\begin{document}
+
+% ----------------------------------------------------------
+% Title Page
+% ----------------------------------------------------------
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\LARGE \textbf{Smart AI Powered Agriculture System}\par}
+    \vspace{1.5cm}
+    {\large
+        Muhammad Awais (BSE223112)\\[0.3cm]
+        Hamza Bashir (BSE223108)\\[0.3cm]
+        Junaid Amin (BSE223107)\\[1.5cm]
+    }
+    \textbf{Supervised by:} Adnan Karamat\\[2cm]
+
+    {\large Fall 2025\\[0.3cm]
+    Department of Software Engineering\\[0.3cm]
+    Capital University of Science and Technology, Islamabad}\\[2cm]
+
+    \vfill
+\end{titlepage}
+
+% ----------------------------------------------------------
+% Preliminary Pages: ToC, LoF, LoT with Roman numbering
+% ----------------------------------------------------------
+\pagenumbering{roman}
+
+% Custom header for Table of Contents page
+\fancyhead[L]{Table of Contents}
+\tableofcontents
+\newpage
+
+% Custom header for List of Figures page
+\fancyhead[L]{List of Figures}
+\listoffigures
+\newpage
+
+% Custom header for List of Tables page
+\fancyhead[L]{List of Tables}
+\listoftables
+\newpage
+
+% If you later want Acknowledgements, Dedication, etc.
+% you can add them here as unnumbered chapters:
+% \chapter*{Acknowledgements}
+% \addcontentsline{toc}{chapter}{Acknowledgements}
+% ...
+
+% ----------------------------------------------------------
+% Main Matter starts (Arabic page numbers)
+% ----------------------------------------------------------
+\newpage
+\pagenumbering{arabic}
+% Reset header to show chapter titles
+\fancyhead[L]{\leftmark}
+
+% ==========================================================
+% CHAPTER 1
+% ==========================================================
+\chapter{Introduction}
+
+Agriculture in Pakistan faces challenges like water shortage, low productivity, and lack of modern tools. To address this, the \textbf{Smart AI Powered Agriculture System} uses Internet of Things (IoT) sensors to monitor soil and weather conditions, automates irrigation to save water, and applies artificial intelligence (AI) to recommend suitable crops. This solution is designed to help farmers improve yield, reduce costs, save water, and adopt smarter farming practices.
+
+\section{Project Introduction}
+
+The Smart AI Powered Agriculture System is an IoT-based solution designed to make farming more efficient and sustainable. The system uses sensors to monitor soil moisture, temperature, humidity, light, and rainfall in real time. This data is sent to a mobile application through a backend server, allowing farmers to track field conditions, receive alerts, and view historical records.
+
+The system also includes automatic irrigation, where water is supplied only when the soil is dry, and an AI module that recommends the most suitable crops for upcoming seasons. The goal is to help farmers conserve water, improve crop yield, and make data-driven decisions in agriculture.
+
+The main beneficiaries of this project are small and medium scale farmers in Pakistan, who often face challenges such as water wastage, low crop productivity, and lack of access to modern agricultural tools. By using this system, farmers can monitor their fields easily, save water through automated irrigation, and receive crop recommendations that support better planning. This helps them reduce costs, increase income, and adopt smarter farming practices.
+
+\section{Existing Examples / Solutions}
+
+Several existing systems and solutions in Pakistan and globally work towards precision agriculture, smart irrigation, and farm monitoring. However, most of them are either expensive, focused on large-scale farms, or limited in scope. Table~\ref{tab:existing_examples} summarizes some examples and the gaps that remain.
+
+\begin{table}[H]
+\centering
+\caption{Existing Examples}
+\label{tab:existing_examples}
+\begin{tabular}{|p{3.2cm}|p{5.2cm}|p{5.2cm}|}
+\hline
+\textbf{Name} & \textbf{What they do (features)} & \textbf{What gap remains} \\ \hline
+SAWiE (Sustainable Agriculture Water \& Intelligent Ecosystem) &
+Offers IoT and machine learning based advisory for farmers; soil mapping and alerts for droughts and floods. &
+Does not directly automate irrigation hardware or pump control. \\ \hline
+
+Buraq Integrated Solutions --- Smart Drip Irrigation &
+Implements drip irrigation systems with soil moisture and temperature sensors. &
+Lacks an AI-based crop recommendation module. \\ \hline
+
+VGreen --- CropSight\textsuperscript{\texttrademark} &
+Provides farm mapping, real-time monitoring, and analytics; localized for Pakistani farms. &
+Good dashboards and analytics but lacks full automation (pump control and crop recommendation) and is costly for small farmers. \\ \hline
+
+Field Commander --- Valley Irrigation Pakistan &
+Offers remote monitoring and SMS/Email alerts. &
+Does not offer smart irrigation and is mainly available for large commercial farms. \\ \hline
+
+Smart IoT Farm at PMAS--AAUR, Rawalpindi &
+University research farm with sensors (e.g., soil moisture) and real-time IoT monitoring to demonstrate precision agriculture. &
+No dedicated mobile application for farmers, no AI-based decision support, and no automated irrigation. \\ \hline
+\end{tabular}
+\end{table}
+
+The Smart AI Powered Agriculture System aims to combine IoT-based sensing, automatic irrigation, mobile app support, and AI-driven crop recommendations in a single affordable solution targeted at small and medium farmers.
+
+\section{Problem Statement}
+
+Agriculture is the main source of income and food in many countries, especially in developing regions. Many farmers depend on farming for their livelihood, but they face challenges such as water wastage, unpredictable weather, limited access to real-time information, and lack of proper guidance for choosing crops or managing their fields. Traditional farming methods often result in over-watering or under-watering, loss of soil nutrients, and low crop production.
+
+Even though modern technology is available, many small and medium farmers cannot afford or access smart farming tools. There is a need for an affordable and easy-to-use smart agriculture system that uses IoT and AI to monitor the environment, save resources such as water and energy, and provide useful recommendations to farmers. Such a system can help them make better decisions, increase crop yield, and practice farming in a more sustainable way.
+
+\section{Business Scope}
+
+The Smart AI Powered Agriculture System has strong potential in the agriculture sector of Pakistan. Since many farmers face problems like water wastage, low crop yield, and lack of modern tools, this system provides an affordable and simple solution.
+
+By offering IoT-based smart farming kits (sensors, controller, and mobile application), farmers can save water, achieve better crop production, and make smarter decisions. The system can be adopted by small and medium farmers and can also be promoted through government programs, non-governmental organizations (NGOs), and agriculture companies. The idea has strong business value because it directly improves farmers' income and supports food security.
+
+Table~\ref{tab:lean_canvas} presents a Lean Canvas view of the business model.
+
+\begin{table}[H]
+\centering
+\caption{Lean Canvas}
+\label{tab:lean_canvas}
+\small
+\begin{tabular}{|p{4.0cm}|p{4.0cm}|p{4.0cm}|}
+\hline
+\textbf{Problem} & \textbf{Solution} & \textbf{Unique Value Proposition} \\ \hline
+1. Water wastage due to over-irrigation. & 1. IoT sensors for soil and weather. & An affordable smart farming kit that saves water, increases yield, and helps farmers make better crop decisions. \\ \hline
+2. Low crop yield from poor crop choice. & 2. Automatic irrigation system. &  \\ \hline
+3. Lack of affordable smart farming tools. & 3. Mobile app with AI-based crop suggestion. &  \\ \hline
+\end{tabular}
+
+\vspace{0.5cm}
+
+\begin{tabular}{|p{4.0cm}|p{4.0cm}|p{4.0cm}|}
+\hline
+\textbf{Existing Alternatives} & \textbf{Key Metrics (Approx.)} & \textbf{High-Level Concept} \\ \hline
+1. Manual irrigation. & 1. 100+ farmers use the system. & A smart farming assistant for every farmer, like a personal digital guide for crops. \\ \hline
+2. Expensive imported smart farming systems. & 2. 45\% water savings (estimated). &  \\ \hline
+ & 3. 35\% increase in crop yield (estimated). &  \\ \hline
+\end{tabular}
+
+\vspace{0.5cm}
+
+\begin{tabular}{|p{4.0cm}|p{4.0cm}|p{4.0cm}|}
+\hline
+\textbf{Channels} & \textbf{Cost Structure} & \textbf{Customer Segments} \\ \hline
+1. Direct sales to farmers. & 1. IoT hardware (sensors, controllers). & 1. Small and medium farmers. \\ \hline
+2. Partnerships with NGOs and government programs. & 2. Mobile app and server hosting. & 2. Agriculture NGOs and government projects. \\ \hline
+3. Agriculture supply companies. & 3. Installation and support. &  \\ \hline
+\end{tabular}
+
+\vspace{0.5cm}
+
+\begin{tabular}{|p{6.0cm}|p{6.0cm}|}
+\hline
+\textbf{Early Adopters} & \textbf{Revenue Structure} \\ \hline
+1. Farmers with 1--4 acres of land. & 1. Selling hardware kits. \\ \hline
+2. NGOs running pilot agriculture projects. & 2. Subscription for premium application features. \\ \hline
+ & 3. Installation and training services. \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Useful Tools and Technologies}
+
+The key hardware and software components for the Smart AI Powered Agriculture System are:
+
+\subsection{Hardware}
+\begin{itemize}[noitemsep]
+    \item \textbf{ESP32} --- Microcontroller with Wi-Fi support for sensor data processing and transmission.
+    \item \textbf{Soil Moisture Sensor (e.g., YL-69 or capacitive sensor)} --- Detects soil water level.
+    \item \textbf{DHT22 Sensor} --- Measures temperature and humidity.
+    \item \textbf{Light Sensor (LDR)} --- Monitors sunlight levels for crop growth.
+    \item \textbf{Rain Sensor (e.g., FC-37 / YL-82)} --- Detects rainfall to avoid unnecessary irrigation.
+    \item \textbf{Relay Module} --- Controls water pump or valve for automation.
+    \item \textbf{Water Flow Sensor} --- Measures water usage during irrigation.
+\end{itemize}
+
+\subsection{Software}
+\begin{itemize}[noitemsep]
+    \item \textbf{Arduino IDE (C++)} --- Programming the ESP32.
+    \item \textbf{Backend Server: Node.js} --- Handles data from sensors and communicates with the mobile app.
+    \item \textbf{Database: Firebase Realtime Database / MySQL} --- Stores sensor readings and historical records.
+    \item \textbf{Mobile Application: Android (Java/Kotlin) or Flutter} --- Displays live data, history, and alerts.
+    \item \textbf{Data Visualization:} Libraries such as MPAndroidChart, Chart.js, or Recharts for graphs and charts.
+    \item \textbf{Notifications: Firebase Cloud Messaging} --- For sending push alerts.
+\end{itemize}
+
+\subsection{AI and Machine Learning}
+\begin{itemize}[noitemsep]
+    \item \textbf{Python (TensorFlow / Scikit-learn)} --- For crop recommendation and predictive analytics.
+    \item \textbf{Signal Processing Techniques} --- To filter and clean noisy sensor data before analysis.
+\end{itemize}
+
+\section{Project Work Break Down}
+
+The project is divided into multiple phases to ensure systematic development, testing, and deployment. Major tasks include requirement analysis, hardware selection and setup, backend development, mobile app development, AI model training, integration, and testing.
+
+Figure~\ref{fig:wbs} shows a conceptual Work Breakdown Structure (WBS) of the project.
+
+\begin{figure}[H]
+    \centering
+    % Replace fig_wbs.png with your actual WBS image filename
+    \includegraphics[width=0.9\textwidth]{fig_wbs.png}
+    \caption{Work Breakdown Structure}
+    \label{fig:wbs}
+\end{figure}
+
+\section{Project Time Line}
+
+The project timeline spans from 29 September 2025 to 10 July 2026 and covers research, hardware setup, software development, integration, and testing. Each phase is scheduled to ensure steady progress and timely completion.
+
+A Gantt chart is used to represent the project timeline, as shown in Figure~\ref{fig:gantt}.
+
+\begin{figure}[H]
+    \centering
+    % Replace fig_gantt.png with your actual Gantt chart image filename
+    \includegraphics[width=0.9\textwidth]{fig_gantt.png}
+    \caption{Gantt Chart}
+    \label{fig:gantt}
+\end{figure}
+
+% ==========================================================
+% CHAPTER 2
+% ==========================================================
+\chapter{Requirement Specification and Analysis}
+
+This chapter describes the functional requirements of the Smart AI Powered Agriculture System in terms of epics, user stories, test cases, user interface design, and a traceability matrix. The requirements are written in clear language so that they can be reviewed by both technical and non-technical stakeholders.
+
+\section{Epics}
+
+Epics are large, high-level features that represent significant functionalities of the system. Each epic is later broken down into multiple user stories.
+
+\subsection{E1: User Authentication and Profile Management}
+
+\textbf{Description:} As a farmer or administrator, the user wants to securely log in, register, and manage their profile so that data and farm configurations remain private and secure.
+
+\subsection{E2: Real-Time Sensor Data Monitoring}
+
+\textbf{Description:} As a farmer, the user wants to monitor real-time environmental data (soil moisture, temperature, humidity) from the fields so that informed decisions can be made about crop care.
+
+\subsection{E3: Intelligent Irrigation Control}
+
+\textbf{Description:} As a farmer, the user wants to control irrigation systems manually or set automatic triggers based on sensor thresholds so that water usage is optimized and crops receive adequate hydration.
+
+\subsection{E4: AI-Driven Crop Recommendations}
+
+\textbf{Description:} As a farmer, the user wants to receive AI-generated crop recommendations based on soil and weather analysis so that yield can be maximized and the most suitable crops for the season can be selected.
+
+\subsection{E5: Alerting and Notification System}
+
+\textbf{Description:} As a farmer, the user wants to receive immediate alerts about critical conditions (e.g., low soil moisture, sensor failure) so that timely corrective actions can be taken to prevent crop damage.
+
+\subsection{E6: Historical Data Analytics and Visualization}
+
+\textbf{Description:} As a farmer, the user wants to view historical trends and graphical visualizations of farm data so that long-term patterns can be analyzed and farming strategies improved.
+
+\section{User Stories}
+
+Each epic is decomposed into smaller, actionable user stories. User stories are written from the user's perspective with clear acceptance criteria.
+
+\subsection{Epic E1: User Authentication and Profile Management}
+
+\subsubsection{E1-US1: User Registration}
+
+\textbf{Description:} As a new user, the user wants to create an account using email and phone number so that system features can be accessed.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given the user is on the registration screen,
+    \item When valid name, email, phone, and password are entered,
+    \item Then the system should create a new account and redirect to the login page.
+\end{itemize}
+
+\subsubsection{E1-US2: Secure Login}
+
+\textbf{Description:} As a registered user, the user wants to log in using credentials so that the personal dashboard can be accessed.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given the user has a valid account,
+    \item When the correct email and password are entered,
+    \item Then the system should authenticate the user and grant access to the dashboard.
+\end{itemize}
+
+\subsubsection{E1-US3: Profile Management}
+
+\textbf{Description:} As a user, the user wants to update personal information and change the password so that account details remain current and secure.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given the user is logged in,
+    \item When the user navigates to profile settings and updates the phone number,
+    \item Then the system should save the changes and display a success message.
+\end{itemize}
+
+\subsection{Epic E2: Real-Time Sensor Data Monitoring}
+
+\subsubsection{E2-US1: View Field Overview}
+
+\textbf{Description:} As a farmer, the user wants to see a list of all fields with their current status so that the overall farm health can be assessed quickly.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given the user is on the dashboard,
+    \item When the page loads,
+    \item Then the system should display all registered fields with summary indicators such as ``Healthy'' or ``Needs Water''.
+\end{itemize}
+
+\subsubsection{E2-US2: Detailed Sensor Readings}
+
+\textbf{Description:} As a farmer, the user wants to view specific readings from individual sensors (e.g., Sensor ID 14) so that issues in specific areas can be pinpointed.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given the user selects a specific field,
+    \item When a sensor node is tapped,
+    \item Then the system should show the latest values for soil moisture, temperature, and humidity.
+\end{itemize}
+
+\subsubsection{E2-US3: Sensor Status Monitoring}
+
+\textbf{Description:} As a farmer, the user wants to know if a sensor is offline or has low battery so that maintenance can be performed.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given a sensor has stopped sending data,
+    \item When the user views the sensor list,
+    \item Then the system should display an ``Offline'' status indicator next to that sensor.
+\end{itemize}
+
+\subsection{Epic E3: Intelligent Irrigation Control}
+
+\subsubsection{E3-US1: Manual Irrigation Toggle}
+
+\textbf{Description:} As a farmer, the user wants to remotely turn the water pump on or off so that the field can be irrigated immediately when needed.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given the irrigation system is connected,
+    \item When the user presses the ``Start Irrigation'' button,
+    \item Then the system should send a command to the actuator and update the status to ``Irrigating''.
+\end{itemize}
+
+\subsubsection{E3-US2: Threshold-Based Automation}
+
+\textbf{Description:} As a farmer, the user wants to set a soil moisture threshold (e.g., 30\%) so that the system automatically irrigates when the soil becomes too dry.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given the automation mode is enabled,
+    \item When soil moisture drops below the defined threshold,
+    \item Then the system should automatically trigger the irrigation pump without user intervention.
+\end{itemize}
+
+\subsubsection{E3-US3: Irrigation Logging}
+
+\textbf{Description:} As a farmer, the user wants to see a history of irrigation events so that water usage can be tracked.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given an irrigation cycle has completed,
+    \item When the user views the irrigation logs,
+    \item Then the system should list the start time, end time, and total duration of each event.
+\end{itemize}
+
+\subsection{Epic E4: AI-Driven Crop Recommendations}
+
+\subsubsection{E4-US1: Request Crop Recommendation}
+
+\textbf{Description:} As a farmer, the user wants to request a crop recommendation based on the field's current soil data so that the most viable crop can be planted.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given the user is on the recommendation screen,
+    \item When the ``Analyze Field'' button is clicked,
+    \item Then the system should process the soil parameters and display a recommended crop (e.g., ``Wheat'').
+\end{itemize}
+
+\subsubsection{E4-US2: View Recommendation Confidence}
+
+\textbf{Description:} As a farmer, the user wants to see the confidence score of the AI prediction so that trust in the recommendation can be established.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given a recommendation is generated,
+    \item When the result is displayed,
+    \item Then the system should show a percentage confidence score (e.g., ``85\% Confidence'').
+\end{itemize}
+
+\subsubsection{E4-US3: Accept Recommendation}
+
+\textbf{Description:} As a farmer, the user wants to mark a recommendation as ``Accepted'' so that the system tracks what has actually been planted.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given a recommendation is displayed,
+    \item When the user clicks ``Accept'',
+    \item Then the field's current crop status should be updated to match the recommendation.
+\end{itemize}
+
+\subsection{Epic E5: Alerting and Notification System}
+
+\subsubsection{E5-US1: Critical Threshold Alerts}
+
+\textbf{Description:} As a farmer, the user wants to receive a notification when soil moisture is critically low so that crops do not die due to lack of water.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given the soil moisture is below the critical limit,
+    \item When the sensor transmits the data,
+    \item Then the system should generate a ``Critical Alert'' and notify the user.
+\end{itemize}
+
+\subsubsection{E5-US2: View Unread Alerts}
+
+\textbf{Description:} As a farmer, the user wants to see a badge count of unread alerts so that any missed information is visible.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given there are new alerts,
+    \item When the user opens the app,
+    \item Then the notification icon should show a badge with the number of unread items.
+\end{itemize}
+
+\subsubsection{E5-US3: Resolve Alerts}
+
+\textbf{Description:} As a farmer, the user wants to mark an alert as resolved so that the notification feed can be cleared.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given an active alert exists,
+    \item When the user clicks ``Mark as Resolved'',
+    \item Then the alert should be moved to the history archive and its status updated.
+\end{itemize}
+
+\subsection{Epic E6: Historical Data Analytics and Visualization}
+
+\subsubsection{E6-US1: View Moisture Trends}
+
+\textbf{Description:} As a farmer, the user wants to see a line graph of soil moisture over the last week so that drying patterns can be understood.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given historical data exists,
+    \item When the user selects the ``Weekly View'' on the chart,
+    \item Then the system should render a line graph showing moisture levels over the past 7 days.
+\end{itemize}
+
+\subsubsection{E6-US2: Export Data}
+
+\textbf{Description:} As a farmer, the user wants to export farm data so that offline records can be kept.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given the user is on the analytics screen,
+    \item When the ``Export'' button is clicked,
+    \item Then the system should generate a downloadable report (e.g., CSV or PDF).
+\end{itemize}
+
+\subsubsection{E6-US3: Compare Fields}
+
+\textbf{Description:} As a farmer, the user wants to compare the water usage of two different fields so that inefficiencies can be identified.
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}[noitemsep]
+    \item Given the user selects two fields,
+    \item When the ``Compare'' option is chosen,
+    \item Then the system should display side-by-side statistics for both fields.
+\end{itemize}
+
+\section{Test Cases}
+
+This section defines test cases mapped to user stories. Each test case includes a description, inputs, and expected result.
+
+\subsection{Test Case 1 --- Verify User Registration with Valid Data}
+
+This test case verifies the user registration process. It checks if the system correctly accepts valid user details and creates a new user record, followed by a redirection to the login page.
+
+\begin{table}[H]
+\centering
+\caption{Verify User Registration with Valid Data}
+\label{tab:tc_registration}
+\begin{tabular}{|p{3cm}|p{9cm}|}
+\hline
+\textbf{Test ID} & TC-E1-US1-01 \\ \hline
+\textbf{US ID} & E1-US1 \\ \hline
+\textbf{Test Case Description} & Ensure a new user can register successfully with correct details. \\ \hline
+\textbf{Inputs} & Name = ``Ali Khan'', Email = ``ali@test.com'', Phone = ``+923001234567'', Password = ``Pass123'' \\ \hline
+\textbf{Expected Result} & Account created in \texttt{users} table; user redirected to login screen. \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Test Case 2 --- Verify Login with Valid Credentials}
+
+This test case validates the user login mechanism. It ensures that a registered user can access the dashboard by providing correct credentials, and that a JSON Web Token (JWT) is generated.
+
+\begin{table}[H]
+\centering
+\caption{Verify Login with Valid Credentials}
+\label{tab:tc_login}
+\begin{tabular}{|p{3cm}|p{9cm}|}
+\hline
+\textbf{Test ID} & TC-E1-US2-01 \\ \hline
+\textbf{US ID} & E1-US2 \\ \hline
+\textbf{Test Case Description} & Ensure a registered user can access the dashboard. \\ \hline
+\textbf{Inputs} & Email = ``ali@test.com'', Password = ``Pass123'' \\ \hline
+\textbf{Expected Result} & JWT token generated; user redirected to dashboard; HTTP 200 OK. \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Test Case 3 --- Verify Real-Time Data Display}
+
+This test case ensures the accuracy of real-time sensor data display. It verifies that the latest readings for soil moisture, temperature, and humidity sent by the sensor are correctly reflected on the user interface.
+
+\begin{table}[H]
+\centering
+\caption{Verify Real-Time Data Display}
+\label{tab:tc_realtime}
+\begin{tabular}{|p{3cm}|p{9cm}|}
+\hline
+\textbf{Test ID} & TC-E2-US2-01 \\ \hline
+\textbf{US ID} & E2-US2 \\ \hline
+\textbf{Test Case Description} & Check if the latest sensor reading is shown correctly on the UI. \\ \hline
+\textbf{Inputs} & SensorID = 14 sends \{moisture: 45\%, temperature: 30$^{\circ}$C\} \\ \hline
+\textbf{Expected Result} & UI displays ``Moisture: 45\%'', ``Temp: 30$^{\circ}$C''; data matches \texttt{sensor\_readings} table. \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Test Case 4 --- Verify Manual Pump Start}
+
+This test case verifies the manual control of the irrigation system. It checks if the water pump can be successfully activated via the application's interface and if the status is updated in real time.
+
+\begin{table}[H]
+\centering
+\caption{Verify Manual Pump Start}
+\label{tab:tc_pump}
+\begin{tabular}{|p{3cm}|p{9cm}|}
+\hline
+\textbf{Test ID} & TC-E3-US1-01 \\ \hline
+\textbf{US ID} & E3-US1 \\ \hline
+\textbf{Test Case Description} & Ensure the pump turns on when the user clicks the start button. \\ \hline
+\textbf{Inputs} & Click ``Start Irrigation'' button for Field ID = 6. \\ \hline
+\textbf{Expected Result} & API returns success; pump status updates to ``ON''; new entry in \texttt{irrigation\_logs}. \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Test Case 5 --- Verify Automatic Trigger on Low Moisture}
+
+This test case validates the automatic irrigation logic. It simulates a low soil moisture condition to verify that the system automatically triggers the water pump and generates an appropriate alert without user intervention.
+
+\begin{table}[H]
+\centering
+\caption{Verify Automatic Trigger on Low Moisture}
+\label{tab:tc_auto}
+\begin{tabular}{|p{3cm}|p{9cm}|}
+\hline
+\textbf{Test ID} & TC-E3-US2-01 \\ \hline
+\textbf{US ID} & E3-US2 \\ \hline
+\textbf{Test Case Description} & Ensure pump starts automatically when moisture is below threshold. \\ \hline
+\textbf{Inputs} & Set threshold = 30\%; simulate sensor reading = 25\%. \\ \hline
+\textbf{Expected Result} & System triggers irrigation command; alert generated; pump status ``ON''. \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Test Case 6 --- Verify Crop Recommendation Generation}
+
+This test case tests the AI-driven crop recommendation feature. It verifies that the system can process field data (soil type and season) and return a valid crop suggestion along with a confidence score.
+
+\begin{table}[H]
+\centering
+\caption{Verify Crop Recommendation Generation}
+\label{tab:tc_crop}
+\begin{tabular}{|p{3cm}|p{9cm}|}
+\hline
+\textbf{Test ID} & TC-E4-US1-01 \\ \hline
+\textbf{US ID} & E4-US1 \\ \hline
+\textbf{Test Case Description} & Ensure the AI model returns a valid crop suggestion. \\ \hline
+\textbf{Inputs} & Field ID = 6 (Soil: Loamy, Season: Rabi). \\ \hline
+\textbf{Expected Result} & System returns ``Wheat'' with confidence score; entry created in \texttt{crop\_recommendations}. \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Test Case 7 --- Verify Critical Alert Delivery}
+
+This test case verifies the critical alert system. It ensures that when a sensor reports a value below the critical threshold, the system generates a high-priority alert to notify the user.
+
+\begin{table}[H]
+\centering
+\caption{Verify Critical Alert Delivery}
+\label{tab:tc_alert}
+\begin{tabular}{|p{3cm}|p{9cm}|}
+\hline
+\textbf{Test ID} & TC-E5-US1-01 \\ \hline
+\textbf{US ID} & E5-US1 \\ \hline
+\textbf{Test Case Description} & Ensure an alert is created when a sensor reports critical values. \\ \hline
+\textbf{Inputs} & Sensor reading: Moisture = 10\% (critical limit < 15\%). \\ \hline
+\textbf{Expected Result} & New record in \texttt{alerts} table; notification badge increments on UI. \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Test Case 8 --- Verify Weekly Trend Graph}
+
+This test case validates the data visualization capabilities. It checks if the system correctly renders historical soil moisture trends over the past week on a line graph, ensuring that data points are accurate.
+
+\begin{table}[H]
+\centering
+\caption{Verify Weekly Trend Graph}
+\label{tab:tc_trend}
+\begin{tabular}{|p{3cm}|p{9cm}|}
+\hline
+\textbf{Test ID} & TC-E6-US1-01 \\ \hline
+\textbf{US ID} & E6-US1 \\ \hline
+\textbf{Test Case Description} & Ensure the chart renders 7 data points for the last week. \\ \hline
+\textbf{Inputs} & Select ``Last 7 Days'' filter. \\ \hline
+\textbf{Expected Result} & Line chart displays with correct dates on X-axis and moisture values on Y-axis. \\ \hline
+\end{tabular}
+\end{table}
+
+\section{User Interface Design (Prototypes)}
+
+User Interface (UI) design focuses on simplicity, clarity, and ease of use for farmers. The following prototypes describe the main screens of the system.
+
+\subsection{Login Screen}
+
+\textbf{UI Layout:} Centered card layout with logo at the top.
+
+\textbf{Fields and Components:}
+\begin{itemize}[noitemsep]
+    \item Email Address (input field with email validation).
+    \item Password (input field with obscured text).
+    \item Login (primary button).
+    \item Register (text link).
+\end{itemize}
+
+\textbf{Validation Rules:}
+\begin{itemize}[noitemsep]
+    \item Email must be in valid format.
+    \item Password cannot be empty.
+\end{itemize}
+
+\textbf{Navigation Behavior:}
+\begin{itemize}[noitemsep]
+    \item On successful login $\rightarrow$ Redirect to dashboard.
+    \item On failure $\rightarrow$ Show error toast.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    % Replace ui_login.png with your actual login UI image
+    \includegraphics[width=0.45\textwidth]{ui_login.png}
+    \caption{Example Login Page UI Design}
+    \label{fig:ui_login}
+\end{figure}
+
+\subsection{Dashboard (Sensor Overview)}
+
+\textbf{UI Layout:} Grid layout of cards representing different fields.
+
+\textbf{Fields and Components:}
+\begin{itemize}[noitemsep]
+    \item Field Name (header).
+    \item Status Indicator (green/red dot).
+    \item Quick Stats (average moisture, temperature).
+    \item Add Field (floating action button).
+\end{itemize}
+
+\textbf{Validation Rules:} Not applicable (display only).
+
+\textbf{Navigation Behavior:}
+\begin{itemize}[noitemsep]
+    \item Tap on a field card $\rightarrow$ Navigate to Detailed Sensor Data Page.
+\end{itemize}
+
+\subsection{Detailed Sensor Data Page}
+
+\textbf{UI Layout:} Tabbed view (Live Data, History, Settings).
+
+\textbf{Fields and Components:}
+\begin{itemize}[noitemsep]
+    \item Gauge Chart (visualizing soil moisture percentage).
+    \item Digital Readout (temperature, humidity).
+    \item Last Updated (timestamp).
+    \item Sensor ID (label).
+\end{itemize}
+
+\textbf{Validation Rules:}
+\begin{itemize}[noitemsep]
+    \item Data refreshes every 30 seconds.
+\end{itemize}
+
+\textbf{Navigation Behavior:}
+\begin{itemize}[noitemsep]
+    \item Back button $\rightarrow$ Dashboard.
+\end{itemize}
+
+\subsection{AI Crop Recommendation Screen}
+
+\textbf{UI Layout:} Form input followed by a result card.
+
+\textbf{Fields and Components:}
+\begin{itemize}[noitemsep]
+    \item Soil Type (dropdown).
+    \item Season (dropdown).
+    \item Analyze (button).
+    \item Recommendation Card (displays crop name, confidence percentage, yield estimate).
+    \item Accept Recommendation (button).
+\end{itemize}
+
+\textbf{Validation Rules:}
+\begin{itemize}[noitemsep]
+    \item All dropdowns must be selected before clicking ``Analyze''.
+\end{itemize}
+
+\textbf{Navigation Behavior:}
+\begin{itemize}[noitemsep]
+    \item ``Accept'' $\rightarrow$ Updates field details.
+\end{itemize}
+
+\subsection{Irrigation Control Panel}
+
+\textbf{UI Layout:} Toggle switches and slider controls.
+
+\textbf{Fields and Components:}
+\begin{itemize}[noitemsep]
+    \item Manual Control (on/off switch).
+    \item Auto-Irrigation (checkbox).
+    \item Moisture Threshold (slider from 0--100\%).
+    \item Status (text: ``Pump Running'' / ``Idle'').
+\end{itemize}
+
+\textbf{Validation Rules:}
+\begin{itemize}[noitemsep]
+    \item Manual Control cannot be enabled if Auto-Irrigation is active (mutual exclusion).
+\end{itemize}
+
+\textbf{Navigation Behavior:}
+\begin{itemize}[noitemsep]
+    \item Toggling a switch sends an API request immediately.
+\end{itemize}
+
+\subsection{Alerts \& Notifications Screen}
+
+\textbf{UI Layout:} List view of notification cards.
+
+\textbf{Fields and Components:}
+\begin{itemize}[noitemsep]
+    \item Alert Icon (warning triangle, info circle).
+    \item Title (e.g., ``Low Moisture Warning'').
+    \item Time (relative time, e.g., ``2 mins ago'').
+    \item Mark as Read (swipe action or button).
+\end{itemize}
+
+\textbf{Validation Rules:}
+\begin{itemize}[noitemsep]
+    \item Unread items are highlighted.
+\end{itemize}
+
+\textbf{Navigation Behavior:}
+\begin{itemize}[noitemsep]
+    \item Tap on alert $\rightarrow$ Navigate to relevant Field/Sensor page.
+\end{itemize}
+
+\subsection{Settings / Profile Page}
+
+\textbf{UI Layout:} List of settings categories.
+
+\textbf{Fields and Components:}
+\begin{itemize}[noitemsep]
+    \item Profile Image (avatar).
+    \item Name, Email (editable fields).
+    \item Change Password (button).
+    \item Notification Preferences (toggles).
+    \item Logout (destructive button).
+\end{itemize}
+
+\textbf{Validation Rules:}
+\begin{itemize}[noitemsep]
+    \item Password change requires old password verification.
+\end{itemize}
+
+\textbf{Navigation Behavior:}
+\begin{itemize}[noitemsep]
+    \item Logout $\rightarrow$ Redirect to login screen.
+\end{itemize}
+
+\section{Traceability Matrix}
+
+The traceability matrix maps epics to user stories, test cases, and UI screens to ensure full coverage of requirements and proper validation.
+
+\begin{table}[H]
+\centering
+\caption{Traceability Matrix}
+\label{tab:traceability}
+\small
+\begin{tabular}{|p{2cm}|p{4cm}|p{3cm}|p{3cm}|}
+\hline
+\textbf{Epic} & \textbf{User Story} & \textbf{Test Case} & \textbf{UI Screen} \\ \hline
+E1 (Auth) & E1-US1 (Register) & TC-E1-US1-01 & Login Screen (Register) \\ \hline
+E1 (Auth) & E1-US2 (Login) & TC-E1-US2-01 & Login Screen \\ \hline
+E1 (Auth) & E1-US3 (Profile) & N/A (Standard Update) & Settings / Profile Page \\ \hline
+
+E2 (Monitoring) & E2-US1 (Field Overview) & N/A (Visual Check) & Dashboard \\ \hline
+E2 (Monitoring) & E2-US2 (Sensor Detail) & TC-E2-US2-01 & Detailed Sensor Data Page \\ \hline
+E2 (Monitoring) & E2-US3 (Status) & N/A (Status Check) & Dashboard / Sensor Page \\ \hline
+
+E3 (Irrigation) & E3-US1 (Manual) & TC-E3-US1-01 & Irrigation Control Panel \\ \hline
+E3 (Irrigation) & E3-US2 (Auto) & TC-E3-US2-01 & Irrigation Control Panel \\ \hline
+E3 (Irrigation) & E3-US3 (Logs) & N/A (Log Check) & Detailed Sensor Data Page (History Tab) \\ \hline
+
+E4 (AI) & E4-US1 (Request Rec) & TC-E4-US1-01 & AI Crop Recommendation Screen \\ \hline
+E4 (AI) & E4-US2 (Confidence) & N/A (Visual Check) & AI Crop Recommendation Screen \\ \hline
+E4 (AI) & E4-US3 (Accept) & N/A (State Change) & AI Crop Recommendation Screen \\ \hline
+
+E5 (Alerts) & E5-US1 (Critical) & TC-E5-US1-01 & Alerts \& Notifications Screen \\ \hline
+E5 (Alerts) & E5-US2 (Unread) & N/A (Badge Check) & Dashboard (Alert Icon) \\ \hline
+E5 (Alerts) & E5-US3 (Resolve) & N/A (Action Check) & Alerts \& Notifications Screen \\ \hline
+
+E6 (Analytics) & E6-US1 (Trends) & TC-E6-US1-01 & Detailed Sensor Data Page (History) \\ \hline
+E6 (Analytics) & E6-US2 (Export) & N/A (Download) & Settings / Profile Page \\ \hline
+E6 (Analytics) & E6-US3 (Compare) & N/A (Multi-view) & Dashboard (Comparison View) \\ \hline
+\end{tabular}
+\end{table}
+
+% ----------------------------------------------------------
+% End of Chapters 1 & 2
+% ----------------------------------------------------------
+
+\end{document}
