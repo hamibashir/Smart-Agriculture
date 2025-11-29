@@ -36,6 +36,7 @@
     top=1in,
     bottom=1in
 }
+\setlength{\headheight}{14.49998pt}
 \onehalfspacing
 
 % ----------------------------------------------------------
@@ -100,20 +101,41 @@
 % ----------------------------------------------------------
 \begin{titlepage}
     \centering
-    \vspace*{2cm}
+    
+    % Project Title
+    \vspace*{1.5cm}
     {\LARGE \textbf{Smart AI Powered Agriculture System}\par}
-    \vspace{1.5cm}
+    \vspace{2cm}
+    
+    % University Logo
+    \includegraphics[width=0.25\textwidth]{images/cust-logo.png}
+    \vspace{2cm}
+    
+    % Student Names and Registration Numbers
     {\large
-        Muhammad Awais (BSE223112)\\[0.3cm]
-        Hamza Bashir (BSE223108)\\[0.3cm]
-        Junaid Amin (BSE223107)\\[1.5cm]
+        \begin{tabular}{lc}
+            Muhammad Awais & (BSE223112) \\[0.2cm]
+            Hamza Bashir & (BSE223108) \\[0.2cm]
+            Junaid Amin & (BSE223107)
+        \end{tabular}
     }
-    \textbf{Supervised by:} Adnan Karamat\\[2cm]
-
-    {\large Fall 2025\\[0.3cm]
-    Department of Software Engineering\\[0.3cm]
-    Capital University of Science and Technology, Islamabad}\\[2cm]
-
+    \vspace{1.5cm}
+    
+    % Supervisor
+    {\large \textbf{Supervised By}\par}
+    \vspace{0.3cm}
+    {\large Adnan Karamat\par}
+    \vspace{1.5cm}
+    
+    % Semester and Program
+    {\large Fall 2025\par}
+    \vspace{0.3cm}
+    {\large BS Software Engineering\par}
+    \vspace{0.3cm}
+    {\large Department of Software Engineering\par}
+    \vspace{0.3cm}
+    {\large Capital University of Science \& Technology, Islamabad\par}
+    
     \vfill
 \end{titlepage}
 
@@ -300,7 +322,7 @@ Figure~\ref{fig:wbs} shows a conceptual Work Breakdown Structure (WBS) of the pr
 \begin{figure}[H]
     \centering
     % Replace fig_wbs.png with your actual WBS image filename
-    \includegraphics[width=0.9\textwidth]{fig_wbs.png}
+    \includegraphics[width=0.9\textwidth]{images/Work Breakdown.png}
     \caption{Work Breakdown Structure}
     \label{fig:wbs}
 \end{figure}
@@ -314,7 +336,7 @@ A Gantt chart is used to represent the project timeline, as shown in Figure~\ref
 \begin{figure}[H]
     \centering
     % Replace fig_gantt.png with your actual Gantt chart image filename
-    \includegraphics[width=0.9\textwidth]{fig_gantt.png}
+    \includegraphics[width=0.9\textwidth]{images/Project Timeline.png}
     \caption{Gantt Chart}
     \label{fig:gantt}
 \end{figure}
@@ -722,6 +744,13 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
 
 \subsection{Login Screen}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/login_screen.png}
+    \caption{Login Screen UI Design}
+    \label{fig:ui_login}
+\end{figure}
+
 \textbf{UI Layout:} Centered card layout with logo at the top.
 
 \textbf{Fields and Components:}
@@ -744,16 +773,7 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
     \item On failure $\rightarrow$ Show error toast.
 \end{itemize}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.45\textwidth]{images/login_screen.png}
-    \caption{Login Screen UI Design}
-    \label{fig:ui_login}
-\end{figure}
-
 \subsection{Dashboard (Sensor Overview)}
-
-\textbf{UI Layout:} Grid layout of cards representing different fields.
 
 \begin{figure}[H]
     \centering
@@ -761,6 +781,8 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
     \caption{Dashboard UI Design}
     \label{fig:ui_dashboard}
 \end{figure}
+
+\textbf{UI Layout:} Grid layout of cards representing different fields.
 
 \textbf{Fields and Components:}
 \begin{itemize}[noitemsep]
@@ -778,6 +800,13 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
 \end{itemize}
 
 \subsection{Detailed Sensor Data Page}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/field_data_screen.png}
+    \caption{Detailed Sensor Data Page UI Design}
+    \label{fig:ui_sensor_detail}
+\end{figure}
 
 \textbf{UI Layout:} Tabbed view (Live Data, History, Settings).
 
@@ -799,14 +828,14 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
     \item Back button $\rightarrow$ Dashboard.
 \end{itemize}
 
+\subsection{AI Crop Recommendation Screen}
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/field_data_screen.png}
-    \caption{Detailed Sensor Data Page UI Design}
-    \label{fig:ui_sensor_detail}
+    \includegraphics[width=0.45\textwidth]{images/crop_recommendation_screen.png}
+    \caption{AI Crop Recommendation Screen UI Design}
+    \label{fig:ui_crop_rec}
 \end{figure}
-
-\subsection{AI Crop Recommendation Screen}
 
 \textbf{UI Layout:} Form input followed by a result card.
 
@@ -829,16 +858,7 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
     \item ``Accept'' $\rightarrow$ Updates field details.
 \end{itemize}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.45\textwidth]{images/crop_recommendation_screen.png}
-    \caption{AI Crop Recommendation Screen UI Design}
-    \label{fig:ui_crop_rec}
-\end{figure}
-
 \subsection{Irrigation Control Panel}
-
-\textbf{UI Layout:} Toggle switches and slider controls.
 
 \begin{figure}[H]
     \centering
@@ -846,6 +866,8 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
     \caption{Irrigation Control Panel UI Design}
     \label{fig:ui_irrigation}
 \end{figure}
+
+\textbf{UI Layout:} Toggle switches and slider controls.
 
 \textbf{Fields and Components:}
 \begin{itemize}[noitemsep]
@@ -867,6 +889,13 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
 
 \subsection{Alerts \& Notifications Screen}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/alerts_screen.png}
+    \caption{Alerts \& Notifications Screen UI Design}
+    \label{fig:ui_alerts}
+\end{figure}
+
 \textbf{UI Layout:} List view of notification cards.
 
 \textbf{Fields and Components:}
@@ -887,14 +916,14 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
     \item Tap on alert $\rightarrow$ Navigate to relevant Field/Sensor page.
 \end{itemize}
 
+\subsection{Settings / Profile Page}
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/alerts_screen.png}
-    \caption{Alerts \& Notifications Screen UI Design}
-    \label{fig:ui_alerts}
+    \includegraphics[width=0.45\textwidth]{images/profile_screen.png}
+    \caption{Settings / Profile Page UI Design}
+    \label{fig:ui_profile}
 \end{figure}
-
-\subsection{Settings / Profile Page}
 
 \textbf{UI Layout:} List of settings categories.
 
@@ -916,13 +945,6 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
 \begin{itemize}[noitemsep]
     \item Logout $\rightarrow$ Redirect to login screen.
 \end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.45\textwidth]{images/profile_screen.png}
-    \caption{Settings / Profile Page UI Design}
-    \label{fig:ui_profile}
-\end{figure}
 
 \section{Traceability Matrix}
 
