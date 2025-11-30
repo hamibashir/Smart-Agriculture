@@ -225,9 +225,9 @@ The Smart AI Powered Agriculture System aims to combine IoT-based sensing, autom
 
 \section{Problem Statement}
 
-Agriculture is the main source of income and food in many countries, especially in developing regions. Many farmers depend on farming for their livelihood, but they face challenges such as water wastage, unpredictable weather, limited access to real-time information, and lack of proper guidance for choosing crops or managing their fields. Traditional farming methods often result in over-watering or under-watering, loss of soil nutrients, and low crop production.
+Agriculture is the main source of income and food in many countries, especially in developing regions. Many farmers depend on farming for their livelihood, but they face challenges such as water wastage, unpredictable weather, limited access to real-time information, and lack of proper guidance for choosing crops or managing their fields. Traditional farming methods often result in over-watering or under-watering, loss of soil nutrients, and low crop production. Even though modern technology is available, many small and medium farmers cannot afford or access smart farming tools. There is a need for an affordable and easy-to-use smart agriculture system that uses IoT and AI to monitor the environment, save resources such as water and energy, and provide useful recommendations to farmers.
 
-Even though modern technology is available, many small and medium farmers cannot afford or access smart farming tools. There is a need for an affordable and easy-to-use smart agriculture system that uses IoT and AI to monitor the environment, save resources such as water and energy, and provide useful recommendations to farmers. Such a system can help them make better decisions, increase crop yield, and practice farming in a more sustainable way.
+\clearpage
 
 \section{Business Scope}
 
@@ -235,15 +235,13 @@ The Smart AI Powered Agriculture System has strong potential in the agriculture 
 
 By offering IoT-based smart farming kits (sensors, controller, and mobile application), farmers can save water, achieve better crop production, and make smarter decisions. The system can be adopted by small and medium farmers and can also be promoted through government programs, non-governmental organizations (NGOs), and agriculture companies. The idea has strong business value because it directly improves farmers' income and supports food security.
 
-Table~\ref{tab:lean_canvas} presents a Lean Canvas view of the business model.
-
 \begin{table}[H]
 \centering
 \caption{Lean Canvas}
 \label{tab:lean_canvas}
-\small
-\renewcommand{\arraystretch}{1.3}
-\begin{tabular}{|p{4.0cm}|p{4.0cm}|p{4.0cm}|}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|p{3.8cm}|p{3.8cm}|p{3.8cm}|}
 \hline
 \textbf{Problem} & \textbf{Solution} & \textbf{Unique Value Proposition} \\ \hline
 1. Water wastage due to over-irrigation. \newline
@@ -256,10 +254,10 @@ An affordable smart farming kit that saves water, increases yield, and helps far
 
 \textbf{Existing Alternatives} & \textbf{Key Metrics (Approx.)} & \textbf{High-Level Concept} \\ \hline
 1. Manual irrigation. \newline
-2. Expensive imported smart farming systems. & 
+2. Expensive imported systems. & 
 1. 100+ farmers use the system. \newline
-2. 45\% water savings (estimated). \newline
-3. 35\% increase in crop yield (estimated). & 
+2. 45\% water savings (est.). \newline
+3. 35\% increase in yield (est.). & 
 A smart farming assistant for every farmer, like a personal digital guide for crops. \\ \hline
 
 \textbf{Channels} & \textbf{Cost Structure} & \textbf{Customer Segments} \\ \hline
@@ -272,11 +270,11 @@ A smart farming assistant for every farmer, like a personal digital guide for cr
 1. Small and medium farmers. \newline
 2. Agriculture NGOs and government projects. \\ \hline
 
-\textbf{Early Adopters} & \multicolumn{2}{p{\dimexpr8.0cm+2\tabcolsep+\arrayrulewidth}|}{\textbf{Revenue Structure}} \\ \hline
+\textbf{Early Adopters} & \multicolumn{2}{p{\dimexpr7.6cm+2\tabcolsep+\arrayrulewidth}|}{\textbf{Revenue Structure}} \\ \hline
 1. Farmers with 1--4 acres of land. \newline
-2. NGOs running pilot agriculture projects. & \multicolumn{2}{p{\dimexpr8.0cm+2\tabcolsep+\arrayrulewidth}|}{
+2. NGOs running pilot agriculture projects. & \multicolumn{2}{p{\dimexpr7.6cm+2\tabcolsep+\arrayrulewidth}|}{
 1. Selling hardware kits. \newline
-2. Subscription for premium application features. \newline
+2. Subscription for premium app features. \newline
 3. Installation and training services.
 } \\ \hline
 \end{tabular}
@@ -612,6 +610,8 @@ This test case verifies the user registration process. It checks if the system c
 \end{tabular}
 \end{table}
 
+\clearpage
+
 \subsection{Test Case 2 --- Verify Login with Valid Credentials}
 
 This test case validates the user login mechanism. It ensures that a registered user can access the dashboard by providing correct credentials, and that a JSON Web Token (JWT) is generated.
@@ -647,6 +647,8 @@ This test case ensures the accuracy of real-time sensor data display. It verifie
 \textbf{Expected Result} & UI displays ``Moisture: 45\%'', ``Temp: 30$^{\circ}$C''; data matches \texttt{sensor\_readings} table. \\ \hline
 \end{tabular}
 \end{table}
+
+\clearpage
 
 \subsection{Test Case 4 --- Verify Manual Pump Start}
 
@@ -684,6 +686,8 @@ This test case validates the automatic irrigation logic. It simulates a low soil
 \end{tabular}
 \end{table}
 
+\clearpage
+
 \subsection{Test Case 6 --- Verify Crop Recommendation Generation}
 
 This test case tests the AI-driven crop recommendation feature. It verifies that the system can process field data (soil type and season) and return a valid crop suggestion along with a confidence score.
@@ -720,6 +724,8 @@ This test case verifies the critical alert system. It ensures that when a sensor
 \end{tabular}
 \end{table}
 
+\clearpage
+
 \subsection{Test Case 8 --- Verify Weekly Trend Graph}
 
 This test case validates the data visualization capabilities. It checks if the system correctly renders historical soil moisture trends over the past week on a line graph, ensuring that data points are accurate.
@@ -738,6 +744,8 @@ This test case validates the data visualization capabilities. It checks if the s
 \end{tabular}
 \end{table}
 
+\clearpage
+
 \section{User Interface Design (Prototypes)}
 
 User Interface (UI) design focuses on simplicity, clarity, and ease of use for farmers. The following prototypes describe the main screens of the system.
@@ -746,7 +754,7 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/login_screen.png}
+    \includegraphics[width=0.45\textwidth]{images/login_screen.jpg}
     \caption{Login Screen UI Design}
     \label{fig:ui_login}
 \end{figure}
@@ -777,7 +785,7 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/main_dashboard_screen.png}
+    \includegraphics[width=0.45\textwidth]{images/main_dashboard_screen.jpg}
     \caption{Dashboard UI Design}
     \label{fig:ui_dashboard}
 \end{figure}
@@ -803,7 +811,7 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/field_data_screen.png}
+    \includegraphics[width=0.45\textwidth]{images/field_data_screen.jpg}
     \caption{Detailed Sensor Data Page UI Design}
     \label{fig:ui_sensor_detail}
 \end{figure}
@@ -832,7 +840,7 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/crop_recommendation_screen.png}
+    \includegraphics[width=0.45\textwidth]{images/crop_recommendation_screen.jpg}
     \caption{AI Crop Recommendation Screen UI Design}
     \label{fig:ui_crop_rec}
 \end{figure}
@@ -862,7 +870,7 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/irrigation_control_screen.png}
+    \includegraphics[width=0.45\textwidth]{images/irrigation_control_screen.jpg}
     \caption{Irrigation Control Panel UI Design}
     \label{fig:ui_irrigation}
 \end{figure}
@@ -891,7 +899,7 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/alerts_screen.png}
+    \includegraphics[width=0.45\textwidth]{images/alerts_screen.jpg}
     \caption{Alerts \& Notifications Screen UI Design}
     \label{fig:ui_alerts}
 \end{figure}
@@ -920,7 +928,7 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/profile_screen.png}
+    \includegraphics[width=0.45\textwidth]{images/profile_screen.jpg}
     \caption{Settings / Profile Page UI Design}
     \label{fig:ui_profile}
 \end{figure}
@@ -950,7 +958,7 @@ User Interface (UI) design focuses on simplicity, clarity, and ease of use for f
 
 The traceability matrix maps epics to user stories, test cases, and UI screens to ensure full coverage of requirements and proper validation.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Traceability Matrix}
 \label{tab:traceability}
