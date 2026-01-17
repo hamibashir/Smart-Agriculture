@@ -64,16 +64,23 @@ fun DashboardScreen(
                 },
                 actions = {
                     IconButton(onClick = { /* TODO: Notifications */ }) {
-                        Badge(
-                            containerColor = ErrorRed
+                        BadgedBox(
+                            badge = {
+                                if ((uiState.stats?.activeAlerts ?: 0) > 0) {
+                                    Badge(
+                                        containerColor = ErrorRed
+                                    ) {
+                                        Text(
+                                            "${uiState.stats?.activeAlerts}",
+                                            color = Color.White,
+                                            fontSize = 10.sp
+                                        )
+                                    }
+                                }
+                            }
                         ) {
-                            Text(
-                                "${uiState.stats?.activeAlerts ?: 0}",
-                                color = Color.White,
-                                fontSize = 10.sp
-                            )
+                            Icon(Icons.Default.Notifications, "Notifications")
                         }
-                        Icon(Icons.Default.Notifications, "Notifications")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -101,6 +108,7 @@ fun DashboardScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(padding)
                 .nestedScroll(pullRefreshState.nestedScrollConnection)
         ) {
             LazyColumn(
