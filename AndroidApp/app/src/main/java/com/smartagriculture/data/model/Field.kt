@@ -3,7 +3,7 @@ package com.smartagriculture.data.model
 import com.google.gson.annotations.SerializedName
 
 data class Field(
-    @SerializedName("id")
+    @SerializedName("field_id")
     val id: Int,
     
     @SerializedName("name")
@@ -15,26 +15,26 @@ data class Field(
     @SerializedName("area")
     val area: Double,
     
-    @SerializedName("cropType")
-    val cropType: String,
+    @SerializedName("crop_type")
+    val cropType: String? = "Unknown",
     
-    @SerializedName("soilType")
+    @SerializedName("soil_type")
     val soilType: String? = null,
     
-    @SerializedName("sensorCount")
+    @SerializedName("sensor_count")
     val sensorCount: Int = 0,
     
     @SerializedName("status")
-    val status: String = "active", // active, inactive, maintenance
+    val status: String? = "active", // active, inactive, maintenance
     
-    @SerializedName("lastIrrigation")
+    @SerializedName("last_irrigation")
     val lastIrrigation: String? = null,
     
-    @SerializedName("createdAt")
-    val createdAt: String,
+    @SerializedName("created_at")
+    val createdAt: String? = null,
     
-    @SerializedName("userId")
-    val userId: Int
+    @SerializedName("user_id")
+    val userId: Int? = null
 )
 
 data class FieldsResponse(
@@ -58,10 +58,10 @@ data class CreateFieldRequest(
     @SerializedName("area")
     val area: Double,
     
-    @SerializedName("cropType")
+    @SerializedName("crop_type")
     val cropType: String,
     
-    @SerializedName("soilType")
+    @SerializedName("soil_type")
     val soilType: String? = null
 )
 

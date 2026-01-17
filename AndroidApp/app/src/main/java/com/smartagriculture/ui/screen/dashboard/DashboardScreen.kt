@@ -35,6 +35,7 @@ fun DashboardScreen(
     onNavigateToFields: () -> Unit = {},
     onNavigateToSensors: () -> Unit = {},
     onNavigateToAlerts: () -> Unit = {},
+    onNavigateToAddField: () -> Unit = {},
     viewModel: DashboardViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -133,7 +134,7 @@ fun DashboardScreen(
                 // Quick Actions Section
                 item {
                     QuickActionsSection(
-                        onAddField = { /* TODO */ },
+                        onAddField = onNavigateToAddField,
                         onViewSensors = onNavigateToSensors,
                         onCheckAlerts = onNavigateToAlerts
                     )

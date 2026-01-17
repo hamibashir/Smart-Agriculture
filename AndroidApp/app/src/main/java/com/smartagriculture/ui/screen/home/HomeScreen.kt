@@ -1,15 +1,19 @@
 package com.smartagriculture.ui.screen.home
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.smartagriculture.ui.screen.dashboard.DashboardScreen
 import com.smartagriculture.ui.screen.fields.FieldsScreen
+import com.smartagriculture.ui.screen.profile.ProfileScreen
 import com.smartagriculture.ui.theme.PrimaryGreen
 
 sealed class BottomNavItem(
@@ -24,7 +28,10 @@ sealed class BottomNavItem(
 }
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    onNavigateToAddField: () -> Unit = {},
+    onLogout: () -> Unit = {}
+) {
     var selectedTab by remember { mutableStateOf(0) }
     
     val items = listOf(
@@ -63,19 +70,21 @@ fun HomeScreen() {
                 modifier = Modifier.padding(padding),
                 onNavigateToFields = { selectedTab = 1 },
                 onNavigateToSensors = { /* TODO */ },
-                onNavigateToAlerts = { selectedTab = 2 }
+                onNavigateToAlerts = { selectedTab = 2 },
+                onNavigateToAddField = onNavigateToAddField
             )
             1 -> FieldsScreen(
                 modifier = Modifier.padding(padding),
                 onNavigateToFieldDetail = { fieldId ->
                     // TODO: Navigate to field detail
                 },
-                onNavigateToAddField = {
-                    // TODO: Navigate to add field
-                }
+                onNavigateToAddField = onNavigateToAddField
             )
             2 -> PlaceholderScreen("Alerts", Modifier.padding(padding))
-            3 -> PlaceholderScreen("Profile", Modifier.padding(padding))
+            3 -> ProfileScreen(
+                modifier = Modifier.padding(padding),
+                onLogout = onLogout
+            )
         }
     }
 }

@@ -14,7 +14,7 @@ interface ApiService {
     suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
     
     @GET("auth/profile")
-    suspend fun getProfile(): Response<User>
+    suspend fun getProfile(): Response<ProfileResponse>
     
     // Dashboard
     @GET("dashboard/stats")

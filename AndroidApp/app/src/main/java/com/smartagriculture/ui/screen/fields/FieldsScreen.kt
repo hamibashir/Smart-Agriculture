@@ -35,7 +35,6 @@ fun FieldsScreen(
     viewModel: FieldsViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var searchQuery by remember { mutableStateOf("") }
     
     // Load fields on first composition
     LaunchedEffect(Unit) {
@@ -60,11 +59,6 @@ fun FieldsScreen(
                                 color = Color.White.copy(alpha = 0.8f)
                             )
                         }
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* TODO: Filter */ }) {
-                        Icon(Icons.Default.FilterList, "Filter")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -109,9 +103,7 @@ fun FieldsScreen(
                 else -> {
                     FieldsGrid(
                         fields = uiState.fields,
-                        onFieldClick = onNavigateToFieldDetail,
-                        onRefresh = { viewModel.loadFields() },
-                        isRefreshing = uiState.isLoading
+                        onFieldClick = onNavigateToFieldDetail
                     )
                 }
             }
@@ -122,9 +114,7 @@ fun FieldsScreen(
 @Composable
 private fun FieldsGrid(
     fields: List<Field>,
-    onFieldClick: (Int) -> Unit,
-    onRefresh: () -> Unit,
-    isRefreshing: Boolean
+    onFieldClick: (Int) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -200,7 +190,7 @@ private fun FieldCard(
                     }
                     
                     // Status badge
-                    StatusBadge(status = field.status)
+                    StatusBadge(status = field.status ?: "active")
                 }
                 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -229,7 +219,7 @@ private fun FieldCard(
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
-                        text = field.cropType,
+                        text = field.cropType ?: "Unknown",
                         style = MaterialTheme.typography.bodySmall,
                         color = TextSecondary
                     )

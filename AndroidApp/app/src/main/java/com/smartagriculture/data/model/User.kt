@@ -32,15 +32,22 @@ data class LoginResponse(
 )
 
 data class RegisterRequest(
-    val name: String,
+    @SerializedName("full_name")
+    val fullName: String,
     val email: String,
     val password: String,
-    val phone: String? = null,
-    val location: String? = null
+    val phone: String? = null
 )
 
 data class RegisterResponse(
     val success: Boolean,
-    val message: String,
+    val message: String? = null,
+    val token: String? = null,
     val user: User? = null
+)
+
+data class ProfileResponse(
+    val success: Boolean,
+    val data: User? = null,
+    val message: String? = null
 )
