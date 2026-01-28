@@ -26,10 +26,10 @@ dependencies:
   shared_preferences: ^2.2.3
   
   # Charts & Visualization
-  fl_chart: ^0.68.0
+  fl_chart: ^0.71.0
   
   # Date & Time
-  intl: ^0.19.0
+  intl: ^0.20.2
   
   # Icons
   font_awesome_flutter: ^10.7.0
@@ -44,7 +44,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.1
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
