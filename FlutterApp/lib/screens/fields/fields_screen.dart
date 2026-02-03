@@ -12,7 +12,7 @@ class FieldsScreen extends StatefulWidget {
   State<FieldsScreen> createState() => _FieldsScreenState();
 }
 
-class _FieldsScreenState extends State<FieldsScreen> with AutomaticKeepAliveClientMixin {
+class _FieldsScreenState extends State<FieldsScreen> {
   final ApiService _apiService = ApiService();
   List<Field> _fields = [];
   bool _isLoading = true;
@@ -24,9 +24,6 @@ class _FieldsScreenState extends State<FieldsScreen> with AutomaticKeepAliveClie
     _loadFields();
   }
 
-  @override
-  bool get wantKeepAlive => true;
-
   Future<void> _loadFields() async {
     setState(() {
       _isLoading = true;
@@ -36,13 +33,12 @@ class _FieldsScreenState extends State<FieldsScreen> with AutomaticKeepAliveClie
     try {
       final response = await _apiService.getFields();
       if (response['success'] == true) {
-        final fieldsData = response['data'] as List;
         setState(() {
-          _fields = fieldsData.map((json) => Field.fromJson(json)).toList();
+          _fields = (response['data'] as List).map((json) => Field.fromJson(json)).toList();
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (_) {
       setState(() {
         _error = 'Failed to load fields';
         _isLoading = false;
@@ -50,45 +46,48 @@ class _FieldsScreenState extends State<FieldsScreen> with AutomaticKeepAliveClie
     }
   }
 
+  Future<void> _navigateToAddField() async {
+    final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddFieldScreen()));
+    if (result == true) _loadFields();
+  }
+
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         title: const Text('My Fields'),
-        actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: _loadFields),
-        ],
+        actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: _loadFields)],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? _buildError()
+              ? _ErrorView(onRetry: _loadFields)
               : _fields.isEmpty
-                  ? _buildEmptyState()
+                  ? _EmptyState(onAdd: _navigateToAddField)
                   : RefreshIndicator(
                       onRefresh: _loadFields,
                       child: ListView.builder(
                         padding: const EdgeInsets.all(16),
                         itemCount: _fields.length,
-                        itemBuilder: (context, index) => _buildFieldCard(_fields[index]),
+                        itemBuilder: (_, index) => _FieldCard(field: _fields[index]),
                       ),
                     ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddFieldScreen()),
-          );
-          if (result == true) _loadFields();
-        },
+        onPressed: _navigateToAddField,
         child: const Icon(Icons.add),
       ),
     );
   }
+}
 
-  Widget _buildError() {
+class _ErrorView extends StatelessWidget {
+  const _ErrorView({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -97,13 +96,20 @@ class _FieldsScreenState extends State<FieldsScreen> with AutomaticKeepAliveClie
           const SizedBox(height: 16),
           const Text('Failed to load fields', style: TextStyle(fontSize: 16)),
           const SizedBox(height: 16),
-          ElevatedButton(onPressed: _loadFields, child: const Text('Retry')),
+          ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
         ],
       ),
     );
   }
+}
 
-  Widget _buildEmptyState() {
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({required this.onAdd});
+
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -115,13 +121,7 @@ class _FieldsScreenState extends State<FieldsScreen> with AutomaticKeepAliveClie
           const Text('Add your first field to get started', style: TextStyle(color: AppTheme.textSecondary)),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AddFieldScreen()),
-              );
-              if (result == true) _loadFields();
-            },
+            onPressed: onAdd,
             icon: const Icon(Icons.add),
             label: const Text('Add Field'),
           ),
@@ -129,19 +129,20 @@ class _FieldsScreenState extends State<FieldsScreen> with AutomaticKeepAliveClie
       ),
     );
   }
+}
 
-  Widget _buildFieldCard(Field field) {
+class _FieldCard extends StatelessWidget {
+  const _FieldCard({required this.field});
+
+  final Field field;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => FieldDetailScreen(field: field)),
-        ),
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FieldDetailScreen(field: field))),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -168,68 +169,73 @@ class _FieldsScreenState extends State<FieldsScreen> with AutomaticKeepAliveClie
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: field.isActive ? AppTheme.successColor.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      field.isActive ? 'Active' : 'Inactive',
-                      style: TextStyle(
-                        color: field.isActive ? AppTheme.successColor : Colors.grey,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
+                  _StatusBadge(isActive: field.isActive),
                 ],
               ),
               if (field.currentCrop != null || field.soilType != null) ...[
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    if (field.currentCrop != null)
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF9FAFB),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.eco, size: 14, color: AppTheme.primaryGreen),
-                              const SizedBox(width: 6),
-                              Expanded(child: Text(field.currentCrop!, style: const TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                            ],
-                          ),
-                        ),
-                      ),
+                    if (field.currentCrop != null) Expanded(child: _InfoChip(icon: Icons.eco, label: field.currentCrop!, color: AppTheme.primaryGreen)),
                     if (field.currentCrop != null && field.soilType != null) const SizedBox(width: 8),
-                    if (field.soilType != null)
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF9FAFB),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.terrain, size: 14, color: Color(0xFF8b5cf6)),
-                              const SizedBox(width: 6),
-                              Expanded(child: Text(field.soilType!, style: const TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                            ],
-                          ),
-                        ),
-                      ),
+                    if (field.soilType != null) Expanded(child: _InfoChip(icon: Icons.terrain, label: field.soilType!, color: Color(0xFF8b5cf6))),
                   ],
                 ),
               ],
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({required this.isActive});
+
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: isActive ? AppTheme.successColor.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        isActive ? 'Active' : 'Inactive',
+        style: TextStyle(
+          color: isActive ? AppTheme.successColor : Colors.grey,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  const _InfoChip({required this.icon, required this.label, required this.color});
+
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9FAFB),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 6),
+          Expanded(child: Text(label, style: const TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis)),
+        ],
       ),
     );
   }

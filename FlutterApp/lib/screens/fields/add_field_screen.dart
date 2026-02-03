@@ -12,12 +12,12 @@ class AddFieldScreen extends StatefulWidget {
 class _AddFieldScreenState extends State<AddFieldScreen> {
   final _formKey = GlobalKey<FormState>();
   final ApiService _apiService = ApiService();
-  
+
   final _fieldNameController = TextEditingController();
   final _areaSizeController = TextEditingController();
   final _soilTypeController = TextEditingController();
   final _currentCropController = TextEditingController();
-  
+
   String _areaUnit = 'acres';
   bool _isLoading = false;
 
@@ -40,45 +40,29 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
         'field_name': _fieldNameController.text.trim(),
         'area_size': double.parse(_areaSizeController.text),
         'area_unit': _areaUnit,
-        'soil_type': _soilTypeController.text.trim().isEmpty 
-            ? null 
-            : _soilTypeController.text.trim(),
-        'current_crop': _currentCropController.text.trim().isEmpty 
-            ? null 
-            : _currentCropController.text.trim(),
+        'soil_type': _soilTypeController.text.trim().isEmpty ? null : _soilTypeController.text.trim(),
+        'current_crop': _currentCropController.text.trim().isEmpty ? null : _currentCropController.text.trim(),
       });
 
       if (response['success'] == true) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Field added successfully'),
-              backgroundColor: AppTheme.successColor,
-            ),
-          );
-          Navigator.of(context).pop(true);
-        }
+        _showSnackBar('Field added successfully', AppTheme.successColor);
+        Navigator.pop(context, true);
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to add field: ${e.toString()}'),
-            backgroundColor: AppTheme.errorColor,
-          ),
-        );
-      }
+    } catch (_) {
+      _showSnackBar('Failed to add field', AppTheme.errorColor);
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
+  void _showSnackBar(String message, Color color) {
+    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add New Field'),
-      ),
+      appBar: AppBar(title: const Text('Add New Field')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -93,15 +77,9 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
                   hintText: 'e.g., North Field',
                   prefixIcon: Icon(Icons.grass),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter field name';
-                  }
-                  return null;
-                },
+                validator: (value) => value == null || value.isEmpty ? 'Please enter field name' : null,
               ),
               const SizedBox(height: 16),
-
               Row(
                 children: [
                   Expanded(
@@ -114,12 +92,8 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
                         prefixIcon: Icon(Icons.square_foot),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Required';
-                        }
-                        if (double.tryParse(value) == null) {
-                          return 'Invalid number';
-                        }
+                        if (value == null || value.isEmpty) return 'Required';
+                        if (double.tryParse(value) == null) return 'Invalid number';
                         return null;
                       },
                     ),
@@ -128,23 +102,18 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       value: _areaUnit,
-                      decoration: const InputDecoration(
-                        labelText: 'Unit',
-                      ),
+                      decoration: const InputDecoration(labelText: 'Unit'),
                       items: const [
                         DropdownMenuItem(value: 'acres', child: Text('Acres')),
                         DropdownMenuItem(value: 'hectares', child: Text('Hectares')),
                         DropdownMenuItem(value: 'square_meters', child: Text('Sq. Meters')),
                       ],
-                      onChanged: (value) {
-                        setState(() => _areaUnit = value!);
-                      },
+                      onChanged: (value) => setState(() => _areaUnit = value!),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-
               TextFormField(
                 controller: _soilTypeController,
                 decoration: const InputDecoration(
@@ -154,7 +123,6 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
               TextFormField(
                 controller: _currentCropController,
                 decoration: const InputDecoration(
@@ -164,20 +132,14 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-
               ElevatedButton(
                 onPressed: _isLoading ? null : _handleSubmit,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
+                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
                 child: _isLoading
                     ? const SizedBox(
                         height: 20,
                         width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
+                        child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
                       )
                     : const Text('Add Field'),
               ),

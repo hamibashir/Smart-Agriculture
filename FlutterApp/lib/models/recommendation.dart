@@ -17,7 +17,7 @@ class CropRecommendation {
   final DateTime? acceptedAt;
   final DateTime createdAt;
 
-  CropRecommendation({
+  const CropRecommendation({
     required this.recommendationId,
     required this.fieldId,
     required this.recommendedCrop,
@@ -37,37 +37,27 @@ class CropRecommendation {
     required this.createdAt,
   });
 
-  factory CropRecommendation.fromJson(Map<String, dynamic> json) {
-    return CropRecommendation(
-      recommendationId: json['recommendation_id'],
-      fieldId: json['field_id'],
-      recommendedCrop: json['recommended_crop'],
-      confidenceScore: json['confidence_score'] != null 
-          ? double.tryParse(json['confidence_score'].toString()) 
-          : null,
-      soilMoistureAvg: json['soil_moisture_avg'] != null 
-          ? double.tryParse(json['soil_moisture_avg'].toString()) 
-          : null,
-      temperatureAvg: json['temperature_avg'] != null 
-          ? double.tryParse(json['temperature_avg'].toString()) 
-          : null,
-      humidityAvg: json['humidity_avg'] != null 
-          ? double.tryParse(json['humidity_avg'].toString()) 
-          : null,
-      soilType: json['soil_type'],
-      season: json['season'],
-      expectedYield: json['expected_yield'] != null 
-          ? double.tryParse(json['expected_yield'].toString()) 
-          : null,
-      waterRequirement: json['water_requirement'],
-      growthDurationDays: json['growth_duration_days'],
-      recommendationReason: json['recommendation_reason'],
-      modelVersion: json['model_version'],
-      isAccepted: json['is_accepted'] == 1 || json['is_accepted'] == true,
-      acceptedAt: json['accepted_at'] != null 
-          ? DateTime.parse(json['accepted_at']) 
-          : null,
-      createdAt: DateTime.parse(json['created_at']),
-    );
-  }
+  factory CropRecommendation.fromJson(Map<String, dynamic> json) => CropRecommendation(
+        recommendationId: json['recommendation_id'],
+        fieldId: json['field_id'],
+        recommendedCrop: json['recommended_crop'],
+        confidenceScore: _parseDouble(json['confidence_score']),
+        soilMoistureAvg: _parseDouble(json['soil_moisture_avg']),
+        temperatureAvg: _parseDouble(json['temperature_avg']),
+        humidityAvg: _parseDouble(json['humidity_avg']),
+        soilType: json['soil_type'],
+        season: json['season'],
+        expectedYield: _parseDouble(json['expected_yield']),
+        waterRequirement: json['water_requirement'],
+        growthDurationDays: json['growth_duration_days'],
+        recommendationReason: json['recommendation_reason'],
+        modelVersion: json['model_version'],
+        isAccepted: json['is_accepted'] == 1 || json['is_accepted'] == true,
+        acceptedAt: _parseDateTime(json['accepted_at']),
+        createdAt: DateTime.parse(json['created_at']),
+      );
+
+  static double? _parseDouble(dynamic value) => value != null ? double.tryParse(value.toString()) : null;
+
+  static DateTime? _parseDateTime(dynamic value) => value != null ? DateTime.parse(value) : null;
 }

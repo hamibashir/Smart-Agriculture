@@ -12,7 +12,7 @@ class Sensor {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  Sensor({
+  const Sensor({
     required this.sensorId,
     required this.fieldId,
     required this.sensorType,
@@ -27,24 +27,24 @@ class Sensor {
     this.updatedAt,
   });
 
-  factory Sensor.fromJson(Map<String, dynamic> json) {
-    return Sensor(
-      sensorId: json['sensor_id'],
-      fieldId: json['field_id'],
-      sensorType: json['sensor_type'],
-      deviceId: json['device_id'],
-      sensorModel: json['sensor_model'],
-      installationDate: DateTime.parse(json['installation_date']),
-      locationDescription: json['location_description'],
-      isActive: json['is_active'] == 1 || json['is_active'] == true,
-      batteryLevel: json['battery_level'] != null 
-          ? double.tryParse(json['battery_level'].toString()) 
-          : null,
-      firmwareVersion: json['firmware_version'],
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
-    );
-  }
+  factory Sensor.fromJson(Map<String, dynamic> json) => Sensor(
+        sensorId: json['sensor_id'],
+        fieldId: json['field_id'],
+        sensorType: json['sensor_type'],
+        deviceId: json['device_id'],
+        sensorModel: json['sensor_model'],
+        installationDate: DateTime.parse(json['installation_date']),
+        locationDescription: json['location_description'],
+        isActive: json['is_active'] == 1 || json['is_active'] == true,
+        batteryLevel: _parseDouble(json['battery_level']),
+        firmwareVersion: json['firmware_version'],
+        createdAt: _parseDateTime(json['created_at']),
+        updatedAt: _parseDateTime(json['updated_at']),
+      );
+
+  static double? _parseDouble(dynamic value) => value != null ? double.tryParse(value.toString()) : null;
+
+  static DateTime? _parseDateTime(dynamic value) => value != null ? DateTime.parse(value) : null;
 }
 
 class SensorReading {
@@ -56,7 +56,7 @@ class SensorReading {
   final double? humidity;
   final double? lightIntensity;
 
-  SensorReading({
+  const SensorReading({
     required this.readingId,
     required this.sensorId,
     required this.timestamp,
@@ -66,23 +66,15 @@ class SensorReading {
     this.lightIntensity,
   });
 
-  factory SensorReading.fromJson(Map<String, dynamic> json) {
-    return SensorReading(
-      readingId: json['reading_id'],
-      sensorId: json['sensor_id'],
-      timestamp: DateTime.parse(json['reading_time']),
-      soilMoisture: json['soil_moisture'] != null 
-          ? double.parse(json['soil_moisture'].toString()) 
-          : null,
-      temperature: json['temperature'] != null 
-          ? double.parse(json['temperature'].toString()) 
-          : null,
-      humidity: json['humidity'] != null 
-          ? double.parse(json['humidity'].toString()) 
-          : null,
-      lightIntensity: json['light_intensity'] != null 
-          ? double.parse(json['light_intensity'].toString()) 
-          : null,
-    );
-  }
+  factory SensorReading.fromJson(Map<String, dynamic> json) => SensorReading(
+        readingId: json['reading_id'],
+        sensorId: json['sensor_id'],
+        timestamp: DateTime.parse(json['reading_time']),
+        soilMoisture: _parseDouble(json['soil_moisture']),
+        temperature: _parseDouble(json['temperature']),
+        humidity: _parseDouble(json['humidity']),
+        lightIntensity: _parseDouble(json['light_intensity']),
+      );
+
+  static double? _parseDouble(dynamic value) => value != null ? double.tryParse(value.toString()) : null;
 }

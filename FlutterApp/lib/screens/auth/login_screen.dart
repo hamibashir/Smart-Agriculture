@@ -30,195 +30,152 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.login(
-      _emailController.text.trim(),
-      _passwordController.text,
-    );
+    final success = await context.read<AuthProvider>().login(
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
 
+    if (!mounted) return;
     setState(() => _isLoading = false);
 
     if (success) {
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      }
+      Navigator.of(context).pushReplacementNamed('/home');
     } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invalid email or password'),
-            backgroundColor: AppTheme.errorColor,
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid email or password'),
+          backgroundColor: AppTheme.errorColor,
+        ),
+      );
     }
-  }
-
-  Future<bool> _onWillPop() async {
-    return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.exit_to_app, color: Colors.red),
-            SizedBox(width: 12),
-            Text('Exit App'),
-          ],
-        ),
-        content: const Text('Are you sure you want to exit the app?'),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Exit'),
-          ),
-        ],
-      ),
-    ) ?? false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.exit_to_app, color: Colors.red),
+                SizedBox(width: 12),
+                Text('Exit App'),
+              ],
+            ),
+            content: const Text('Are you sure you want to exit the app?'),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Exit'),
+              ),
+            ],
+          ),
+        );
+        if (shouldPop == true && context.mounted) Navigator.pop(context);
+      },
       child: Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Logo/Icon
-                  Icon(
-                    Icons.agriculture,
-                    size: 80,
-                    color: AppTheme.primaryGreen,
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // Title
-                  Text(
-                    'Smart Agriculture',
-                    style: Theme.of(context).textTheme.displaySmall,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  
-                  // Subtitle
-                  Text(
-                    'Login to your account',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textSecondary,
+        backgroundColor: AppTheme.backgroundColor,
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Icon(Icons.agriculture, size: 80, color: AppTheme.primaryGreen),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Smart Agriculture',
+                      style: Theme.of(context).textTheme.displaySmall,
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 48),
-                  
-                  // Email Field
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: Icon(Icons.email_outlined),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Login to your account',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppTheme.textSecondary,
+                          ),
+                      textAlign: TextAlign.center,
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      if (!value.contains('@')) {
-                        return 'Please enter a valid email';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // Password Field
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: const Icon(Icons.lock_outlined),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                    const SizedBox(height: 48),
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.email_outlined),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Please enter your email';
+                        if (!value.contains('@')) return 'Please enter a valid email';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        prefixIcon: const Icon(Icons.lock_outlined),
+                        suffixIcon: IconButton(
+                          icon: Icon(_obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                         ),
-                        onPressed: () {
-                          setState(() => _obscurePassword = !_obscurePassword);
-                        },
                       ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Please enter your password';
+                        if (value.length < 6) return 'Password must be at least 6 characters';
+                        return null;
+                      },
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // Login Button
-                  ElevatedButton(
-                    onPressed: _isLoading ? null : _handleLogin,
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : const Text('Login'),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // Register Link
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Don\'t have an account? ',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const RegisterScreen(),
-                            ),
-                          );
-                        },
-                        child: const Text('Register'),
-                      ),
-                    ],
-                  ),
-                ],
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _handleLogin,
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text('Login'),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Don't have an account? ", style: Theme.of(context).textTheme.bodyMedium),
+                        TextButton(
+                          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())),
+                          child: const Text('Register'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
       ),
     );
   }

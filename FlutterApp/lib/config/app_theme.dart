@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import 'app_config.dart';
 
 class AppTheme {
-  static const Color primaryGreen = Color(AppConfig.primaryGreen);
-  static const Color darkGreen = Color(AppConfig.darkGreen);
-  static const Color lightGreen = Color(AppConfig.lightGreen);
-  static const Color backgroundColor = Color(AppConfig.backgroundColor);
-  static const Color cardColor = Color(AppConfig.cardColor);
-  static const Color textPrimary = Color(AppConfig.textPrimary);
-  static const Color textSecondary = Color(AppConfig.textSecondary);
+  AppTheme._();
+
+  static const Color primaryGreen = Color(0xFF22c55e);
+  static const Color darkGreen = Color(0xFF16a34a);
+  static const Color lightGreen = Color(0xFF86efac);
+  static const Color backgroundColor = Color(0xFFf9fafb);
+  static const Color cardColor = Color(0xFFffffff);
+  static const Color textPrimary = Color(0xFF111827);
+  static const Color textSecondary = Color(0xFF6b7280);
   static const Color errorColor = Color(0xFFef4444);
   static const Color warningColor = Color(0xFFf59e0b);
   static const Color successColor = Color(0xFF10b981);
   static const Color infoColor = Color(0xFF3b82f6);
 
-  static ThemeData lightTheme = ThemeData(
+  static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
-    brightness: Brightness.light,
     primaryColor: primaryGreen,
     scaffoldBackgroundColor: backgroundColor,
     fontFamily: 'Inter',
@@ -35,11 +35,7 @@ class AppTheme {
       backgroundColor: Colors.white,
       foregroundColor: textPrimary,
       centerTitle: false,
-      titleTextStyle: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: textPrimary,
-      ),
+      titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: textPrimary),
       iconTheme: IconThemeData(color: textPrimary),
     ),
     cardTheme: CardTheme(
@@ -55,9 +51,9 @@ class AppTheme {
       headlineMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: textPrimary),
       headlineSmall: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: textPrimary),
       titleLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: textPrimary),
-      bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: textPrimary),
-      bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: textPrimary),
-      bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: textSecondary),
+      bodyLarge: TextStyle(fontSize: 16, color: textPrimary),
+      bodyMedium: TextStyle(fontSize: 14, color: textPrimary),
+      bodySmall: TextStyle(fontSize: 12, color: textSecondary),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -114,7 +110,7 @@ class AppTheme {
       type: BottomNavigationBarType.fixed,
       elevation: 8,
       selectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-      unselectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+      unselectedLabelStyle: TextStyle(fontSize: 12),
     ),
   );
 }

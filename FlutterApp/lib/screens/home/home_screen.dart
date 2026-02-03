@@ -17,17 +17,17 @@ class HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
   void navigateToTab(int index) {
-    setState(() => _currentIndex = index);
+    if (_currentIndex != index) setState(() => _currentIndex = index);
   }
 
-  final List<Widget> _screens = const [
-    DashboardScreen(),
-    FieldsScreen(),
-    IrrigationScreen(),
-    RecommendationsScreen(),
-    AlertsScreen(),
-    ProfileScreen(),
-  ];
+  Widget get _currentScreen => switch (_currentIndex) {
+        0 => const DashboardScreen(),
+        1 => const FieldsScreen(),
+        2 => const IrrigationScreen(),
+        3 => const RecommendationsScreen(),
+        4 => const AlertsScreen(),
+        _ => const ProfileScreen(),
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class HomeScreenState extends State<HomeScreen> {
         if (didPop) return;
         final shouldPop = await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
+          builder: (_) => AlertDialog(
             title: const Text('Exit App'),
             content: const Text('Are you sure you want to exit?'),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -54,18 +54,13 @@ class HomeScreenState extends State<HomeScreen> {
             ],
           ),
         );
-        if (shouldPop == true && context.mounted) {
-          Navigator.pop(context);
-        }
+        if (shouldPop == true && context.mounted) Navigator.pop(context);
       },
       child: Scaffold(
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _screens,
-        ),
+        body: _currentScreen,
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
+          onTap: navigateToTab,
           type: BottomNavigationBarType.fixed,
           items: const [
             BottomNavigationBarItem(

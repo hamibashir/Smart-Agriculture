@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../services/api_service.dart';
 import '../../models/alert.dart';
 import '../../config/app_theme.dart';
-import 'package:intl/intl.dart';
 
 class AlertsScreen extends StatefulWidget {
   const AlertsScreen({super.key});
@@ -32,18 +32,14 @@ class _AlertsScreenState extends State<AlertsScreen> {
     try {
       final response = await _apiService.getAlerts();
       if (response['success'] == true) {
-        final alertsData = response['data'] as List;
         setState(() {
-          _alerts = alertsData.map((json) => Alert.fromJson(json)).toList();
+          _alerts = (response['data'] as List).map((json) => Alert.fromJson(json)).toList();
           _isLoading = false;
         });
-      } else {
-        throw Exception(response['message'] ?? 'Failed to load alerts');
       }
-    } catch (e) {
-      print('❌ Alerts Error: $e');
+    } catch (_) {
       setState(() {
-        _error = e.toString();
+        _error = 'Failed to load alerts';
         _isLoading = false;
       });
     }
@@ -53,52 +49,14 @@ class _AlertsScreenState extends State<AlertsScreen> {
     try {
       await _apiService.markAsRead(alertId);
       _loadAlerts();
-    } catch (e) {
-      // Handle error
-    }
+    } catch (_) {}
   }
 
   Future<void> _resolveAlert(int alertId) async {
     try {
       await _apiService.resolveAlert(alertId);
       _loadAlerts();
-    } catch (e) {
-      // Handle error
-    }
-  }
-
-  Color _getAlertColor(String type) {
-    switch (type) {
-      case 'critical':
-        return AppTheme.errorColor;
-      case 'warning':
-        return AppTheme.warningColor;
-      case 'success':
-        return AppTheme.successColor;
-      default:
-        return AppTheme.infoColor;
-    }
-  }
-
-  IconData _getAlertIcon(String category) {
-    switch (category) {
-      case 'soil_moisture':
-        return Icons.water_drop;
-      case 'temperature':
-        return Icons.thermostat;
-      case 'humidity':
-        return Icons.cloud;
-      case 'irrigation':
-        return Icons.water;
-      case 'sensor_offline':
-        return Icons.sensors_off;
-      case 'crop_health':
-        return Icons.eco;
-      case 'weather':
-        return Icons.wb_sunny;
-      default:
-        return Icons.notifications;
-    }
+    } catch (_) {}
   }
 
   @override
@@ -106,90 +64,113 @@ class _AlertsScreenState extends State<AlertsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Alerts'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadAlerts,
-          ),
-        ],
+        actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: _loadAlerts)],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? _buildError()
+              ? _ErrorView(onRetry: _loadAlerts)
               : _alerts.isEmpty
-                  ? _buildEmptyState()
-                  : _buildAlertsList(),
+                  ? const _EmptyState()
+                  : RefreshIndicator(
+                      onRefresh: _loadAlerts,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: _alerts.length,
+                        itemBuilder: (_, index) => _AlertCard(
+                          alert: _alerts[index],
+                          onMarkRead: () => _markAsRead(_alerts[index].alertId),
+                          onResolve: () => _resolveAlert(_alerts[index].alertId),
+                        ),
+                      ),
+                    ),
     );
   }
+}
 
-  Widget _buildError() {
+class _ErrorView extends StatelessWidget {
+  const _ErrorView({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: AppTheme.errorColor),
+          const Icon(Icons.error_outline, size: 64, color: AppTheme.errorColor),
           const SizedBox(height: 16),
           Text('Failed to load alerts', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: _loadAlerts,
-            child: const Text('Retry'),
-          ),
+          ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
         ],
       ),
     );
   }
+}
 
-  Widget _buildEmptyState() {
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.notifications_none, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
-          Text(
-            'No alerts',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text('No alerts', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Text(
-            'You\'re all caught up!',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
+            "You're all caught up!",
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildAlertsList() {
-    return RefreshIndicator(
-      onRefresh: _loadAlerts,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _alerts.length,
-        itemBuilder: (context, index) {
-          final alert = _alerts[index];
-          return _buildAlertCard(alert);
-        },
-      ),
-    );
-  }
+class _AlertCard extends StatelessWidget {
+  const _AlertCard({
+    required this.alert,
+    required this.onMarkRead,
+    required this.onResolve,
+  });
 
-  Widget _buildAlertCard(Alert alert) {
-    final color = _getAlertColor(alert.alertType);
-    final icon = _getAlertIcon(alert.alertCategory);
+  final Alert alert;
+  final VoidCallback onMarkRead;
+  final VoidCallback onResolve;
+
+  static Color _getColor(String type) => switch (type) {
+        'critical' => AppTheme.errorColor,
+        'warning' => AppTheme.warningColor,
+        'success' => AppTheme.successColor,
+        _ => AppTheme.infoColor,
+      };
+
+  static IconData _getIcon(String category) => switch (category) {
+        'soil_moisture' => Icons.water_drop,
+        'temperature' => Icons.thermostat,
+        'humidity' => Icons.cloud,
+        'irrigation' => Icons.water,
+        'sensor_offline' => Icons.sensors_off,
+        'crop_health' => Icons.eco,
+        'weather' => Icons.wb_sunny,
+        _ => Icons.notifications,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _getColor(alert.alertType);
+    final icon = _getIcon(alert.alertCategory);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () {
-          if (!alert.isRead) {
-            _markAsRead(alert.alertId);
-          }
-        },
+        onTap: alert.isRead ? null : onMarkRead,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -225,10 +206,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                               Container(
                                 width: 8,
                                 height: 8,
-                                decoration: BoxDecoration(
-                                  color: color,
-                                  shape: BoxShape.circle,
-                                ),
+                                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
                               ),
                           ],
                         ),
@@ -243,14 +221,11 @@ class _AlertsScreenState extends State<AlertsScreen> {
                 ],
               ),
               const SizedBox(height: 12),
-              Text(
-                alert.message,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+              Text(alert.message, style: Theme.of(context).textTheme.bodyMedium),
               if (!alert.isResolved) ...[
                 const SizedBox(height: 12),
                 OutlinedButton(
-                  onPressed: () => _resolveAlert(alert.alertId),
+                  onPressed: onResolve,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: color,
                     side: BorderSide(color: color),
