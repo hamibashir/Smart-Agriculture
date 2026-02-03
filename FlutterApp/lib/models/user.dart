@@ -9,8 +9,8 @@ class User {
   final String? postalCode;
   final String role;
   final bool isActive;
-  final bool? emailVerified;
-  final bool? phoneVerified;
+  final bool emailVerified;
+  final bool phoneVerified;
   final DateTime createdAt;
   final DateTime? lastLogin;
   final DateTime? updatedAt;
@@ -26,8 +26,8 @@ class User {
     this.postalCode,
     required this.role,
     required this.isActive,
-    this.emailVerified,
-    this.phoneVerified,
+    required this.emailVerified,
+    required this.phoneVerified,
     required this.createdAt,
     this.lastLogin,
     this.updatedAt,
@@ -53,18 +53,21 @@ class User {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'user_id': userId,
-      'full_name': fullName,
-      'email': email,
-      'phone': phone,
-      'address': address,
-      'city': city,
-      'province': province,
-      'role': role,
-      'is_active': isActive,
-      'created_at': createdAt.toIso8601String(),
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'user_id': userId,
+    'full_name': fullName,
+    'email': email,
+    'phone': phone,
+    'address': address,
+    'city': city,
+    'province': province,
+    'postal_code': postalCode,
+    'role': role,
+    'is_active': isActive,
+    'email_verified': emailVerified,
+    'phone_verified': phoneVerified,
+    'created_at': createdAt.toIso8601String(),
+    'last_login': lastLogin?.toIso8601String(),
+    'updated_at': updatedAt?.toIso8601String(),
+  };
 }

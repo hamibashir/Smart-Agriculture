@@ -42,16 +42,10 @@ class IrrigationLog {
       startTime: DateTime.parse(json['start_time']),
       endTime: json['end_time'] != null ? DateTime.parse(json['end_time']) : null,
       durationMinutes: json['duration_minutes'],
-      waterUsedLiters: json['water_used_liters'] != null 
-          ? double.tryParse(json['water_used_liters'].toString()) 
-          : null,
+      waterUsedLiters: json['water_used_liters'] != null ? double.tryParse(json['water_used_liters'].toString()) : null,
       triggerReason: json['trigger_reason'],
-      soilMoistureBefore: json['soil_moisture_before'] != null 
-          ? double.tryParse(json['soil_moisture_before'].toString()) 
-          : null,
-      soilMoistureAfter: json['soil_moisture_after'] != null 
-          ? double.tryParse(json['soil_moisture_after'].toString()) 
-          : null,
+      soilMoistureBefore: json['soil_moisture_before'] != null ? double.tryParse(json['soil_moisture_before'].toString()) : null,
+      soilMoistureAfter: json['soil_moisture_after'] != null ? double.tryParse(json['soil_moisture_after'].toString()) : null,
       pumpStatus: json['pump_status'],
       initiatedBy: json['initiated_by'],
       notes: json['notes'],

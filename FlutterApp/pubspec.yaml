@@ -12,14 +12,11 @@ dependencies:
   
   # UI & Icons
   cupertino_icons: ^1.0.8
-  google_fonts: ^6.2.1
-  flutter_svg: ^2.0.10
   
   # State Management
   provider: ^6.1.2
   
-  # HTTP & API
-  http: ^1.2.1
+  # HTTP & API (REMOVED http, keeping only Dio)
   dio: ^5.4.3
   
   # Local Storage
@@ -31,12 +28,9 @@ dependencies:
   # Date & Time
   intl: ^0.20.2
   
-  # Icons
-  font_awesome_flutter: ^10.7.0
+  # Icons (REMOVED font_awesome - use built-in Icons or cupertino_icons)
   
-  # Loading & Animations
-  shimmer: ^3.0.0
-  lottie: ^3.1.2
+  # Loading (REMOVED lottie and shimmer - will use simple alternatives)
   
   # Utils
   url_launcher: ^6.3.0
@@ -50,6 +44,6 @@ flutter:
   uses-material-design: true
   
   # Assets
-  # assets:
-  #   - assets/images/
-  #   - assets/icons/
+  assets:
+    - assets/images/
+    - assets/icons/
