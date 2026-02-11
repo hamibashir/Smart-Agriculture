@@ -1,16 +1,9 @@
 import express from 'express';
-import { 
-  getIrrigationLogs, 
-  startIrrigation, 
-  stopIrrigation,
-  getSchedules,
-  createSchedule
-} from '../controllers/irrigationController.js';
+import { getIrrigationLogs, startIrrigation, stopIrrigation, getSchedules, createSchedule } from '../controllers/irrigationController.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// All routes require authentication
 router.use(authenticateToken);
 
 router.get('/logs/:fieldId', getIrrigationLogs);

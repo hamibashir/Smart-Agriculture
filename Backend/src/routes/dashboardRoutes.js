@@ -4,7 +4,6 @@ import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// All routes require authentication
 router.use(authenticateToken);
 
 router.get('/stats', getDashboardStats);
