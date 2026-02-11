@@ -48,7 +48,7 @@ class _FieldsScreenState extends State<FieldsScreen> {
 
   Future<void> _navigateToAddField() async {
     final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddFieldScreen()));
-    if (result == true) _loadFields();
+    if (result == true) await _loadFields();
   }
 
   @override
@@ -154,7 +154,7 @@ class _FieldCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withOpacity(0.1),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(Icons.grass, color: AppTheme.primaryGreen, size: 20),
@@ -178,7 +178,7 @@ class _FieldCard extends StatelessWidget {
                   children: [
                     if (field.currentCrop != null) Expanded(child: _InfoChip(icon: Icons.eco, label: field.currentCrop!, color: AppTheme.primaryGreen)),
                     if (field.currentCrop != null && field.soilType != null) const SizedBox(width: 8),
-                    if (field.soilType != null) Expanded(child: _InfoChip(icon: Icons.terrain, label: field.soilType!, color: Color(0xFF8b5cf6))),
+                    if (field.soilType != null) Expanded(child: _InfoChip(icon: Icons.terrain, label: field.soilType!, color: const Color(0xFF8b5cf6))),
                   ],
                 ),
               ],
@@ -200,7 +200,7 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isActive ? AppTheme.successColor.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+        color: isActive ? AppTheme.successColor.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(

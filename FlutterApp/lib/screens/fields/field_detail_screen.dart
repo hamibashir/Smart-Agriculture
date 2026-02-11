@@ -170,7 +170,7 @@ class _SensorCard extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: sensor.isActive ? AppTheme.successColor.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+            color: sensor.isActive ? AppTheme.successColor.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(Icons.sensors, color: sensor.isActive ? AppTheme.successColor : Colors.grey),

@@ -140,7 +140,7 @@ class _SensorBindingScreenState extends State<SensorBindingScreen> {
                                   _selectedSensorId = sensor.sensorId;
                                   _selectedFieldId = sensor.fieldId > 0 ? sensor.fieldId : null;
                                 });
-                                PrimaryScrollController.of(context)?.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+                                PrimaryScrollController.of(context).animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
                               },
                             )),
                     ],
@@ -218,14 +218,16 @@ class _BindingForm extends StatelessWidget {
             const SizedBox(height: 16),
             DropdownButtonFormField<int>(
               decoration: const InputDecoration(labelText: 'Select Sensor'),
-              value: selectedSensorId,
+              key: ValueKey(selectedSensorId),
+              initialValue: selectedSensorId,
               items: sensors.map((s) => DropdownMenuItem(value: s.sensorId, child: Text('${s.sensorType} (${s.deviceId})', overflow: TextOverflow.ellipsis))).toList(),
               onChanged: onSensorChanged,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<int>(
               decoration: const InputDecoration(labelText: 'Select Field'),
-              value: selectedFieldId,
+              key: ValueKey(selectedFieldId),
+              initialValue: selectedFieldId,
               items: fields.map((f) => DropdownMenuItem(value: f.fieldId, child: Text(f.fieldName, overflow: TextOverflow.ellipsis))).toList(),
               onChanged: onFieldChanged,
             ),

@@ -31,6 +31,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
     try {
       final response = await _apiService.getAlerts();
+      if (!mounted) return;
       if (response['success'] == true) {
         setState(() {
           _alerts = (response['data'] as List).map((json) => Alert.fromJson(json)).toList();
@@ -38,6 +39,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
         });
       }
     } catch (_) {
+      if (!mounted) return;
       setState(() {
         _error = 'Failed to load alerts';
         _isLoading = false;
@@ -48,14 +50,14 @@ class _AlertsScreenState extends State<AlertsScreen> {
   Future<void> _markAsRead(int alertId) async {
     try {
       await _apiService.markAsRead(alertId);
-      _loadAlerts();
+      await _loadAlerts();
     } catch (_) {}
   }
 
   Future<void> _resolveAlert(int alertId) async {
     try {
       await _apiService.resolveAlert(alertId);
-      _loadAlerts();
+      await _loadAlerts();
     } catch (_) {}
   }
 
@@ -182,7 +184,7 @@ class _AlertCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.1),
+                      color: color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(icon, color: color, size: 20),

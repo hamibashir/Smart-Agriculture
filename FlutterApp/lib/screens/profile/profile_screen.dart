@@ -49,7 +49,7 @@ class ProfileScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(user.role.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
@@ -82,6 +82,7 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 _LogoutButton(
                   onTap: () async {
+                    final authProvider = context.read<AuthProvider>();
                     final confirm = await showDialog<bool>(
                       context: context,
                       builder: (_) => AlertDialog(
@@ -98,8 +99,9 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     );
                     if (confirm == true) {
-                      await context.read<AuthProvider>().logout();
-                      if (context.mounted) Navigator.pushReplacementNamed(context, '/login');
+                      await authProvider.logout();
+                      if (!context.mounted) return;
+                      await Navigator.pushReplacementNamed(context, '/login');
                     }
                   },
                 ),

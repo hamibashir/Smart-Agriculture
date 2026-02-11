@@ -92,8 +92,8 @@ class _LiveIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(right: 16),
-      child: Row(
-        children: const [
+      child: const Row(
+        children: [
           Icon(Icons.circle, size: 8, color: Colors.greenAccent),
           SizedBox(width: 6),
           Text('LIVE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),

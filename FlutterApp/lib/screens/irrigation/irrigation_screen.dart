@@ -38,17 +38,21 @@ class _IrrigationScreenState extends State<IrrigationScreen> with SingleTickerPr
   Future<void> _loadFields() async {
     try {
       final response = await _apiService.getFields();
+      if (!mounted) return;
       if (response['success'] == true) {
+        final fields = (response['data'] as List).map((json) => Field.fromJson(json)).toList();
+        final selectedField = fields.isNotEmpty ? fields.first : null;
         setState(() {
-          _fields = (response['data'] as List).map((json) => Field.fromJson(json)).toList();
-          if (_fields.isNotEmpty) {
-            _selectedField = _fields.first;
-            _loadLogs();
-          }
+          _fields = fields;
+          _selectedField = selectedField;
           _isLoading = false;
         });
+        if (selectedField != null) {
+          await _loadLogs();
+        }
       }
     } catch (_) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
   }
@@ -57,6 +61,7 @@ class _IrrigationScreenState extends State<IrrigationScreen> with SingleTickerPr
     if (_selectedField == null) return;
     try {
       final response = await _apiService.getIrrigationLogs(_selectedField!.fieldId);
+      if (!mounted) return;
       if (response['success'] == true) {
         setState(() => _logs = (response['data'] as List).map((json) => IrrigationLog.fromJson(json)).toList());
       }
@@ -74,13 +79,14 @@ class _IrrigationScreenState extends State<IrrigationScreen> with SingleTickerPr
         'duration_minutes': 30,
       });
       if (response['success'] == true) {
+        if (!mounted) return;
         _showSnackBar('Irrigation started', AppTheme.successColor);
-        _loadLogs();
+        await _loadLogs();
       }
     } catch (_) {
       _showSnackBar('Failed to start irrigation', AppTheme.errorColor);
     } finally {
-      setState(() => _isIrrigating = false);
+      if (mounted) setState(() => _isIrrigating = false);
     }
   }
 
@@ -89,8 +95,9 @@ class _IrrigationScreenState extends State<IrrigationScreen> with SingleTickerPr
     try {
       final response = await _apiService.stopIrrigation(_selectedField!.fieldId);
       if (response['success'] == true) {
+        if (!mounted) return;
         _showSnackBar('Irrigation stopped', AppTheme.successColor);
-        _loadLogs();
+        await _loadLogs();
       }
     } catch (_) {
       _showSnackBar('Failed to stop irrigation', AppTheme.errorColor);
@@ -124,10 +131,8 @@ class _IrrigationScreenState extends State<IrrigationScreen> with SingleTickerPr
                       selectedField: _selectedField,
                       isIrrigating: _isIrrigating,
                       onFieldChanged: (field) {
-                        setState(() {
-                          _selectedField = field;
-                          _loadLogs();
-                        });
+                        setState(() => _selectedField = field);
+                        _loadLogs();
                       },
                       onStart: _startIrrigation,
                       onStop: _stopIrrigation,
@@ -189,7 +194,8 @@ class _ControlTab extends StatelessWidget {
                 const Text('Select Field', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<Field>(
-                  value: selectedField,
+                  key: ValueKey(selectedField?.fieldId),
+                  initialValue: selectedField,
                   decoration: const InputDecoration(prefixIcon: Icon(Icons.grass)),
                   items: fields.map((field) => DropdownMenuItem(value: field, child: Text(field.fieldName))).toList(),
                   onChanged: onFieldChanged,
@@ -298,7 +304,7 @@ class _LogCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: log.pumpStatus == 'on' ? AppTheme.successColor.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+                  color: log.pumpStatus == 'on' ? AppTheme.successColor.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(

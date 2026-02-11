@@ -45,13 +45,14 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
       });
 
       if (response['success'] == true) {
+        if (!mounted) return;
         _showSnackBar('Field added successfully', AppTheme.successColor);
         Navigator.pop(context, true);
       }
     } catch (_) {
       _showSnackBar('Failed to add field', AppTheme.errorColor);
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -101,7 +102,8 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _areaUnit,
+                      key: ValueKey(_areaUnit),
+                      initialValue: _areaUnit,
                       decoration: const InputDecoration(labelText: 'Unit'),
                       items: const [
                         DropdownMenuItem(value: 'acres', child: Text('Acres')),

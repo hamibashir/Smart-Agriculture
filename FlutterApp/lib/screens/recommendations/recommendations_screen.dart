@@ -29,17 +29,21 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
   Future<void> _loadFields() async {
     try {
       final response = await _apiService.getFields();
+      if (!mounted) return;
       if (response['success'] == true) {
+        final fields = (response['data'] as List).map((json) => Field.fromJson(json)).toList();
+        final selectedField = fields.isNotEmpty ? fields.first : null;
         setState(() {
-          _fields = (response['data'] as List).map((json) => Field.fromJson(json)).toList();
-          if (_fields.isNotEmpty) {
-            _selectedField = _fields.first;
-            _loadRecommendations();
-          }
+          _fields = fields;
+          _selectedField = selectedField;
           _isLoading = false;
         });
+        if (selectedField != null) {
+          await _loadRecommendations();
+        }
       }
     } catch (_) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
   }
@@ -48,6 +52,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
     if (_selectedField == null) return;
     try {
       final response = await _apiService.getRecommendations(_selectedField!.fieldId);
+      if (!mounted) return;
       if (response['success'] == true) {
         setState(() => _recommendations = (response['data'] as List).map((json) => CropRecommendation.fromJson(json)).toList());
       }
@@ -58,8 +63,9 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
     try {
       final response = await _apiService.acceptRecommendation(recommendationId);
       if (response['success'] == true) {
+        if (!mounted) return;
         _showSnackBar('Recommendation accepted', AppTheme.successColor);
-        _loadRecommendations();
+        await _loadRecommendations();
       }
     } catch (_) {
       _showSnackBar('Failed to accept recommendation', AppTheme.errorColor);
@@ -84,10 +90,8 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                       fields: _fields,
                       selectedField: _selectedField,
                       onChanged: (field) {
-                        setState(() {
-                          _selectedField = field;
-                          _loadRecommendations();
-                        });
+                        setState(() => _selectedField = field);
+                        _loadRecommendations();
                       },
                     ),
                     const Divider(height: 1),
@@ -149,7 +153,8 @@ class _FieldSelector extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       color: Colors.white,
       child: DropdownButtonFormField<Field>(
-        value: selectedField,
+        key: ValueKey(selectedField?.fieldId),
+        initialValue: selectedField,
         decoration: const InputDecoration(labelText: 'Select Field', prefixIcon: Icon(Icons.grass)),
         items: fields.map((field) => DropdownMenuItem(value: field, child: Text(field.fieldName))).toList(),
         onChanged: onChanged,
@@ -208,7 +213,7 @@ class _RecommendationCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryGreen.withOpacity(0.1),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.eco, color: AppTheme.primaryGreen, size: 28),
@@ -241,7 +246,7 @@ class _RecommendationCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppTheme.successColor.withOpacity(0.1),
+                      color: AppTheme.successColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text('ACCEPTED', style: TextStyle(color: AppTheme.successColor, fontSize: 12, fontWeight: FontWeight.w600)),
@@ -253,9 +258,9 @@ class _RecommendationCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.infoColor.withOpacity(0.05),
+                  color: AppTheme.infoColor.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppTheme.infoColor.withOpacity(0.2)),
+                  border: Border.all(color: AppTheme.infoColor.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [

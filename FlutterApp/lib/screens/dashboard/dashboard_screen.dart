@@ -31,8 +31,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _error = null;
     });
 
+    final authProvider = context.read<AuthProvider>();
+
     try {
       final response = await _apiService.getDashboardStats();
+      if (!mounted) return;
       if (response['success'] == true) {
         setState(() {
           _stats = response['data'];
@@ -41,10 +44,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
     } catch (e) {
       if (e.toString().contains('Unauthorized')) {
-        await context.read<AuthProvider>().logout();
-        if (mounted) Navigator.pushReplacementNamed(context, '/login');
+        await authProvider.logout();
+        if (!mounted) return;
+        await Navigator.pushReplacementNamed(context, '/login');
         return;
       }
+      if (!mounted) return;
       setState(() {
         _error = 'Failed to load data';
         _isLoading = false;
