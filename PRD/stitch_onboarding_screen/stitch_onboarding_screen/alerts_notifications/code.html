@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartAgri Alerts</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#edeeef",
+              "on-secondary-fixed": "#002109",
+              "on-primary-container": "#004b1e",
+              "outline": "#6d7b6c",
+              "inverse-surface": "#2e3132",
+              "on-tertiary": "#ffffff",
+              "surface-variant": "#e1e3e4",
+              "surface": "#f8f9fa",
+              "on-primary-fixed-variant": "#005321",
+              "primary": "#006e2f",
+              "secondary-fixed-dim": "#96d59d",
+              "surface-dim": "#d9dadb",
+              "on-secondary-container": "#346e40",
+              "on-secondary-fixed-variant": "#145126",
+              "surface-container-lowest": "#ffffff",
+              "error-container": "#ffdad6",
+              "surface-container-low": "#f3f4f5",
+              "inverse-primary": "#4ae176",
+              "inverse-on-surface": "#f0f1f2",
+              "on-primary": "#ffffff",
+              "secondary": "#2f6a3c",
+              "secondary-fixed": "#b2f2b7",
+              "surface-bright": "#f8f9fa",
+              "primary-container": "#22c55e",
+              "error": "#ba1a1a",
+              "on-primary-fixed": "#002109",
+              "on-tertiary-fixed": "#410001",
+              "on-secondary": "#ffffff",
+              "on-error-container": "#93000a",
+              "tertiary": "#9e4036",
+              "primary-fixed": "#6bff8f",
+              "on-tertiary-container": "#76231b",
+              "background": "#f8f9fa",
+              "tertiary-fixed-dim": "#ffb4a9",
+              "secondary-container": "#afefb4",
+              "primary-fixed-dim": "#4ae176",
+              "on-tertiary-fixed-variant": "#7f2a21",
+              "tertiary-container": "#ff8b7c",
+              "surface-container-high": "#e7e8e9",
+              "on-surface-variant": "#3d4a3d",
+              "outline-variant": "#bccbb9",
+              "tertiary-fixed": "#ffdad5",
+              "on-background": "#191c1d",
+              "surface-container-highest": "#e1e3e4",
+              "on-error": "#ffffff",
+              "on-surface": "#191c1d",
+              "surface-tint": "#006e2f"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="bg-[#F8F9FA] dark:bg-slate-900 dock-top full-width top-0 z-50">
+<div class="flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#006E2F] dark:text-[#22C55E]">menu</span>
+<h1 class="font-['Inter'] font-bold tracking-tighter text-lg dark:text-white">Alerts</h1>
+</div>
+<button class="text-sm font-semibold text-primary hover:opacity-80 transition-opacity">
+                Mark all as read
+            </button>
+</div>
+</header>
+<main class="max-w-2xl mx-auto px-4 mt-4">
+<!-- Filter Chips Row -->
+<div class="flex gap-3 overflow-x-auto hide-scrollbar py-2 mb-8">
+<button class="flex-shrink-0 px-6 py-2 bg-primary-container text-on-primary-container font-semibold rounded-full text-sm scale-105 shadow-sm transition-all">
+                All
+            </button>
+<button class="flex-shrink-0 px-6 py-2 bg-surface-container-high text-on-surface-variant font-medium rounded-full text-sm hover:opacity-80 transition-all">
+                Unread
+            </button>
+<button class="flex-shrink-0 px-6 py-2 bg-surface-container-high text-on-surface-variant font-medium rounded-full text-sm hover:opacity-80 transition-all">
+                Critical
+            </button>
+<button class="flex-shrink-0 px-6 py-2 bg-surface-container-high text-on-surface-variant font-medium rounded-full text-sm hover:opacity-80 transition-all">
+                Resolved
+            </button>
+</div>
+<!-- Alerts List -->
+<div class="space-y-6">
+<!-- Red Alert Card (Critical) -->
+<div class="relative overflow-hidden bg-surface-container-lowest rounded-lg border-l-[6px] border-error shadow-[0_4px_12px_rgba(186,26,26,0.04)] transition-transform hover:scale-[1.01]">
+<div class="p-5">
+<div class="flex items-start gap-4">
+<div class="bg-error-container p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-error" data-weight="fill" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-lg font-bold text-on-surface tracking-tight">Low Soil Moisture</h3>
+<span class="text-xs font-medium text-outline">Just now</span>
+</div>
+<p class="text-on-surface-variant leading-relaxed text-sm">
+                                Moisture at 15% in Main Wheat Field. Immediate irrigation recommended.
+                            </p>
+<div class="flex gap-3 mt-6">
+<button class="px-5 py-2 text-xs font-bold uppercase tracking-widest text-outline border border-outline-variant/30 rounded-full hover:bg-surface-container transition-colors">
+                                    Mark Read
+                                </button>
+<button class="px-5 py-2 text-xs font-bold uppercase tracking-widest bg-inverse-surface text-inverse-on-surface rounded-full shadow-md hover:opacity-90 transition-opacity">
+                                    Resolve
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Blue Alert Card (Info) -->
+<div class="relative overflow-hidden bg-surface-container-lowest rounded-lg border-l-[6px] border-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.02)] transition-transform hover:scale-[1.01]">
+<div class="p-5">
+<div class="flex items-start gap-4">
+<div class="bg-blue-50 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-600" data-weight="fill" style="font-variation-settings: 'FILL' 1;">info</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-lg font-bold text-on-surface tracking-tight">Irrigation Completed</h3>
+<span class="text-xs font-medium text-outline">2h ago</span>
+</div>
+<p class="text-on-surface-variant leading-relaxed text-sm">
+                                Pump ran for 45 mins on East Sector. Soil sensors report saturation levels at 78%.
+                            </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Additional Contextual Card (Visual Interest) -->
+<div class="relative overflow-hidden bg-surface-container-low rounded-lg p-1">
+<div class="bg-surface-container-lowest rounded-[calc(1rem-4px)] p-5">
+<div class="flex items-start gap-4 opacity-70">
+<div class="bg-surface-variant p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-outline">check_circle</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-lg font-bold text-on-surface tracking-tight">Weather Alert Dismissed</h3>
+<span class="text-xs font-medium text-outline">Yesterday</span>
+</div>
+<p class="text-on-surface-variant leading-relaxed text-sm">
+                                Wind speeds returned to normal threshold for spraying operations.
+                            </p>
+</div>
+</div>
+</div>
+</div>
+<!-- System Visual (Asymmetric Graphic) -->
+<div class="mt-12 mb-8 flex justify-end">
+<div class="w-2/3 h-48 rounded-lg overflow-hidden relative shadow-lg rotate-1">
+<img alt="Agri Tech" class="w-full h-full object-cover" data-alt="Modern agricultural field with precision irrigation systems at sunrise, soft golden lighting and professional clean photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQlkk1rxlVsZO11DZx-CNkRqnBKvut4JtHXsObYNi-xjGNY8FV5_tQ1QykhjIuaSGBjHKDAjuWK8ynjx_bYHchjlpC-3k0WJUJRCgJo4api-HS9boMyxcDWar52rPkUO8dGRHD9_9kpaMm0lieozby-RUkpLhtbCIX5-_tUnW8Veo0SXBWxyGO3b6FX1l9y5tUovz85O2YpHsYQ3VBUk65Zujxx0SqFCDhR2MCRlPg2TNgMNHmL0QJRmG-QBOwRISRt-F_yZeR1Yg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent flex items-end p-6">
+<span class="text-white font-bold text-lg tracking-tight">Precision Monitoring Active</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-[#BCCBB9]/20 shadow-[0_-4px_12px_rgba(0,110,47,0.06)] z-50 rounded-t-[2rem]">
+<div class="flex flex-col items-center justify-center text-[#6B7280] dark:text-slate-400 p-2 hover:text-[#006E2F] dark:hover:text-[#22C55E] active:scale-90 transition-transform cursor-pointer">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#6B7280] dark:text-slate-400 p-2 hover:text-[#006E2F] dark:hover:text-[#22C55E] active:scale-90 transition-transform cursor-pointer">
+<span class="material-symbols-outlined mb-1">potted_plant</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase">Fields</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-[#22C55E] text-white rounded-full p-3 scale-110 -translate-y-2 transition-all shadow-lg active:scale-90 cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">notifications_active</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase mt-0.5">Alerts</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#6B7280] dark:text-slate-400 p-2 hover:text-[#006E2F] dark:hover:text-[#22C55E] active:scale-90 transition-transform cursor-pointer">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase">Profile</span>
+</div>
+</nav>
+</body></html>

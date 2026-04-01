@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartAgri - The Precision Orchard</title>
+<!-- Google Fonts: Inter for the Swiss-style architectural feel -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#edeeef",
+              "on-secondary-fixed": "#002109",
+              "on-primary-container": "#004b1e",
+              "outline": "#6d7b6c",
+              "inverse-surface": "#2e3132",
+              "on-tertiary": "#ffffff",
+              "surface-variant": "#e1e3e4",
+              "surface": "#f8f9fa",
+              "on-primary-fixed-variant": "#005321",
+              "primary": "#006e2f",
+              "secondary-fixed-dim": "#96d59d",
+              "surface-dim": "#d9dadb",
+              "on-secondary-container": "#346e40",
+              "on-secondary-fixed-variant": "#145126",
+              "surface-container-lowest": "#ffffff",
+              "error-container": "#ffdad6",
+              "surface-container-low": "#f3f4f5",
+              "inverse-primary": "#4ae176",
+              "inverse-on-surface": "#f0f1f2",
+              "on-primary": "#ffffff",
+              "secondary": "#2f6a3c",
+              "secondary-fixed": "#b2f2b7",
+              "surface-bright": "#f8f9fa",
+              "primary-container": "#22c55e",
+              "error": "#ba1a1a",
+              "on-primary-fixed": "#002109",
+              "on-tertiary-fixed": "#410001",
+              "on-secondary": "#ffffff",
+              "on-error-container": "#93000a",
+              "tertiary": "#9e4036",
+              "primary-fixed": "#6bff8f",
+              "on-tertiary-container": "#76231b",
+              "background": "#f8f9fa",
+              "tertiary-fixed-dim": "#ffb4a9",
+              "secondary-container": "#afefb4",
+              "primary-fixed-dim": "#4ae176",
+              "on-tertiary-fixed-variant": "#7f2a21",
+              "tertiary-container": "#ff8b7c",
+              "surface-container-high": "#e7e8e9",
+              "on-surface-variant": "#3d4a3d",
+              "outline-variant": "#bccbb9",
+              "tertiary-fixed": "#ffdad5",
+              "on-background": "#191c1d",
+              "surface-container-highest": "#e1e3e4",
+              "on-error": "#ffffff",
+              "on-surface": "#191c1d",
+              "surface-tint": "#006e2f"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        
+        /* Custom spinner for loading indicator */
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .agri-blur {
+            box-shadow: 0 12px 16px -4px rgba(0, 110, 47, 0.06);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body antialiased">
+<!-- Splash Screen Container -->
+<!-- As a task-focused entry point, TopAppBar and BottomNavBar are suppressed per the Shell Visibility & Relevance filter. -->
+<div class="relative min-h-screen w-full bg-primary-container flex flex-col items-center justify-center overflow-hidden">
+<!-- Background Organic Texture Overlay -->
+<div class="absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none">
+<div class="absolute inset-0" data-alt="close-up high-resolution macro photography of leaf veins and cellular structure with vibrant green tones and soft natural light" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCblHbNPDQcBEFgltUDLQUVue4amKwazaOSbRJQBzTVQoLdoCx9kcnewXgGKXlBjAalbus3avuIqDclofY_p1A9QhB1AQ8thY-5hGtqWB3fNeWvy5VTfcfU0yq2ZQp-jepe9ho9mvnftsB8jHrkf2V8gfJkyDXd1EYDN6_iJyXdJ5WmPOL2LcL-Fpbbu9pLjZDjYAACKdaoC1Ifoxz4M4iiTE2niKxmPSoYuXR1RQ4wnjTX0z9zdbuACflcBSORMssqtTkbcyq6kr0'); background-size: cover; background-position: center;"></div>
+</div>
+<!-- Central Identity Cluster -->
+<div class="relative z-10 flex flex-col items-center gap-6">
+<!-- App Logo (modern leaf/tech icon) -->
+<div class="w-32 h-32 bg-white rounded-xl flex items-center justify-center agri-blur scale-105">
+<span class="material-symbols-outlined text-primary-container !text-7xl" data-icon="eco" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+<!-- App Title: SmartAgri (JSON-Mandated Content) -->
+<h1 class="font-headline font-extrabold text-5xl tracking-tighter text-white">
+                SmartAgri
+            </h1>
+<!-- Tagline (Design System Voice) -->
+<p class="font-label text-white/80 uppercase tracking-[0.2em] text-xs font-bold">
+                The Precision Orchard
+            </p>
+</div>
+<!-- Footer Loading Area -->
+<div class="absolute bottom-16 flex flex-col items-center gap-4">
+<!-- Loading Indicator -->
+<div class="spinner"></div>
+<!-- Status Label -->
+<span class="font-label text-white/60 text-[10px] uppercase tracking-widest font-bold">
+                Initializing Field Systems
+            </span>
+</div>
+<!-- Asymmetric Decorative Elements (Editorial Approach) -->
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-primary rounded-full blur-[100px] opacity-40"></div>
+<div class="absolute -bottom-12 -left-12 w-48 h-48 bg-white rounded-full blur-[80px] opacity-20"></div>
+</div>
+<!-- Hidden Layout Anchors (Excluded from Splash but available for Structure) -->
+<!-- Note: TopAppBar and BottomNavBar are NOT rendered on this screen per the "Linear/Transactional" rule in the "Shell Visibility & Relevance" section of the hierarchy. -->
+</body></html>

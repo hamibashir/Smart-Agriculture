@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartAgri - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#edeeef",
+              "on-secondary-fixed": "#002109",
+              "on-primary-container": "#004b1e",
+              "outline": "#6d7b6c",
+              "inverse-surface": "#2e3132",
+              "on-tertiary": "#ffffff",
+              "surface-variant": "#e1e3e4",
+              "surface": "#f8f9fa",
+              "on-primary-fixed-variant": "#005321",
+              "primary": "#006e2f",
+              "secondary-fixed-dim": "#96d59d",
+              "surface-dim": "#d9dadb",
+              "on-secondary-container": "#346e40",
+              "on-secondary-fixed-variant": "#145126",
+              "surface-container-lowest": "#ffffff",
+              "error-container": "#ffdad6",
+              "surface-container-low": "#f3f4f5",
+              "inverse-primary": "#4ae176",
+              "inverse-on-surface": "#f0f1f2",
+              "on-primary": "#ffffff",
+              "secondary": "#2f6a3c",
+              "secondary-fixed": "#b2f2b7",
+              "surface-bright": "#f8f9fa",
+              "primary-container": "#22c55e",
+              "error": "#ba1a1a",
+              "on-primary-fixed": "#002109",
+              "on-tertiary-fixed": "#410001",
+              "on-secondary": "#ffffff",
+              "on-error-container": "#93000a",
+              "tertiary": "#9e4036",
+              "primary-fixed": "#6bff8f",
+              "on-tertiary-container": "#76231b",
+              "background": "#f8f9fa",
+              "tertiary-fixed-dim": "#ffb4a9",
+              "secondary-container": "#afefb4",
+              "primary-fixed-dim": "#4ae176",
+              "on-tertiary-fixed-variant": "#7f2a21",
+              "tertiary-container": "#ff8b7c",
+              "surface-container-high": "#e7e8e9",
+              "on-surface-variant": "#3d4a3d",
+              "outline-variant": "#bccbb9",
+              "tertiary-fixed": "#ffdad5",
+              "on-background": "#191c1d",
+              "surface-container-highest": "#e1e3e4",
+              "on-error": "#ffffff",
+              "on-surface": "#191c1d",
+              "surface-tint": "#006e2f"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen pb-32">
+<!-- Top AppBar Execution -->
+<header class="bg-[#F8F9FA] dark:bg-slate-900 dock-0 sticky top-0 z-40">
+<div class="flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<img alt="User Profile" class="w-12 h-12 rounded-full object-cover border-2 border-primary-container" data-alt="Close-up portrait of a middle-aged man with a friendly smile, outdoor natural lighting, soft agricultural background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtvtF6-DA1V551uOpvJsXrOyn4gJW_VVzBdBTGqvHfEf1kbTcgsp7vYPhFDja_46hq_lCqDZ_sd_Q8kH5BVSEPkjl-O7Dm_BesZF32G9Bc2NuHnit2pJNpBo0QzoGkt3x88lO6Z10TTi-hkFnoqCvhRgBNLMGyMQOXcQ1M9NrdOGwfSNeC1JSQ05REhglk2LNHTHql3fr4-LeQd9LNHjKdl8w98UA3vAvA2__tJ-R6kfQWnI5oQwrbNQ5rNK0pHwIS3yNgvhiFPqw"/>
+<div>
+<p class="text-xs text-outline font-medium tracking-wide uppercase">Good morning,</p>
+<h1 class="font-['Inter'] font-bold tracking-tighter text-lg text-on-surface">Ahmed!</h1>
+</div>
+</div>
+<div class="relative hover:opacity-80 transition-opacity active:scale-95 duration-150 cursor-pointer">
+<span class="material-symbols-outlined text-primary text-2xl">notifications</span>
+<span class="absolute top-0 right-0 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
+</div>
+</div>
+</header>
+<main class="max-w-md mx-auto px-6 space-y-8 mt-4">
+<!-- Stats Carousel (Horizontal Scroll) -->
+<section class="px-2">
+<div class="grid grid-cols-3 gap-3">
+<!-- Card 1 -->
+<div class="bg-primary p-3 rounded-lg flex flex-col justify-between h-32">
+<span class="material-symbols-outlined text-white text-2xl" data-weight="fill">potted_plant</span>
+<div>
+<p class="text-white/80 text-[8px] font-bold tracking-widest uppercase leading-tight">Total Fields</p>
+<p class="text-white text-2xl font-extrabold tracking-tight">4</p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest p-3 rounded-lg flex flex-col justify-between h-32 shadow-sm border border-outline/10">
+<span class="material-symbols-outlined text-primary-container text-2xl">sensors</span>
+<div>
+<p class="text-outline text-[8px] font-bold tracking-widest uppercase leading-tight">Active Sensors</p>
+<p class="text-primary-container text-2xl font-extrabold tracking-tight">12</p>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest p-3 rounded-lg flex flex-col justify-between h-32 shadow-sm border border-outline/10">
+<span class="material-symbols-outlined text-primary-container text-2xl">water_drop</span>
+<div>
+<p class="text-outline text-[8px] font-bold tracking-widest uppercase leading-tight">Water Saved</p>
+<p class="text-on-surface text-xl font-extrabold tracking-tight truncate">1,200L</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Live Sensor Hero Card -->
+<section class="relative overflow-hidden rounded-lg">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover" data-alt="Wide angle view of a lush green wheat field under a bright morning sun with morning dew reflecting light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrszJ-ex0PCNJ3D5IK6Oh8RhojCsg8KT1SsEKILIj9yTz1ayvYlJOVpMfmhvE-FkrALvGsrORjUyOIv9sGGfj0de8hW8DzkCH07k5IdLpUF0Gt9yxjmVdJPAmN7I0Mz-mRiwjhDAsYwEHvHqGXB00a-ANYv2qI70s8n9EenxXL3kajXFbA2K7lI6FcuCXRDDy_3eoFU3KWBFNGQ1s5iVny_-n06BblCSjBa_a-0RLdmHWrwdaf1Z4qB6LOlLMxKmzvaULJy3fZ0JA"/>
+<div class="absolute inset-0 bg-gradient-to-br from-primary/40 to-transparent"></div>
+</div>
+<div class="relative z-10 p-6 bg-white/20 backdrop-blur-xl border border-white/30 m-4 rounded-lg shadow-xl">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-white font-bold text-xl tracking-tight">Main Wheat Field</h2>
+<div class="flex items-center gap-1.5 px-3 py-1 bg-white/30 rounded-full">
+<span class="w-2 h-2 bg-primary-container rounded-full animate-pulse"></span>
+<span class="text-white text-[10px] font-bold uppercase tracking-wider">Live</span>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2">
+<div class="flex flex-col items-center bg-white/10 p-3 rounded-lg border border-white/10">
+<span class="material-symbols-outlined text-white mb-1" style="font-variation-settings: 'FILL' 1;">humidity_mid</span>
+<p class="text-white font-bold">42%</p>
+<p class="text-white/60 text-[8px] uppercase tracking-tighter">Moisture</p>
+</div>
+<div class="flex flex-col items-center bg-white/10 p-3 rounded-lg border border-white/10">
+<span class="material-symbols-outlined text-white mb-1">thermostat</span>
+<p class="text-white font-bold">30°C</p>
+<p class="text-white/60 text-[8px] uppercase tracking-tighter">Temp</p>
+</div>
+<div class="flex flex-col items-center bg-white/10 p-3 rounded-lg border border-white/10">
+<span class="material-symbols-outlined text-white mb-1">water</span>
+<p class="text-white font-bold">60%</p>
+<p class="text-white/60 text-[8px] uppercase tracking-tighter">Humidity</p>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
+<p class="text-white/80 text-[10px]">Last updated: just now</p>
+<span class="material-symbols-outlined text-white text-sm">arrow_forward_ios</span>
+</div>
+</div>
+</section>
+<!-- Quick Actions Grid -->
+<section>
+<h3 class="text-outline text-[10px] font-bold tracking-widest uppercase mb-4 px-2">Quick Actions</h3>
+<div class="grid grid-cols-4 gap-3">
+<button class="flex flex-col items-center gap-2 p-3 bg-surface-container-low rounded-lg active:scale-95 transition-transform group">
+<div class="w-10 h-10 flex items-center justify-center bg-surface-container-lowest rounded-full group-hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-primary">add</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface">Add Field</span>
+</button>
+<button class="flex flex-col items-center gap-2 p-3 bg-surface-container-low rounded-lg active:scale-95 transition-transform group">
+<div class="w-10 h-10 flex items-center justify-center bg-surface-container-lowest rounded-full group-hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-primary">opacity</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface">Irrigate</span>
+</button>
+<button class="flex flex-col items-center gap-2 p-3 bg-surface-container-low rounded-lg active:scale-95 transition-transform group">
+<div class="w-10 h-10 flex items-center justify-center bg-surface-container-lowest rounded-full group-hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-primary">analytics</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface">Analytics</span>
+</button>
+<button class="flex flex-col items-center gap-2 p-3 bg-surface-container-low rounded-lg active:scale-95 transition-transform group">
+<div class="w-10 h-10 flex items-center justify-center bg-surface-container-lowest rounded-full group-hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-primary">psychology</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface">AI Advice</span>
+</button>
+</div>
+</section>
+<!-- Recent Activity Section -->
+<section class="pb-8">
+<div class="flex justify-between items-center mb-4 px-2">
+<h3 class="text-on-surface font-bold text-lg tracking-tight">Recent Activity</h3>
+<button class="text-primary text-[10px] font-bold uppercase tracking-widest">See All</button>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg">
+<div class="w-10 h-10 bg-primary-container/20 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold text-on-surface">Irrigation completed</h4>
+<p class="text-xs text-outline">Main Wheat Field</p>
+</div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-tighter">2m ago</span>
+</div>
+<div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg">
+<div class="w-10 h-10 bg-error/10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold text-on-surface">High temperature alert</h4>
+<p class="text-xs text-outline">North Vineyard</p>
+</div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-tighter">45m ago</span>
+</div>
+<div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg opacity-60">
+<div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">update</span>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold text-on-surface">System diagnostic run</h4>
+<p class="text-xs text-outline">All Sensors</p>
+</div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-tighter">3h ago</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar Execution -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-[#BCCBB9]/20 shadow-[0_-4px_12px_rgba(0,110,47,0.06)] z-50 rounded-t-[2rem]">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center justify-center bg-[#22C55E] text-white rounded-full p-3 scale-110 -translate-y-2 transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+</a>
+<!-- Fields (Inactive) -->
+<a class="flex flex-col items-center justify-center text-[#6B7280] dark:text-slate-400 p-2 hover:text-[#006E2F] dark:hover:text-[#22C55E] transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined">potted_plant</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase mt-1">Fields</span>
+</a>
+<!-- Alerts (Inactive) -->
+<a class="flex flex-col items-center justify-center text-[#6B7280] dark:text-slate-400 p-2 hover:text-[#006E2F] dark:hover:text-[#22C55E] transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined">notifications_active</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase mt-1">Alerts</span>
+</a>
+<!-- Profile (Inactive) -->
+<a class="flex flex-col items-center justify-center text-[#6B7280] dark:text-slate-400 p-2 hover:text-[#006E2F] dark:hover:text-[#22C55E] transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

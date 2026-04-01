@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartAgri - Add New Field</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "surface-container": "#edeeef",
+                "on-secondary-fixed": "#002109",
+                "on-primary-container": "#004b1e",
+                "outline": "#6d7b6c",
+                "inverse-surface": "#2e3132",
+                "on-tertiary": "#ffffff",
+                "surface-variant": "#e1e3e4",
+                "surface": "#f8f9fa",
+                "on-primary-fixed-variant": "#005321",
+                "primary": "#006e2f",
+                "secondary-fixed-dim": "#96d59d",
+                "surface-dim": "#d9dadb",
+                "on-secondary-container": "#346e40",
+                "on-secondary-fixed-variant": "#145126",
+                "surface-container-lowest": "#ffffff",
+                "error-container": "#ffdad6",
+                "surface-container-low": "#f3f4f5",
+                "inverse-primary": "#4ae176",
+                "inverse-on-surface": "#f0f1f2",
+                "on-primary": "#ffffff",
+                "secondary": "#2f6a3c",
+                "secondary-fixed": "#b2f2b7",
+                "surface-bright": "#f8f9fa",
+                "primary-container": "#22c55e",
+                "error": "#ba1a1a",
+                "on-primary-fixed": "#002109",
+                "on-tertiary-fixed": "#410001",
+                "on-secondary": "#ffffff",
+                "on-error-container": "#93000a",
+                "tertiary": "#9e4036",
+                "primary-fixed": "#6bff8f",
+                "on-tertiary-container": "#76231b",
+                "background": "#f8f9fa",
+                "tertiary-fixed-dim": "#ffb4a9",
+                "secondary-container": "#afefb4",
+                "primary-fixed-dim": "#4ae176",
+                "on-tertiary-fixed-variant": "#7f2a21",
+                "tertiary-container": "#ff8b7c",
+                "surface-container-high": "#e7e8e9",
+                "on-surface-variant": "#3d4a3d",
+                "outline-variant": "#bccbb9",
+                "tertiary-fixed": "#ffdad5",
+                "on-background": "#191c1d",
+                "surface-container-highest": "#e1e3e4",
+                "on-error": "#ffffff",
+                "on-surface": "#191c1d",
+                "surface-tint": "#006e2f"
+              },
+              fontFamily: {
+                "headline": ["Inter"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col items-center justify-start">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 bg-[#F8F9FA] flex justify-between items-center px-6 py-4 w-full sticky z-50">
+<div class="flex items-center gap-4">
+<button class="hover:opacity-80 transition-opacity active:scale-95 duration-150 text-[#006E2F]">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-['Inter'] font-bold tracking-tighter text-lg text-on-surface">Add New Field</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="hover:opacity-80 transition-opacity active:scale-95 duration-150 text-[#006E2F]">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Content Container (Scrollable View) -->
+<main class="w-full max-w-2xl px-6 pt-4 pb-32 flex flex-col gap-8 hide-scrollbar overflow-y-auto">
+<!-- Header Section -->
+<section class="space-y-2">
+<p class="text-label-md font-bold tracking-widest uppercase text-outline">Configuration</p>
+<h2 class="text-3xl font-extrabold tracking-tighter text-primary">Field Details</h2>
+</section>
+<!-- Form Layout -->
+<div class="flex flex-col gap-6">
+<!-- Field Name Input -->
+<div class="space-y-1.5">
+<label class="text-sm font-bold tracking-tight text-on-surface-variant ml-1">Field Name</label>
+<div class="bg-surface-container-lowest rounded-lg p-1 transition-shadow hover:shadow-sm focus-within:shadow-[0_0_0_2px_rgba(34,197,94,0.2)]">
+<input class="w-full bg-transparent border-none focus:ring-0 px-4 py-3 text-on-surface placeholder:text-outline-variant" placeholder="e.g., North Farm" type="text"/>
+</div>
+</div>
+<!-- Row: Area Size & Unit -->
+<div class="flex gap-4">
+<div class="flex-1 space-y-1.5">
+<label class="text-sm font-bold tracking-tight text-on-surface-variant ml-1">Area Size</label>
+<div class="bg-surface-container-lowest rounded-lg p-1 transition-shadow hover:shadow-sm">
+<input class="w-full bg-transparent border-none focus:ring-0 px-4 py-3 text-on-surface" placeholder="15" type="number"/>
+</div>
+</div>
+<div class="w-1/3 space-y-1.5">
+<label class="text-sm font-bold tracking-tight text-on-surface-variant ml-1">Unit</label>
+<div class="relative bg-surface-container-lowest rounded-lg p-1 transition-shadow hover:shadow-sm">
+<select class="w-full bg-transparent border-none focus:ring-0 px-4 py-3 appearance-none text-on-surface pr-10">
+<option>Acres</option>
+<option>Hectares</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-outline" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Dropdowns Group -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="space-y-1.5">
+<label class="text-sm font-bold tracking-tight text-on-surface-variant ml-1">Crop Type</label>
+<div class="relative bg-surface-container-lowest rounded-lg p-1 transition-shadow hover:shadow-sm">
+<select class="w-full bg-transparent border-none focus:ring-0 px-4 py-3 appearance-none text-on-surface pr-10">
+<option>Cotton</option>
+<option>Corn</option>
+<option>Wheat</option>
+<option>Soybean</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-outline" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="text-sm font-bold tracking-tight text-on-surface-variant ml-1">Soil Type</label>
+<div class="relative bg-surface-container-lowest rounded-lg p-1 transition-shadow hover:shadow-sm">
+<select class="w-full bg-transparent border-none focus:ring-0 px-4 py-3 appearance-none text-on-surface pr-10">
+<option>Loamy</option>
+<option>Clay</option>
+<option>Sandy</option>
+<option>Silty</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-outline" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</div>
+</div>
+</div>
+<!-- Date Picker -->
+<div class="space-y-1.5">
+<label class="text-sm font-bold tracking-tight text-on-surface-variant ml-1">Planting Date</label>
+<div class="bg-surface-container-lowest rounded-lg p-1 transition-shadow hover:shadow-sm flex items-center">
+<input class="flex-1 bg-transparent border-none focus:ring-0 px-4 py-3 text-on-surface" placeholder="Select date" type="text"/>
+<span class="material-symbols-outlined px-4 text-primary" data-icon="calendar_today">calendar_today</span>
+</div>
+</div>
+<!-- Map Placeholder -->
+<div class="space-y-1.5">
+<div class="flex justify-between items-center ml-1">
+<label class="text-sm font-bold tracking-tight text-on-surface-variant">Field Boundary</label>
+<button class="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="my_location">my_location</span>
+                        Locate
+                    </button>
+</div>
+<div class="relative w-full aspect-video rounded-lg overflow-hidden bg-surface-container-high border-2 border-dashed border-outline-variant/30 group">
+<img alt="Satellite view" class="w-full h-full object-cover opacity-50 grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Aerial satellite view of a rectangular green farm field surrounded by rural landscape in soft morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1tBsYqGnfAiEh8N0HYRu_QEuVHD4XP04ng9F9owahqCj1_krjfPicGtFfv-0zYKTLv7UWw0jnKaO_OkL3KXOZHrXoE5KqTalpOgyYmfEY_etc8CCBXlefbGVDz3erGv9uC_-5_oM1ZBKupNtSN2ohlll8J_DeddvqFCBvivRIGrAp8gU-lA06p02DovIF4NLpUFtvCZXF7l9sjgVzjPF50pPEDiZiykHvWqmI6G6q9qELCGe2LPExlp56aQqpczh-uQgN_3x81rE"/>
+<div class="absolute inset-0 flex flex-col items-center justify-center bg-surface-container-high/40 backdrop-blur-[2px]">
+<span class="material-symbols-outlined text-4xl text-outline mb-2" data-icon="map">map</span>
+<p class="text-sm font-medium text-on-surface-variant">Tap to define field boundary on map</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Button -->
+<footer class="fixed bottom-0 left-0 w-full p-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-outline-variant/20 flex justify-center z-50">
+<button class="w-full max-w-2xl bg-primary-container text-white py-4 px-8 rounded-full font-bold tracking-tight text-lg shadow-[0_4px_12px_rgba(34,197,94,0.3)] hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="save">save</span>
+            Save Field
+        </button>
+</footer>
+<!-- BottomNavBar (Hidden on this focused task screen as per Filter Rule) -->
+</body></html>

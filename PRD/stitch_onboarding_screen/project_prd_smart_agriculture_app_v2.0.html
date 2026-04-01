@@ -1,0 +1,124 @@
+# Project PRD/Brief: Smart Agriculture Flutter App v2.0
+
+**1. Project Title:** Smart Agriculture Flutter App v2.0
+**2. Document Owner:** Product Manager / Lead Developer
+**3. Version & Date:** v1.0, 02/04/2026
+
+---
+
+## 4. Executive Summary
+The Smart Agriculture Flutter App v2.0 is a complete ground-up rebuild of the mobile companion app for the Smart Agriculture IoT System. The system features ESP32 sensors installed in farms tracking soil moisture, temperature, and humidity, while providing automated irrigation capabilities. This rebuild aims to empower Pakistani farmers by upgrading the existing app with real-time WebSocket data, offline-first database syncing, Firebase push notifications, and a modern, localized (Urdu) interface. The ultimate goal is to increase farmer engagement, reduce response times to critical field alerts, and make the app fully usable in remote areas with poor internet connectivity.
+
+---
+
+## 5. Problem Statement
+Traditional farming requires manual field monitoring and irrigation tracking, which leads to water wastage and delayed responses to critical crop conditions.
+
+*   **Who:** Smallholder farmers (e.g., in Punjab/Sindh) and multi-field farm managers in Pakistan.
+*   **What:** While the v1.0 app functionality exists, users in remote fields suffer from poor 3G/4G connectivity, rendering the current cloud-only app completely unusable when they are actually at the farm. Furthermore, the lack of push notifications means farmers miss critical events (like a pump failing or soil drying out) unless they actively open the app.
+*   **Impact:** This leads to water wastage, crop stress due to delayed irrigation, and lack of trust in the "smart" system because the farmer isn't instantly notified of problems.
+
+---
+
+## 6. Goals & Objectives
+*   **Primary Goal:** Deliver a real-time, offline-capable mobile companion that allows farmers to monitor and control their fields reliably from anywhere, even without an active internet connection.
+*   **Secondary Goals:**
+    *   Increase Daily Active Usage (DAU) by 60% via real-time data streaming and proactive push notifications.
+    *   Reduce farmer response time to critical alerts (e.g., low soil moisture) to under 5 minutes.
+    *   Ensure 100% availability of cached field and sensor data when in "Offline Mode".
+    *   Provide a fully localized Urdu user interface to expand accessibility to non-English speaking farmers.
+
+---
+
+## 7. Target Audience/Users
+*   **Primary Users:** Smallholder Pakistani farmers (e.g., 5-10 acre plots). They need simple, icon-driven, language-accessible (Urdu) interfaces to monitor their fields and manually override water pumps.
+*   **Secondary Users:** Multi-field farm managers or agricultural technicians. They require detailed analytics, multi-field comparison charts, and advanced irrigation scheduling.
+
+### User Personas:
+*   **"Smallholder Ahmed" (42):** Manages 10 acres of wheat. Unreliable internet in the field. Needs large text, offline access, and an obvious "START PUMP" button.
+*   **"Manager Fatima" (35):** Tech-savvy, manages 25 acres across 3 fields. Needs detailed charts, trend analysis, and PDF data exports for planning.
+
+---
+
+## 8. Proposed Solution & Key Features
+**High-Level Overview:** We are building a fully rewritten Flutter application using modern state management (Riverpod) and routing (GoRouter). It connects to the existing Node.js backend. It will feature a premium glassmorphism UI, a local Isar NoSQL database for offline caching, FCM for push alerts, and Socket.IO for live sensor telemetry.
+
+### Key Features (MVP Scope):
+*   **Real-Time Dashboard:** Live sensor readings (moisture, temp, humidity, light) streaming continuously via WebSockets.
+*   **Irrigation Control Panel:** Manual start/stop controls for water pumps, with visual feedback and historical logs.
+*   **Offline-First Engine:** Local database automatically caches field data, sensor readings, and allows queueing of non-critical actions when internet is lost.
+*   **Smart Alerts & Push Notifications:** FCM integration for instant hardware-triggered alerts (e.g., "Critical: Moisture dropped below 20%").
+*   **AI Crop Recommendations:** View, analyze, and accept ML-driven crop suggestions based on field soil data.
+*   **Urdu Localization:** Total translation framework supporting RTL layouts.
+
+### User Stories:
+*   As a farmer in a remote area, I want to open the app and view my last synced dashboard without internet, so I can plan my day before heading out.
+*   As a farm manager, I want to receive a push notification the moment an irrigation pump starts automatically, so I have peace of mind.
+*   As an Urdu speaker, I want the app entirely in my native language, so I don't struggle to understand technical alerts.
+
+---
+
+## 9. Scope (In & Out)
+### In Scope:
+*   Complete Flutter App UI/UX redesign (Light/Dark mode).
+*   Integration with existing Node.js REST APIs.
+*   Socket.IO & Firebase FCM setup.
+*   Isar local database architecture for offline mode.
+*   Urdu / English i18n support.
+
+### Out of Scope:
+*   Modifications to the ESP32 hardware firmware.
+*   Major changes to the Node.js backend database schema.
+*   Advanced drone integration or satellite imagery.
+*   In-app community chat forums.
+
+---
+
+## 10. Success Metrics / KPIs
+*   **Offline Usability Rate:** Target 100% success rate reading cached dashboard data.
+*   **Alert Action Rate:** Percentage of critical push notifications tapped within 10 mins (Target: > 70%).
+*   **App Crash Rate:** Maintain a crash-free session rate of > 99.5%.
+*   **App Store Rating:** Achieve an average rating of 4.5+ stars.
+
+---
+
+## 11. Assumptions
+*   Existing Node.js backend is stable.
+*   Target demographic has access to basic Android smartphones (Android 6.0+).
+*   ESP32 hardware is correctly transmitting data.
+
+---
+
+## 12. Constraints
+*   **Network Topography:** Optimization for low-bandwidth, high-latency rural connections.
+*   **Timeline:** 12-week development cycle for the Kharif planting season.
+*   **App Size:** Final APK must remain under 25 MB.
+
+---
+
+## 13. Dependencies
+*   **Backend Team:** Implement missing APIs and configure FCM push events.
+*   **Infrastructure:** Procurement of Google Maps API keys and Firebase setup.
+*   **Translation:** Accurate agricultural Urdu translations from experts.
+
+---
+
+## 14. Potential Risks
+*   **Battery Drain from WebSockets:** Managed via smart socket lifecycle management.
+*   **Data Conflicts in Offline Mode:** Managed via strict last-write-wins and timestamp validation.
+*   **Hardware Integration Gaps:** Addressed via concurrent firmware updates.
+
+---
+
+## 15. High-Level Technical Considerations
+*   **State Management:** Riverpod (AsyncNotifierProvider).
+*   **Routing:** GoRouter for deep-linking.
+*   **Storage:** flutter_secure_storage for tokens, Isar for offline caching.
+*   **API Client:** Dio with global request interceptors.
+
+---
+
+## 16. Future Considerations
+*   Biometric authentication.
+*   Market price integration (Pakistani mandi rates).
+*   AR or camera-based AI crop disease detection.

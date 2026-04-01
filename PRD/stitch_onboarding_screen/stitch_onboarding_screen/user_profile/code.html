@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Profile - SmartAgri</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#edeeef",
+              "on-secondary-fixed": "#002109",
+              "on-primary-container": "#004b1e",
+              "outline": "#6d7b6c",
+              "inverse-surface": "#2e3132",
+              "on-tertiary": "#ffffff",
+              "surface-variant": "#e1e3e4",
+              "surface": "#f8f9fa",
+              "on-primary-fixed-variant": "#005321",
+              "primary": "#006e2f",
+              "secondary-fixed-dim": "#96d59d",
+              "surface-dim": "#d9dadb",
+              "on-secondary-container": "#346e40",
+              "on-secondary-fixed-variant": "#145126",
+              "surface-container-lowest": "#ffffff",
+              "error-container": "#ffdad6",
+              "surface-container-low": "#f3f4f5",
+              "inverse-primary": "#4ae176",
+              "inverse-on-surface": "#f0f1f2",
+              "on-primary": "#ffffff",
+              "secondary": "#2f6a3c",
+              "secondary-fixed": "#b2f2b7",
+              "surface-bright": "#f8f9fa",
+              "primary-container": "#22c55e",
+              "error": "#ba1a1a",
+              "on-primary-fixed": "#002109",
+              "on-tertiary-fixed": "#410001",
+              "on-secondary": "#ffffff",
+              "on-error-container": "#93000a",
+              "tertiary": "#9e4036",
+              "primary-fixed": "#6bff8f",
+              "on-tertiary-container": "#76231b",
+              "background": "#f8f9fa",
+              "tertiary-fixed-dim": "#ffb4a9",
+              "secondary-container": "#afefb4",
+              "primary-fixed-dim": "#4ae176",
+              "on-tertiary-fixed-variant": "#7f2a21",
+              "tertiary-container": "#ff8b7c",
+              "surface-container-high": "#e7e8e9",
+              "on-surface-variant": "#3d4a3d",
+              "outline-variant": "#bccbb9",
+              "tertiary-fixed": "#ffdad5",
+              "on-background": "#191c1d",
+              "surface-container-highest": "#e1e3e4",
+              "on-error": "#ffffff",
+              "on-surface": "#191c1d",
+              "surface-tint": "#006e2f"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-[#F8F9FA] dark:bg-slate-900 dock-full-width top-0 z-40">
+<div class="flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<button class="text-[#006E2F] dark:text-[#22C55E] hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-['Inter'] font-bold tracking-tighter text-lg dark:text-white text-[#006E2F] dark:text-[#22C55E]">SmartAgri</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-[#BCCBB9] dark:text-slate-500 hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-grow pb-32">
+<!-- Profile Header Section -->
+<section class="flex flex-col items-center py-12 px-6">
+<div class="relative group">
+<div class="w-32 h-32 rounded-full overflow-hidden border-4 border-primary-container/20 p-1 bg-surface-container-low shadow-lg">
+<img alt="Ahmed Ali" class="w-full h-full object-cover rounded-full" data-alt="portrait of a middle-aged professional man with a warm smile and short beard in soft natural light with a green field background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCT9OUmxF56aVkBBjPYy3L2oF0AGQ-OZkCAimMGzKzcaEam3wghiS_nv3H8CCrSEoRqRJ--RwYteo1lKqo1gicfsh2mb7gfCwDOV24BkVgtGy8O-WEmbFjrcSG34RVIpO24CWaTL8AsgsWsPKcwy6SQZbbNvkeOcpAm7RCvDjDx5YfxuImmJWBCpi6tKtzZ910AG0hd-EwKMGb_GJ2q_BnurpYWP07yFJ-uV_UtjssfAQ4X4lMjvrkNQgqbRcjhh906WMTGMGcJKYI"/>
+</div>
+<div class="absolute bottom-1 right-1 bg-primary text-white p-2 rounded-full border-4 border-background scale-90">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div class="mt-6 text-center">
+<h2 class="text-2xl font-bold tracking-tight text-primary">Ahmed Ali</h2>
+<p class="text-on-surface-variant font-medium mt-1">farmer@app.com</p>
+<div class="mt-3 inline-flex items-center gap-2 px-4 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-xs font-bold uppercase tracking-widest shadow-sm">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                    Premium Farmer
+                </div>
+</div>
+</section>
+<!-- Menu Groups (Editorial Asymmetric Layout) -->
+<div class="px-6 max-w-2xl mx-auto space-y-8">
+<!-- Group 1: Account -->
+<div>
+<h3 class="label-md font-bold text-outline uppercase tracking-[0.1em] text-xs mb-4 ml-2">Account</h3>
+<div class="bg-surface-container-low rounded-lg overflow-hidden space-y-[2px]">
+<!-- Item: Edit Profile -->
+<button class="w-full flex items-center justify-between p-5 bg-surface-container-lowest hover:bg-surface-container-high transition-colors text-left">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">person_edit</span>
+</div>
+<div>
+<span class="block font-semibold text-on-surface">Edit Profile</span>
+<span class="block text-xs text-on-surface-variant">Manage your personal details</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+<!-- Item: Notification Settings -->
+<button class="w-full flex items-center justify-between p-5 bg-surface-container-lowest hover:bg-surface-container-high transition-colors text-left">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">notifications_active</span>
+</div>
+<div>
+<span class="block font-semibold text-on-surface">Notification Settings</span>
+<span class="block text-xs text-on-surface-variant">Alerts, updates, and reminders</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+<!-- Item: App Preferences -->
+<button class="w-full flex items-center justify-between p-5 bg-surface-container-lowest hover:bg-surface-container-high transition-colors text-left">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<div>
+<span class="block font-semibold text-on-surface">App Preferences</span>
+<span class="block text-xs text-on-surface-variant">Language, Theme, Accessibility</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Group 2: Support -->
+<div>
+<h3 class="label-md font-bold text-outline uppercase tracking-[0.1em] text-xs mb-4 ml-2">Support</h3>
+<div class="bg-surface-container-low rounded-lg overflow-hidden space-y-[2px]">
+<!-- Item: Help & Support -->
+<button class="w-full flex items-center justify-between p-5 bg-surface-container-lowest hover:bg-surface-container-high transition-colors text-left">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary/10 text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined">help</span>
+</div>
+<div>
+<span class="block font-semibold text-on-surface">Help &amp; Support</span>
+<span class="block text-xs text-on-surface-variant">Guides, FAQ, and Support Center</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+<!-- Item: Privacy Policy -->
+<button class="w-full flex items-center justify-between p-5 bg-surface-container-lowest hover:bg-surface-container-high transition-colors text-left">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary/10 text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined">policy</span>
+</div>
+<div>
+<span class="block font-semibold text-on-surface">Privacy Policy</span>
+<span class="block text-xs text-on-surface-variant">Data usage and security standards</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Logout Button -->
+<div class="pt-8 flex justify-center">
+<button class="flex items-center gap-2 px-8 py-4 text-error font-bold tracking-wider uppercase text-sm hover:bg-error/5 rounded-full transition-all active:scale-95">
+<span class="material-symbols-outlined">logout</span>
+                    Log Out
+                </button>
+</div>
+<!-- App Version Meta -->
+<div class="text-center pb-10">
+<p class="text-outline text-[10px] font-medium tracking-widest uppercase opacity-50">SmartAgri v2.4.1 (Production)</p>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-[#BCCBB9]/20 shadow-[0_-4px_12px_rgba(0,110,47,0.06)] z-50 rounded-t-[2rem]">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-[#6B7280] dark:text-slate-400 p-2 hover:text-[#006E2F] active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase mt-1">Home</span>
+</a>
+<!-- Fields -->
+<a class="flex flex-col items-center justify-center text-[#6B7280] dark:text-slate-400 p-2 hover:text-[#006E2F] active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="potted_plant">potted_plant</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase mt-1">Fields</span>
+</a>
+<!-- Alerts -->
+<a class="flex flex-col items-center justify-center text-[#6B7280] dark:text-slate-400 p-2 hover:text-[#006E2F] active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase mt-1">Alerts</span>
+</a>
+<!-- Profile (ACTIVE) -->
+<a class="flex flex-col items-center justify-center bg-[#22C55E] text-white rounded-full p-3 scale-110 -translate-y-2 transition-all shadow-lg" href="#">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase mt-0.5">Profile</span>
+</a>
+</nav>
+</body></html>
