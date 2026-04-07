@@ -255,6 +255,7 @@ CREATE TABLE `sensor_readings` (
   `temperature` decimal(5,2) DEFAULT NULL COMMENT 'Celsius',
   `humidity` decimal(5,2) DEFAULT NULL COMMENT 'Percentage',
   `light_intensity` int(11) DEFAULT NULL COMMENT 'Lux',
+  `rainfall` decimal(6,2) DEFAULT NULL COMMENT 'mm',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -262,8 +263,8 @@ CREATE TABLE `sensor_readings` (
 -- Dumping data for table `sensor_readings`
 --
 
-INSERT INTO `sensor_readings` (`reading_id`, `sensor_id`, `reading_time`, `soil_moisture`, `temperature`, `humidity`, `light_intensity`, `created_at`) VALUES
-(1, 14, '2025-11-19 15:53:26', 45.50, 26.20, 60.50, 800, '2025-11-19 15:53:26');
+INSERT INTO `sensor_readings` (`reading_id`, `sensor_id`, `reading_time`, `soil_moisture`, `temperature`, `humidity`, `light_intensity`, `rainfall`, `created_at`) VALUES
+(1, 14, '2025-11-19 15:53:26', 45.50, 26.20, 60.50, 800, 0.00, '2025-11-19 15:53:26');
 
 -- --------------------------------------------------------
 
@@ -434,7 +435,8 @@ ALTER TABLE `sensors`
 ALTER TABLE `sensor_readings`
   ADD PRIMARY KEY (`reading_id`),
   ADD KEY `idx_sensor_id` (`sensor_id`),
-  ADD KEY `idx_reading_time` (`reading_time`);
+  ADD KEY `idx_reading_time` (`reading_time`),
+  ADD KEY `idx_sensor_time` (`sensor_id`, `reading_time` DESC);
 
 --
 -- Indexes for table `system_settings`
@@ -578,6 +580,12 @@ ALTER TABLE `irrigation_logs`
 ALTER TABLE `irrigation_schedules`
   ADD CONSTRAINT `irrigation_schedules_ibfk_1` FOREIGN KEY (`field_id`) REFERENCES `fields` (`field_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `irrigation_schedules_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `sensor_readings`
+--
+ALTER TABLE `sensor_readings`
+  ADD CONSTRAINT `sensor_readings_ibfk_1` FOREIGN KEY (`sensor_id`) REFERENCES `sensors` (`sensor_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `sensors`
