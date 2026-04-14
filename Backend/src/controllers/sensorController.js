@@ -25,22 +25,25 @@ const triggerAIRecommendation = async (fieldId, sensorId) => {
     );
     if (!field || !field.soil_type) return;
 
-    // Get average of last 5 readings for stable prediction
+    // Average of the 5 most recent rows (matches Database/smart_agriculture.sql column reading_time)
     const [readings] = await pool.query(
       `SELECT 
         AVG(soil_moisture) AS soil_moisture,
         AVG(temperature)   AS temperature,
         AVG(humidity)      AS humidity,
         AVG(rainfall)      AS rainfall
-       FROM sensor_readings
-       WHERE sensor_id = ?
-       ORDER BY reading_timestamp DESC
-       LIMIT 5`,
+       FROM (
+         SELECT soil_moisture, temperature, humidity, rainfall
+         FROM sensor_readings
+         WHERE sensor_id = ?
+         ORDER BY reading_time DESC
+         LIMIT 5
+       ) AS recent`,
       [sensorId]
     );
 
     const avg = readings[0];
-    if (!avg.soil_moisture) return; // Not enough data yet
+    if (avg.soil_moisture == null || avg.temperature == null || avg.humidity == null) return;
 
     // Determine season from current month (Pakistan: Rabi=Oct-Mar, Kharif=Apr-Sep)
     const month   = new Date().getMonth() + 1;
@@ -156,10 +159,53 @@ export const getLatestReading = async (req, res) => {
   }
 };
 
+const toNullableDecimal = (v) => {
+  if (v === undefined || v === null || v === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
+
+const toNullableInt = (v) => {
+  if (v === undefined || v === null || v === '') return null;
+  const n = Number(v);
+  if (!Number.isFinite(n)) return null;
+  return Math.round(Math.min(Math.max(n, -2147483648), 2147483647));
+};
+
+/** sensor_readings.rainfall: 0 = not raining, 1 = raining (accepts bool, 0/1, legacy mm > 0) */
+const toRainfallBool = (v) => {
+  if (v === undefined || v === null || v === '') return null;
+  if (typeof v === 'boolean') return v ? 1 : 0;
+  if (typeof v === 'string') {
+    const t = v.trim().toLowerCase();
+    if (t === 'true' || t === '1' || t === 'yes') return 1;
+    if (t === 'false' || t === '0' || t === 'no') return 0;
+  }
+  const n = Number(v);
+  if (!Number.isFinite(n)) return null;
+  if (n >= 1) return 1;
+  if (n <= 0) return 0;
+  return n >= 0.5 ? 1 : 0;
+};
+
+/** Generic bool parser for tinyint(1): accepts bool, 0/1, yes/no, on/off */
+const toTinyIntBool = (v) => {
+  if (v === undefined || v === null || v === '') return null;
+  if (typeof v === 'boolean') return v ? 1 : 0;
+  if (typeof v === 'string') {
+    const t = v.trim().toLowerCase();
+    if (t === 'true' || t === '1' || t === 'yes' || t === 'on') return 1;
+    if (t === 'false' || t === '0' || t === 'no' || t === 'off') return 0;
+  }
+  const n = Number(v);
+  if (!Number.isFinite(n)) return null;
+  return n >= 1 ? 1 : 0;
+};
+
 // Create sensor reading (for ESP32/IoT devices)
 export const createSensorReading = async (req, res) => {
   try {
-    const { device_id, soil_moisture, temperature, humidity, light_intensity, rainfall } = req.body;
+    const { device_id, soil_moisture, temperature, humidity, light_intensity, rainfall, pump_on } = req.body;
 
     if (!device_id) {
       return res.status(400).json({ success: false, message: 'Device ID is required' });
@@ -174,9 +220,19 @@ export const createSensorReading = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Sensor not found with this device ID' });
     }
 
+    // Align with sensor_readings: decimals + light_intensity INT (lux in schema; IoT may send 0–100)
+    const soil = toNullableDecimal(soil_moisture);
+    const temp = toNullableDecimal(temperature);
+    const hum = toNullableDecimal(humidity);
+    const light = toNullableInt(light_intensity);
+    const rain = toRainfallBool(rainfall);
+    const rainInsert = rain != null ? rain : 0;
+    const pump = toTinyIntBool(pump_on);
+    const pumpInsert = pump != null ? pump : 0;
+
     const [result] = await pool.query(
-      'INSERT INTO sensor_readings (sensor_id, soil_moisture, temperature, humidity, light_intensity, rainfall) VALUES (?, ?, ?, ?, ?, ?)',
-      [sensor.sensor_id, soil_moisture, temperature, humidity, light_intensity, rainfall || 0]
+      'INSERT INTO sensor_readings (sensor_id, soil_moisture, temperature, humidity, light_intensity, rainfall, pump_on) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [sensor.sensor_id, soil, temp, hum, light, rainInsert, pumpInsert]
     );
 
     // ✅ Respond to ESP32 immediately — don't wait for AI

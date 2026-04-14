@@ -159,7 +159,7 @@ CREATE TABLE `irrigation_logs` (
   `field_id` int(11) NOT NULL,
   `sensor_id` int(11) DEFAULT NULL COMMENT 'NULL if manual irrigation',
   `irrigation_type` enum('automatic','manual','scheduled') NOT NULL,
-  `start_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `start_time` timestamp NOT NULL DEFAULT current_timestamp(),
   `end_time` timestamp NULL DEFAULT NULL,
   `duration_minutes` int(11) DEFAULT NULL COMMENT 'Calculated duration',
   `water_used_liters` decimal(10,2) DEFAULT NULL COMMENT 'Total water consumed',
@@ -239,7 +239,7 @@ CREATE TABLE `sensors` (
 --
 
 INSERT INTO `sensors` (`sensor_id`, `field_id`, `sensor_type`, `device_id`, `sensor_model`, `installation_date`, `location_description`, `calibration_offset`, `is_active`, `last_maintenance_date`, `battery_level`, `firmware_version`, `created_at`, `updated_at`) VALUES
-(14, 6, 'combined', 'ESP_32test', 'ESP32 + DHT11 + Soil Sensor', '2025-11-17', 'Test Location', 0.00, 1, NULL, 100.00, '1.0.0', '2025-11-17 14:16:52', '2025-11-17 14:16:52');
+(14, 6, 'combined', 'ESP_32test', 'ESP32 + DHT22 + Soil Sensor', '2025-11-17', 'Test Location', 0.00, 1, NULL, 100.00, '1.0.0', '2025-11-17 14:16:52', '2025-11-17 14:16:52');
 
 -- --------------------------------------------------------
 
@@ -254,8 +254,9 @@ CREATE TABLE `sensor_readings` (
   `soil_moisture` decimal(5,2) DEFAULT NULL COMMENT 'Percentage',
   `temperature` decimal(5,2) DEFAULT NULL COMMENT 'Celsius',
   `humidity` decimal(5,2) DEFAULT NULL COMMENT 'Percentage',
-  `light_intensity` int(11) DEFAULT NULL COMMENT 'Lux',
-  `rainfall` decimal(6,2) DEFAULT NULL COMMENT 'mm',
+  `light_intensity` decimal(5,2) DEFAULT NULL COMMENT 'Percentage (0-100 from ADC mapping)',
+  `rainfall` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1=raining, 0=not raining',
+  `pump_on` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1=pump on, 0=pump off',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -263,8 +264,8 @@ CREATE TABLE `sensor_readings` (
 -- Dumping data for table `sensor_readings`
 --
 
-INSERT INTO `sensor_readings` (`reading_id`, `sensor_id`, `reading_time`, `soil_moisture`, `temperature`, `humidity`, `light_intensity`, `rainfall`, `created_at`) VALUES
-(1, 14, '2025-11-19 15:53:26', 45.50, 26.20, 60.50, 800, 0.00, '2025-11-19 15:53:26');
+INSERT INTO `sensor_readings` (`reading_id`, `sensor_id`, `reading_time`, `soil_moisture`, `temperature`, `humidity`, `light_intensity`, `rainfall`, `pump_on`, `created_at`) VALUES
+(1, 14, '2025-11-19 15:53:26', 45.50, 26.20, 60.50, 80.00, 0, 0, '2025-11-19 15:53:26');
 
 -- --------------------------------------------------------
 

@@ -1,15 +1,4 @@
 #include <WiFi.h>
-#include <WiFiAP.h>
-#include <WiFiClient.h>
-#include <WiFiGeneric.h>
-#include <WiFiMulti.h>
-#include <WiFiSTA.h>
-#include <WiFiScan.h>
-#include <WiFiServer.h>
-#include <WiFiType.h>
-#include <WiFiUdp.h>
-
-#include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <DHT.h>
@@ -17,19 +6,21 @@
 // ============================================
 // WiFi Configuration - UPDATE THESE VALUES!
 // ============================================
-const char* ssid = "AccessDenied";           // Your WiFi network name
-const char* password = "404404404";    // Your WiFi password
+const char* ssid = "Hamza";
+const char* password = "hamza2004";
 
 // ============================================
 // Backend API Configuration - UPDATE YOUR SERVER IP!
 // ============================================
-const char* serverURL = "http://10.79.48.79:5000";  // Your backend server IP (same as Flutter app)
-const char* apiEndpoint = "/api/sensors/reading";
+// Backend: use host + port + path (IPv4 WiFiClient — avoids URL/parser edge cases)
+const char* BACKEND_HOST = "192.168.18.73";
+const uint16_t BACKEND_PORT = 5000;
+const char* API_PATH = "/api/sensors/reading";
 
 // ============================================
 // Device Configuration - UPDATE THIS!
 // ============================================
-const char* deviceId = "ESP_32test";  // Unique device ID (must match database sensor device_id)
+const char* deviceId = "ESP_32test";
 
 // ============================================
 // Pin Definitions
@@ -40,239 +31,243 @@ const char* deviceId = "ESP_32test";  // Unique device ID (must match database s
 #define DHT_PIN 4
 #define RELAY_PIN 14
 
-#define DHT_TYPE DHT11
+#define DHT_TYPE DHT22
 DHT dht(DHT_PIN, DHT_TYPE);
 
 // ============================================
 // Sensor Thresholds
-// CHANGE HERE: Adjust these values to calibrate sensor trigger points
 // ============================================
-#define SOIL_DRY_THRESHOLD 2500 // Value > 2500 is considered DRY
-#define RAIN_THRESHOLD 2000     // Value < 2000 is usually RAIN (depending on sensor logic)
-#define LIGHT_DARK_THRESHOLD 3000 // Value > 3000 is DARK
+#define SOIL_DRY_THRESHOLD 2500
+#define RAIN_THRESHOLD 2000
+#define LIGHT_DARK_THRESHOLD 3000
 
 // ============================================
 // Timing Configuration
 // ============================================
-#define READING_INTERVAL 3000          // Local reading interval (3 seconds)
-#define BACKEND_SEND_INTERVAL 30000    // Send to backend every 30 seconds
+#define READING_INTERVAL 3000
+#define BACKEND_SEND_INTERVAL 30000
+#define BACKEND_RETRY_INTERVAL 5000
 #define PUMP_MIN_RUN_TIME 1500
+#define WIFI_RETRY_INTERVAL_MS 10000
+
+#define ANALOG_SAMPLES 4
 
 unsigned long lastReadTime = 0;
 unsigned long lastBackendSendTime = 0;
+unsigned long lastBackendAttemptTime = 0;
 unsigned long pumpStartTime = 0;
+unsigned long lastWifiAttemptMs = 0;
 bool pumpRunning = false;
-
-// WiFi connection tracking
 bool wifiConnected = false;
+
+static int readAnalogSmoothed(uint8_t pin);
+static bool readDht(float& tempC, float& humPct);
+static void readAllSensors(int& soil, int& rain, int& light, float& tempC, float& humPct);
+static void displaySensorData(int soil, int rain, int light, float temp, float hum);
+static void controlPump(int soilValue, int rainValue);
+static void turnPumpOn();
+static void turnPumpOff();
+static void connectToWiFi();
+static float convertSoilMoistureToPercentage(int rawValue);
+static float convertLightToPercentage(int rawValue);
+static bool sendSensorDataToBackend(int soilRaw, int rainRaw, int lightRaw, float temp, float hum);
+static void printWifiDiag();
 
 void setup() {
   Serial.begin(115200);
   delay(2000);
-  
-  Serial.println("\n🌾 ========================================");
-  Serial.println("🌾  ESP32 Smart Irrigation System");
-  Serial.println("🌾  Backend Integration Enabled");
-  Serial.println("🌾 ========================================\n");
-  
-  // Initialize sensors
+
+  Serial.println("\n====================================");
+  Serial.println(" ESP32 Smart Irrigation + API");
+  Serial.println("====================================\n");
+
   dht.begin();
-  Serial.println("✓ DHT Sensor initialized");
-  
+  Serial.println("DHT initialized");
+
   pinMode(RELAY_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW);
-  Serial.println("✓ Relay initialized (Pump OFF)");
-  
-  Serial.println("✓ Analog sensors ready");
-  
-  // Connect to WiFi
-  Serial.println("\n📶 Connecting to WiFi...");
+  Serial.println("Relay OFF");
+
+  Serial.println("Analog inputs ready");
+
+  Serial.println("\nConnecting to WiFi...");
   connectToWiFi();
-  
+
   if (wifiConnected) {
-    Serial.println("✅ WiFi connected successfully!");
-    Serial.print("📍 IP Address: ");
-    Serial.println(WiFi.localIP());
-    Serial.print("📶 Signal Strength: ");
+    Serial.println("WiFi OK");
+    printWifiDiag();
+    Serial.print("RSSI: ");
     Serial.print(WiFi.RSSI());
     Serial.println(" dBm");
-    Serial.print("🔑 Device ID: ");
+    Serial.print("device_id: ");
     Serial.println(deviceId);
-    Serial.print("🌐 Backend URL: ");
-    Serial.println(serverURL);
+    Serial.print("POST target: http://");
+    Serial.print(BACKEND_HOST);
+    Serial.print(":");
+    Serial.print(BACKEND_PORT);
+    Serial.println(API_PATH);
   } else {
-    Serial.println("⚠️  WiFi connection failed. System will work locally only.");
+    Serial.println("WiFi failed — local pump logic only");
   }
-  
-  Serial.println("\n✅ System ready! Starting readings...\n");
+
+  Serial.println("\nStarting loop.\n");
   delay(1000);
 }
 
 void loop() {
-  unsigned long currentTime = millis();
-  
-  // Check WiFi connection periodically
-  if (WiFi.status() != WL_CONNECTED) {
-    if (wifiConnected) {
-      Serial.println("⚠️  WiFi disconnected. Attempting to reconnect...");
-      wifiConnected = false;
-    }
-    connectToWiFi();
-  } else {
+  unsigned long now = millis();
+
+  if (WiFi.status() == WL_CONNECTED) {
     wifiConnected = true;
-  }
-  
-  // Local sensor readings and pump control (every 2 seconds)
-  if (currentTime - lastReadTime >= READING_INTERVAL) {
-    lastReadTime = currentTime;
-    
-    int soilValue = readSoilMoisture();
-    int rainValue = readRainSensor();
-    int lightValue = readLightSensor();
-    float temperature = readTemperature();
-    float humidity = readHumidity();
-    
-    displaySensorData(soilValue, rainValue, lightValue, temperature, humidity);
-    
-    controlPump(soilValue, rainValue, lightValue);
-  }
-  
-  // Send data to backend (every 30 seconds)
-  if (wifiConnected && (currentTime - lastBackendSendTime >= BACKEND_SEND_INTERVAL)) {
-    lastBackendSendTime = currentTime;
-    
-    int soilValue = readSoilMoisture();
-    int rainValue = readRainSensor();
-    int lightValue = readLightSensor();
-    float temperature = readTemperature();
-    float humidity = readHumidity();
-    
-    // Send sensor data to backend
-    bool success = sendSensorDataToBackend(soilValue, rainValue, lightValue, temperature, humidity);
-    
-    if (success) {
-      Serial.println("✅ Data sent to backend successfully!\n");
-    } else {
-      Serial.println("❌ Failed to send data to backend\n");
+    lastWifiAttemptMs = now;
+  } else {
+    wifiConnected = false;
+    if (now - lastWifiAttemptMs >= WIFI_RETRY_INTERVAL_MS) {
+      Serial.println("WiFi down — reconnecting...");
+      connectToWiFi();
+      lastWifiAttemptMs = millis();
     }
   }
-  
-  delay(100); // Small delay to prevent watchdog issues
-}
 
-int readSoilMoisture() {
-  int value = analogRead(SOIL_PIN);
-  return value;
-}
+  bool needRead = (now - lastReadTime >= READING_INTERVAL);
+  bool enoughTimeSinceSuccess = (now - lastBackendSendTime >= BACKEND_SEND_INTERVAL);
+  bool enoughTimeSinceAttempt = (now - lastBackendAttemptTime >= BACKEND_RETRY_INTERVAL);
+  bool needSend = wifiConnected && enoughTimeSinceSuccess && enoughTimeSinceAttempt;
 
-int readRainSensor() {
-  int value = analogRead(RAIN_PIN);
-  return value;
-}
-
-int readLightSensor() {
-  int value = analogRead(LIGHT_PIN);
-  return value;
-}
-
-float readTemperature() {
-  float temp = dht.readTemperature();
-  if (isnan(temp)) {
-    Serial.println("ERROR: Failed to read temperature!");
-    return -999;
+  if (!needRead && !needSend) {
+    delay(50);
+    return;
   }
-  return temp;
+
+  int soilValue, rainValue, lightValue;
+  float temperature, humidity;
+
+  if (needRead) {
+    lastReadTime = now;
+  }
+  readAllSensors(soilValue, rainValue, lightValue, temperature, humidity);
+
+  if (needRead) {
+    displaySensorData(soilValue, rainValue, lightValue, temperature, humidity);
+    controlPump(soilValue, rainValue);
+  }
+
+  if (needSend) {
+    lastBackendAttemptTime = now;
+    bool ok = sendSensorDataToBackend(soilValue, rainValue, lightValue, temperature, humidity);
+    if (ok) {
+      lastBackendSendTime = now;
+    }
+    Serial.println(ok ? "Backend: OK\n" : "Backend: FAIL\n");
+  }
+
+  delay(50);
 }
 
-float readHumidity() {
-  float hum = dht.readHumidity();
-  if (isnan(hum)) {
-    Serial.println("ERROR: Failed to read humidity!");
-    return -999;
+int readAnalogSmoothed(uint8_t pin) {
+  long sum = 0;
+  for (int i = 0; i < ANALOG_SAMPLES; i++) {
+    sum += analogRead(pin);
+    delayMicroseconds(150);
   }
-  return hum;
+  return (int)(sum / ANALOG_SAMPLES);
+}
+
+bool readDht(float& tempC, float& humPct) {
+  humPct = dht.readHumidity();
+  tempC = dht.readTemperature();
+  if (isnan(humPct) || isnan(tempC)) {
+    tempC = -999;
+    humPct = -999;
+    return false;
+  }
+  return true;
+}
+
+void readAllSensors(int& soil, int& rain, int& light, float& tempC, float& humPct) {
+  soil = readAnalogSmoothed(SOIL_PIN);
+  rain = readAnalogSmoothed(RAIN_PIN);
+  light = readAnalogSmoothed(LIGHT_PIN);
+  readDht(tempC, humPct);
 }
 
 void displaySensorData(int soil, int rain, int light, float temp, float hum) {
-  Serial.println("┌─────────────────────────────────────┐");
-  Serial.println("│      SENSOR READINGS                │");
-  Serial.println("├─────────────────────────────────────┤");
-  
-  Serial.print("│ Soil Moisture: ");
+  Serial.println("-------------------------------------");
+  Serial.print("Soil ADC: ");
   Serial.print(soil);
-  Serial.print(" (");
+  Serial.print("  ");
   if (soil > SOIL_DRY_THRESHOLD) {
-    Serial.print("DRY - Need Water");
+    Serial.println("(dry)");
   } else if (soil > 1500) {
-    Serial.print("MODERATE");
+    Serial.println("(moderate)");
   } else {
-    Serial.print("WET");
+    Serial.println("(wet)");
   }
-  Serial.println(")");
-  
-  Serial.print("│ Rain Sensor:   ");
+
+  Serial.print("Rain ADC: ");
   Serial.print(rain);
-  Serial.print(" (");
-  if (rain < RAIN_THRESHOLD) { // Value < 2000 means Low Resistance (Wet)
-    Serial.print("RAINING");
-  } else {
-    Serial.print("NO RAIN");
-  }
-  Serial.println(")");
-  
-  Serial.print("│ Light Level:   ");
+  Serial.println(rain < RAIN_THRESHOLD ? "  (rain/wet pad)" : "  (no rain)");
+
+  Serial.print("Light ADC: ");
   Serial.print(light);
-  Serial.print(" (");
-  if (light < LIGHT_DARK_THRESHOLD) {
-    Serial.print("Light/Day");
-  } else if (light < 3000) {
-    Serial.print("MODERATE");
+  Serial.print("  ");
+  if (light > LIGHT_DARK_THRESHOLD) {
+    Serial.println("(dark)");
+  } else if (light > 1500) {
+    Serial.println("(moderate)");
   } else {
-    Serial.print("Day/Light");
+    Serial.println("(bright)");
   }
-  Serial.println(")");
-  
-  Serial.print("│ Temperature:   ");
+
+  Serial.print("Temp: ");
   if (temp != -999) {
     Serial.print(temp, 1);
-    Serial.println(" °C");
+    Serial.println(" C");
   } else {
     Serial.println("ERROR");
   }
-  
-  Serial.print("│ Humidity:      ");
+
+  Serial.print("Humidity: ");
   if (hum != -999) {
     Serial.print(hum, 1);
     Serial.println(" %");
   } else {
     Serial.println("ERROR");
   }
-  
-  Serial.print("│ Pump Status:   ");
-  Serial.println(pumpRunning ? "ON (Running)" : "OFF");
-  
-  Serial.println("└─────────────────────────────────────┘\n");
+
+  Serial.print("Pump: ");
+  Serial.println(pumpRunning ? "ON" : "OFF");
+  Serial.println("-------------------------------------\n");
 }
 
-void controlPump(int soilValue, int rainValue, int lightValue) {
-  
-  // High Analog Value = Dry/No Rain (Open Circuit)
-  // Low Analog Value = Wet/Raining (Short Circuit)
-  
-  bool soilIsDry = (soilValue > SOIL_DRY_THRESHOLD); // True if > 2500 (Dry)
-  bool notRaining = (rainValue > RAIN_THRESHOLD);    // True if > 2000 (No Rain)
-  
+void controlPump(int soilValue, int rainValue) {
+  bool soilIsDry = (soilValue > SOIL_DRY_THRESHOLD);
+  bool notRaining = (rainValue > RAIN_THRESHOLD);
+
   if (soilIsDry && notRaining && !pumpRunning) {
     turnPumpOn();
-    Serial.println("🚿 AUTO: Pump turned ON (Soil dry, no rain)");
-    
-  } else if (pumpRunning && (!soilIsDry || !notRaining)) {
+    Serial.println("AUTO: Pump ON (dry soil, no rain)");
+    return;
+  }
+
+  if (!pumpRunning) {
+    return;
+  }
+
+  bool wantOff = (!soilIsDry || !notRaining);
+  if (!wantOff) {
+    return;
+  }
+
+  if (!notRaining) {
     turnPumpOff();
-    if (!notRaining) { // This means it IS Raining inside the logic check
-      Serial.println("⛔ AUTO: Pump turned OFF (Rain detected)");
-    } else {
-      Serial.println("⛔ AUTO: Pump turned OFF (Soil wet enough)");
-    }
+    Serial.println("AUTO: Pump OFF (rain)");
+    return;
+  }
+
+  if (millis() - pumpStartTime >= PUMP_MIN_RUN_TIME) {
+    turnPumpOff();
+    Serial.println("AUTO: Pump OFF (soil wet enough)");
   }
 }
 
@@ -287,135 +282,120 @@ void turnPumpOff() {
   pumpRunning = false;
 }
 
-// ============================================
-// WiFi Connection Function
-// ============================================
 void connectToWiFi() {
   if (WiFi.status() == WL_CONNECTED) {
     wifiConnected = true;
     return;
   }
-  
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  
-  Serial.print("🔗 Connecting to WiFi");
+
+  Serial.print("WiFi");
   unsigned long startTime = millis();
-  
-  while (WiFi.status() != WL_CONNECTED && (millis() - startTime < 15000)) {
-    delay(500);
+  while (WiFi.status() != WL_CONNECTED && (millis() - startTime < 12000)) {
+    delay(400);
     Serial.print(".");
   }
-  
-  if (WiFi.status() == WL_CONNECTED) {
-    wifiConnected = true;
-    Serial.println();
-  } else {
-    wifiConnected = false;
-    Serial.println("\n❌ WiFi connection failed");
+  Serial.println();
+
+  wifiConnected = (WiFi.status() == WL_CONNECTED);
+  if (!wifiConnected) {
+    Serial.println("WiFi connect failed");
   }
 }
 
-// ============================================
-// Convert Sensor Values to Backend Format
-// ============================================
 float convertSoilMoistureToPercentage(int rawValue) {
-  // CHANGE HERE: Adjust 0 (wettest) and 4095 (driest) to your specific sensor's range
-  // ESP32 ADC is 12-bit (0-4095)
-  // Higher raw value = drier soil (less moisture)
-  // Lower raw value = wetter soil (more moisture)
-  // Convert to percentage: 0% = very dry, 100% = very wet
-  // Invert the mapping: 4095 (dry) -> 0%, 0 (wet) -> 100%
-  float percentage = map(rawValue, 0, 4095, 100, 0);
-  return constrain(percentage, 0, 100);
-}
-
-float convertRainToPercentage(int rawValue) {
-  // CHANGE HERE: Adjust 0 and 4095 to calibrate rain sensitivity
-  // Lower raw value = more rain detected
-  // Convert to percentage: 0% = heavy rain, 100% = no rain
-  float percentage = map(rawValue, 0, 4095, 0, 100);
-  return constrain(percentage, 0, 100);
+  float percentage = (float)map(rawValue, 0, 4095, 100, 0);
+  return constrain(percentage, 0.0f, 100.0f);
 }
 
 float convertLightToPercentage(int rawValue) {
-  // CHANGE HERE: Adjust 0 and 4095 to calibrate light sensitivity
-  // Convert to percentage: 0% = dark, 100% = bright
-  // Invert: 0 (Bright) -> 100%, 4095 (Dark) -> 0%
-  float percentage = map(rawValue, 0, 4095, 100, 0);
-  return constrain(percentage, 0, 100);
+  float percentage = (float)map(rawValue, 0, 4095, 100, 0);
+  return constrain(percentage, 0.0f, 100.0f);
 }
 
-// ============================================
-// Send Sensor Data to Backend API
-// ============================================
+void printWifiDiag() {
+  if (WiFi.status() != WL_CONNECTED) {
+    return;
+  }
+  Serial.print("ESP32 IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.print("Gateway:  ");
+  Serial.println(WiFi.gatewayIP());
+  Serial.print("Mask:     ");
+  Serial.println(WiFi.subnetMask());
+  IPAddress esp = WiFi.localIP();
+  IPAddress srv;
+  if (!srv.fromString(BACKEND_HOST)) {
+    Serial.println("BACKEND_HOST is not a valid IPv4 address.");
+    return;
+  }
+  IPAddress mask = WiFi.subnetMask();
+  bool same = true;
+  for (int i = 0; i < 4; i++) {
+    if ((esp[i] & mask[i]) != (srv[i] & mask[i])) {
+      same = false;
+      break;
+    }
+  }
+  if (!same) {
+    Serial.println("WARN: ESP32 and BACKEND_HOST differ in subnet — connection refused is likely.");
+  }
+}
+
 bool sendSensorDataToBackend(int soilRaw, int rainRaw, int lightRaw, float temp, float hum) {
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("❌ WiFi not connected. Cannot send data.");
     return false;
   }
-  
+
+  WiFiClient client;
   HTTPClient http;
-  String fullURL = String(serverURL) + String(apiEndpoint);
-  
-  http.begin(fullURL);
-  http.addHeader("Content-Type", "application/json");
-  http.setTimeout(5000); // 5 second timeout
-  
-  // Convert sensor readings to backend format
-  float soilMoisture = convertSoilMoistureToPercentage(soilRaw);
-  float rainfall = convertRainToPercentage(rainRaw); // Higher = less rain (inverted)
-  float lightIntensity = convertLightToPercentage(lightRaw);
-  
-  // Convert temperature from Fahrenheit to Celsius if needed
-  float tempCelsius = temp;
-  if (temp != -999) {
-    // Assuming DHT11 reads in Celsius by default, but if your readings are in Fahrenheit:
-    // tempCelsius = (temp - 32) * 5.0 / 9.0;
+
+  if (!http.begin(client, BACKEND_HOST, BACKEND_PORT, API_PATH)) {
+    Serial.println("HTTP begin() failed");
+    return false;
   }
-  
-  // Create JSON payload matching backend API format
-  StaticJsonDocument<512> doc;
+  http.addHeader("Content-Type", "application/json");
+  http.setTimeout(10000);
+  http.setConnectTimeout(8000);
+
+  float soilMoisture = convertSoilMoistureToPercentage(soilRaw);
+  float lightIntensity = convertLightToPercentage(lightRaw);
+  // Same rule as Serial/pump: raw < RAIN_THRESHOLD => wet pad / raining
+  bool raining = (rainRaw < RAIN_THRESHOLD);
+
+  StaticJsonDocument<384> doc;
   doc["device_id"] = deviceId;
-  
-  // Add sensor values (always send soil moisture and light, others only if valid)
   doc["soil_moisture"] = soilMoisture;
   doc["light_intensity"] = lightIntensity;
-  
-  // Add temperature and humidity only if valid readings
   if (temp != -999) {
-    doc["temperature"] = tempCelsius;
+    doc["temperature"] = temp;
   }
   if (hum != -999) {
     doc["humidity"] = hum;
   }
-  
-  doc["rainfall"] = (100.0 - rainfall); // Invert: 0% = no rain, 100% = heavy rain
-  doc["water_flow_rate"] = 0.0; // Not measured, set to 0
-  doc["signal_strength"] = WiFi.RSSI();
-  
+  doc["rainfall"] = raining;
+  doc["pump_on"] = pumpRunning ? 1 : 0;
+
   String jsonString;
   serializeJson(doc, jsonString);
-  
-  Serial.println("📤 Sending sensor data to backend...");
-  Serial.printf("🌐 URL: %s\n", fullURL.c_str());
-  Serial.printf("📦 Payload: %s\n", jsonString.c_str());
-  
-  // Send POST request
-  int httpResponseCode = http.POST(jsonString);
-  
+
+  Serial.println("POST sensor reading...");
+  Serial.println(jsonString);
+
+  int code = http.POST(jsonString);
   bool success = false;
-  if (httpResponseCode > 0) {
-    String response = http.getString();
-    Serial.printf("📥 Response Code: %d\n", httpResponseCode);
-    Serial.printf("📝 Response: %s\n", response.c_str());
-    
-    success = (httpResponseCode == 200 || httpResponseCode == 201);
+  if (code > 0) {
+    Serial.printf("HTTP %d\n", code);
+    if (code == 200 || code == 201) {
+      success = true;
+    }
+    http.getString();
   } else {
-    Serial.printf("❌ HTTP Error: %d\n", httpResponseCode);
-    Serial.printf("❌ Error: %s\n", http.errorToString(httpResponseCode).c_str());
+    Serial.printf("HTTP error %d: %s\n", code, http.errorToString(code).c_str());
   }
-  
+
   http.end();
   return success;
 }

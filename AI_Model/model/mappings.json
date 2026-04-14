@@ -1,0 +1,32 @@
+{
+  "soil_types": [
+    "clay",
+    "clay_loam",
+    "loamy",
+    "sandy",
+    "silty"
+  ],
+  "seasons": [
+    "kharif",
+    "rabi"
+  ],
+  "crops": [
+    "chickpea",
+    "cotton",
+    "maize",
+    "mustard",
+    "rice",
+    "sugarcane",
+    "sunflower",
+    "wheat"
+  ],
+  "features": [
+    "soil_moisture",
+    "temperature",
+    "humidity",
+    "soil_type_enc",
+    "season_enc",
+    "rainfall"
+  ],
+  "accuracy": 83.33
+}
