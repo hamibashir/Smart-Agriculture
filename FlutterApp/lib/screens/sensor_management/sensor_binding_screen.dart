@@ -3,6 +3,7 @@ import '../../models/sensor.dart';
 import '../../models/field.dart';
 import '../../services/api_service.dart';
 import '../../config/app_theme.dart';
+import 'add_sensor_screen.dart';
 
 class SensorBindingScreen extends StatefulWidget {
   const SensorBindingScreen({super.key});
@@ -146,6 +147,14 @@ class _SensorBindingScreenState extends State<SensorBindingScreen> {
                     ],
                   ),
                 ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddSensorScreen()));
+          if (result == true) await _loadData();
+        },
+        child: const Icon(Icons.add),
+        tooltip: 'Register New Sensor',
+      ),
     );
   }
 

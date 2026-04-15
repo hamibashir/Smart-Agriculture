@@ -145,7 +145,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   delegate: SliverChildListDelegate([
                     _StatsGrid(stats: _stats!),
                     const SizedBox(height: 24),
-                    const Text('Current Conditions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text('Conditions: ${_stats!['latest_field_name'] ?? 'Farm'}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
                     _ConditionsCard(stats: _stats!),
                     const SizedBox(height: 24),
@@ -190,10 +190,10 @@ class _StatsGrid extends StatelessWidget {
       crossAxisSpacing: 12,
       childAspectRatio: 1.5,
       children: [
-        _StatCard('Fields', stats['total_fields']?.toString() ?? '0', Icons.landscape, const Color(0xFF22c55e)),
-        _StatCard('Sensors', stats['active_sensors']?.toString() ?? '0', Icons.sensors, const Color(0xFF3b82f6)),
-        _StatCard('Alerts', stats['total_alerts']?.toString() ?? '0', Icons.notifications, const Color(0xFFf59e0b)),
-        _StatCard('Water', '${stats['water_saved_today'] ?? 0}L', Icons.water_drop, const Color(0xFF10b981)),
+        _StatCard('Active Fields', stats['total_fields']?.toString() ?? '0', Icons.landscape, const Color(0xFF22c55e)),
+        _StatCard('Live Sensors', stats['active_sensors']?.toString() ?? '0', Icons.sensors, const Color(0xFF3b82f6)),
+        _StatCard('Pending AI Tips', stats['ai_tips']?.toString() ?? '0', Icons.psychology, const Color(0xFF8b5cf6)),
+        _StatCard('System Issues', stats['unread_alerts']?.toString() ?? '0', Icons.warning_amber_rounded, const Color(0xFFf59e0b)),
       ],
     );
   }
@@ -243,10 +243,14 @@ class _ConditionsCard extends StatelessWidget {
       child: Column(
         children: [
           _ConditionRow('Soil Moisture', '${stats['avg_soil_moisture']?.toStringAsFixed(1) ?? '0'}%', Icons.water_drop, const Color(0xFF3b82f6)),
-          const Divider(height: 24),
+          const Divider(height: 16),
           _ConditionRow('Temperature', '${stats['avg_temperature']?.toStringAsFixed(1) ?? '0'}°C', Icons.thermostat, const Color(0xFFf59e0b)),
-          const Divider(height: 24),
+          const Divider(height: 16),
           _ConditionRow('Humidity', '${stats['avg_humidity']?.toStringAsFixed(1) ?? '0'}%', Icons.cloud, const Color(0xFF22c55e)),
+          const Divider(height: 16),
+          _ConditionRow('Light Level', '${stats['light_intensity']?.toStringAsFixed(1) ?? '0'}%', Icons.wb_sunny, const Color(0xFFeab308)),
+          const Divider(height: 16),
+          _ConditionRow('Rainfall', (stats['rainfall'] == 1 || (stats['rainfall'] ?? 0) > 0) ? 'Raining' : 'Clear', Icons.grain, const Color(0xFF64748b)),
         ],
       ),
     );

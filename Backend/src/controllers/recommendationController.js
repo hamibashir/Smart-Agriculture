@@ -30,7 +30,8 @@ export const getRecommendations = async (req, res) => {
 export const acceptRecommendation = async (req, res) => {
   try {
     const [[recommendation]] = await pool.query(
-      `SELECT cr.recommendation_id FROM crop_recommendations cr
+      `SELECT cr.recommendation_id, cr.field_id, cr.recommended_crop 
+       FROM crop_recommendations cr
        JOIN fields f ON cr.field_id = f.field_id
        WHERE cr.recommendation_id = ? AND f.user_id = ?`,
       [req.params.id, req.user.user_id]
@@ -40,12 +41,22 @@ export const acceptRecommendation = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Recommendation not found' });
     }
 
+    // 1. Mark recommendation as accepted
     await pool.query(
       'UPDATE crop_recommendations SET is_accepted = TRUE, accepted_at = NOW() WHERE recommendation_id = ?',
       [req.params.id]
     );
 
-    res.json({ success: true, message: 'Recommendation accepted successfully' });
+    // 2. Automatically update the field's crop type based on the AI's intelligence!
+    await pool.query(
+      'UPDATE fields SET current_crop = ? WHERE field_id = ?',
+      [recommendation.recommended_crop, recommendation.field_id]
+    );
+
+    res.json({ 
+      success: true, 
+      message: `Recommendation accepted. Field successfully updated to grow ${recommendation.recommended_crop}!` 
+    });
   } catch (error) {
     console.error('Accept recommendation error:', error);
     res.status(500).json({ success: false, message: 'Server error' });

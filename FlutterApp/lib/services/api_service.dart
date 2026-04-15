@@ -78,6 +78,7 @@ class ApiService {
   Future<Map<String, dynamic>> getFieldSensors(int fieldId) => get('/sensors/field/$fieldId');
   Future<Map<String, dynamic>> getSensorReadings(int sensorId) => get('/sensors/$sensorId/readings');
   Future<Map<String, dynamic>> getLatestReading(int sensorId) => get('/sensors/$sensorId/latest');
+  Future<Map<String, dynamic>> createSensor(Map<String, dynamic> data) => post('/sensors', data);
   Future<Map<String, dynamic>> bindSensorToField(int sensorId, int fieldId) => put('/sensors/$sensorId', {'field_id': fieldId});
 
   Future<Map<String, dynamic>> getIrrigationLogs(int fieldId) => get('/irrigation/logs/$fieldId');

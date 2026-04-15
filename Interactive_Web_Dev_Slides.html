@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Web Development Lecture - 1 Hour</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+
+        .slides-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 10;
+        }
+
+        .slide-content {
+            background: white;
+            width: 100vw;
+            max-width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            padding: 60px 15vw 100px 15vw;
+            box-shadow: none;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        /* Title Slide */
+        .slide-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide-title h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .slide-title p {
+            font-size: 1.5em;
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+
+        .slide-title .emoji {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Content Slides */
+        .slide-content h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .slide-content h2 {
+            color: #764ba2;
+            font-size: 1.8em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .slide-content p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .slide-content li {
+            font-size: 1.05em;
+            margin-left: 30px;
+            margin-bottom: 10px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .grid-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .grid-item h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .grid-item p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            border-left: 4px solid #667eea;
+        }
+
+        .code-block code {
+            line-height: 1.5;
+        }
+
+        .code-keywords {
+            color: #569cd6;
+        }
+
+        .code-string {
+            color: #ce9178;
+        }
+
+        .code-comment {
+            color: #6a9955;
+        }
+
+        /* Interactive Code Editor */
+        .interactive-editor {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .editor-panel {
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .editor-header {
+            background: #667eea;
+            color: white;
+            padding: 10px 15px;
+            font-weight: bold;
+        }
+
+        .code-input {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            min-height: 250px;
+            resize: none;
+            width: 100%;
+        }
+
+        .output-display {
+            background: #f5f5f5;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            min-height: 250px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .run-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .run-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .run-button:active {
+            transform: translateY(0);
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        table td {
+            border-bottom: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        table tr:hover {
+            background: #f5f5f5;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        /* Quiz */
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .quiz-option {
+            background: #f0f0f0;
+            border: 2px solid transparent;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .quiz-option:hover {
+            border-color: #667eea;
+            background: #f9f9db;
+        }
+
+        .quiz-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .quiz-option.correct {
+            border-color: #4caf50;
+            background: #c8e6c9;
+        }
+
+        .quiz-option.incorrect {
+            border-color: #f44336;
+            background: #ffcdd2;
+        }
+
+        /* Timeline */
+        .timeline {
+            margin: 20px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin: 20px 0;
+        }
+
+        .timeline-time {
+            background: #667eea;
+            color: white;
+            width: 80px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide-content {
+                padding: 40px 5vw 100px 5vw;
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .slide-content h1 {
+                font-size: 1.8em;
+            }
+
+            .slide-title h1 {
+                font-size: 2em;
+            }
+
+            .interactive-editor {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Key Points */
+        .key-points {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .key-points li {
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="slide-content slide-title">
+                <div class="emoji">🌐</div>
+                <h1>Web Development</h1>
+                <p>Frontend Fundamentals</p>
+                <p style="font-size: 1.2em; margin-top: 30px;">HTML • CSS • JavaScript</p>
+                <p style="margin-top: 40px; font-size: 1.1em; opacity: 0.8;">Interactive 1-Hour Lecture</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: What is Web Development -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>🚀 What is Web Development?</h1>
+                
+                <p>Web development is building and maintaining websites and web applications that users interact with in their browsers.</p>
+                
+                <div class="comparison-grid">
+                    <div class="grid-item">
+                        <h3>🎨 Frontend</h3>
+                        <p>What users see and interact with</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">HTML, CSS, JavaScript</p>
+                    </div>
+                    <div class="grid-item">
+                        <h3>🔧 Backend</h3>
+                        <p>Server logic and data management</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Databases, APIs, Servers</p>
+                    </div>
+                    <div class="grid-item">
+                        <h3>🔄 Full Stack</h3>
+                        <p>Both frontend and backend</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Complete applications</p>
+                    </div>
+                </div>
+
+                <h2>How Browsers Work:</h2>
+                <ul style="list-style-type: none;">
+                    <li>✓ User enters a URL</li>
+                    <li>✓ Browser requests files from server</li>
+                    <li>✓ Server sends HTML, CSS, JavaScript</li>
+                    <li>✓ Browser renders the page</li>
+                    <li>✓ JavaScript makes it interactive</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 3: HTML Fundamentals -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>📝 HTML Fundamentals</h1>
+                <p>HTML (HyperText Markup Language) provides the <span class="highlight">structure</span> of web pages using tags.</p>
+
+                <h2>Basic Structure</h2>
+                <div class="code-block">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;title&gt;My Website&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Welcome!&lt;/h1&gt;
+    &lt;p&gt;This is content&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+                </div>
+
+                <h2>Common HTML Tags</h2>
+                <table>
+                    <tr>
+                        <th>Tag</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>&lt;h1&gt; - &lt;h6&gt;</td>
+                        <td>Headings</td>
+                        <td>&lt;h1&gt;Title&lt;/h1&gt;</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;p&gt;</td>
+                        <td>Paragraph</td>
+                        <td>&lt;p&gt;Text&lt;/p&gt;</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;a&gt;</td>
+                        <td>Link</td>
+                        <td>&lt;a href="url"&gt;Link&lt;/a&gt;</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;button&gt;</td>
+                        <td>Button</td>
+                        <td>&lt;button&gt;Click&lt;/button&gt;</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Slide 4: Interactive HTML Example -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>💻 Interactive HTML Form</h1>
+                
+                <div class="interactive-editor">
+                    <div class="editor-panel">
+                        <div class="editor-header">📄 HTML Code</div>
+                        <textarea class="code-input" id="htmlInput">&lt;form&gt;
+  &lt;label for="name"&gt;Name:&lt;/label&gt;
+  &lt;input type="text" id="name" placeholder="Your name"&gt;
+  
+  &lt;label for="email"&gt;Email:&lt;/label&gt;
+  &lt;input type="email" id="email" placeholder="Your email"&gt;
+  
+  &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;</textarea>
+                    </div>
+                    <div class="editor-panel">
+                        <div class="editor-header">👁️ Preview</div>
+                        <div class="output-display" id="htmlOutput" style="padding: 30px; background: white; border-radius: 0 0 8px 8px;">
+                            <form style="display: flex; flex-direction: column; gap: 10px;">
+                                <label>Name:</label>
+                                <input type="text" placeholder="Your name" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                <label style="margin-top: 10px;">Email:</label>
+                                <input type="email" placeholder="Your email" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                <button type="button" style="padding: 10px; background: #667eea; color: white; border: none; border-radius: 4px; margin-top: 10px; cursor: pointer;">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: CSS Fundamentals -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>🎨 CSS Fundamentals</h1>
+                <p>CSS (Cascading Style Sheets) provides <span class="highlight">styling</span> and <span class="highlight">layout</span> for HTML elements.</p>
+
+                <h2>CSS Syntax</h2>
+                <div class="code-block">
+<span class="code-comment">/* Selector */</span>
+h1 {
+    <span class="code-comment">/* Property: Value; */</span>
+    <span class="code-keywords">color</span>: blue;
+    <span class="code-keywords">font-size</span>: 48px;
+    <span class="code-keywords">text-align</span>: center;
+}
+                </div>
+
+                <h2>CSS Selectors</h2>
+                <table>
+                    <tr>
+                        <th>Selector</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>Element</td>
+                        <td>All elements of type</td>
+                        <td>p { }</td>
+                    </tr>
+                    <tr>
+                        <td>Class</td>
+                        <td>Elements with class</td>
+                        <td>.highlight { }</td>
+                    </tr>
+                    <tr>
+                        <td>ID</td>
+                        <td>Element with ID</td>
+                        <td>#header { }</td>
+                    </tr>
+                    <tr>
+                        <td>Pseudo-class</td>
+                        <td>Special state</td>
+                        <td>a:hover { }</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Slide 6: CSS Properties -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>🎨 CSS Box Model & Flexbox</h1>
+
+                <h2>Box Model</h2>
+                <p>Every element has: Margin → Border → Padding → Content</p>
+                <div class="code-block">
+.box {
+    <span class="code-keywords">width</span>: 200px;
+    <span class="code-keywords">padding</span>: 20px;      <span class="code-comment">/* Inside */</span>
+    <span class="code-keywords">border</span>: 2px solid #333;
+    <span class="code-keywords">margin</span>: 10px;       <span class="code-comment">/* Outside */</span>
+    <span class="code-keywords">background-color</span>: lightblue;
+}
+                </div>
+
+                <h2>Flexbox (Modern Layout)</h2>
+                <div class="code-block">
+.container {
+    <span class="code-keywords">display</span>: flex;
+    <span class="code-keywords">justify-content</span>: center;   <span class="code-comment">/* Horizontal */</span>
+    <span class="code-keywords">align-items</span>: center;       <span class="code-comment">/* Vertical */</span>
+    <span class="code-keywords">gap</span>: 20px;                 <span class="code-comment">/* Space between */</span>
+}
+                </div>
+
+                <div class="key-points">
+                    <li><strong>Flexbox</strong> makes responsive layouts easy</li>
+                    <li>Great for centering and distributing items</li>
+                    <li>Works on modern browsers</li>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: JavaScript Basics -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>⚙️ JavaScript Fundamentals</h1>
+                <p>JavaScript adds <span class="highlight">interactivity</span> and <span class="highlight">logic</span> to web pages.</p>
+
+                <h2>Variables & Data Types</h2>
+                <div class="code-block">
+<span class="code-keywords">let</span> name = <span class="code-string">"Alice"</span>;           <span class="code-comment">// String</span>
+<span class="code-keywords">const</span> age = 25;              <span class="code-comment">// Number</span>
+<span class="code-keywords">let</span> isStudent = true;        <span class="code-comment">// Boolean</span>
+<span class="code-keywords">let</span> scores = [95, 87, 92]; <span class="code-comment">// Array</span>
+<span class="code-keywords">let</span> user = {                 <span class="code-comment">// Object</span>
+    name: <span class="code-string">"Bob"</span>,
+    age: 30
+};
+                </div>
+
+                <h2>Functions</h2>
+                <div class="code-block">
+<span class="code-keywords">function</span> greet(name) {
+    <span class="code-keywords">return</span> <span class="code-string">"Hello, "</span> + name;
+}
+
+<span class="code-comment">// Arrow Function (Modern)</span>
+<span class="code-keywords">const</span> add = (a, b) => a + b;
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: JavaScript Control Flow -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>⚙️ Conditionals & Loops</h1>
+
+                <h2>If Statements</h2>
+                <div class="code-block">
+<span class="code-keywords">if</span> (age >= 18) {
+    console.log(<span class="code-string">"Adult"</span>);
+} <span class="code-keywords">else if</span> (age >= 13) {
+    console.log(<span class="code-string">"Teenager"</span>);
+} <span class="code-keywords">else</span> {
+    console.log(<span class="code-string">"Child"</span>);
+}
+                </div>
+
+                <h2>Loops</h2>
+                <div class="code-block">
+<span class="code-comment">// For Loop</span>
+<span class="code-keywords">for</span> (<span class="code-keywords">let</span> i = 0; i < 5; i++) {
+    console.log(i);
+}
+
+<span class="code-comment">// Array forEach</span>
+items.<span class="code-keywords">forEach</span>(item => {
+    console.log(item);
+});
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: DOM Manipulation -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>🖱️ DOM & Event Handling</h1>
+                <p>The <span class="highlight">DOM</span> (Document Object Model) lets JavaScript interact with HTML.</p>
+
+                <h2>Selecting Elements</h2>
+                <div class="code-block">
+<span class="code-keywords">const</span> button = document.getElementById(<span class="code-string">"myButton"</span>);
+<span class="code-keywords">const</span> items = document.querySelectorAll(<span class="code-string">".item"</span>);
+                </div>
+
+                <h2>Changing Content & Styles</h2>
+                <div class="code-block">
+button.textContent = <span class="code-string">"Click Me!"</span>;
+button.style.backgroundColor = <span class="code-string">"blue"</span>;
+button.classList.add(<span class="code-string">"active"</span>);
+                </div>
+
+                <h2>Event Listeners</h2>
+                <div class="code-block">
+button.addEventListener(<span class="code-string">'click'</span>, <span class="code-keywords">function</span>() {
+    alert(<span class="code-string">"Button clicked!"</span>);
+});
+
+input.addEventListener(<span class="code-string">'keypress'</span>, (e) => {
+    <span class="code-keywords">if</span> (e.key === <span class="code-string">'Enter'</span>) {
+        submitForm();
+    }
+});
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Interactive Code Editor -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>💻 Try JavaScript Interactively</h1>
+                
+                <div class="interactive-editor">
+                    <div class="editor-panel">
+                        <div class="editor-header">📝 JavaScript Code</div>
+                        <textarea class="code-input" id="jsInput">// Example: Calculate Sum
+let numbers = [5, 10, 15, 20];
+let sum = 0;
+
+numbers.forEach(num => {
+    sum += num;
+});
+
+console.log("Sum:", sum);
+console.log("Average:", sum / numbers.length);</textarea>
+                    </div>
+                    <div class="editor-panel">
+                        <div class="editor-header">📤 Output</div>
+                        <div class="output-display" id="jsOutput"></div>
+                    </div>
+                </div>
+                <button class="run-button" onclick="runJavaScript()">▶️ Run Code</button>
+            </div>
+        </div>
+
+        <!-- Slide 11: Todo App Project -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>🎯 Project: Interactive Todo App</h1>
+                <p>Let's build a complete app combining HTML, CSS, and JavaScript!</p>
+
+                <div class="key-points">
+                    <li><strong>Features:</strong> Add todos, mark complete, delete items</li>
+                    <li><strong>Technologies:</strong> HTML for structure, CSS for styling, JS for logic</li>
+                    <li><strong>Skills:</strong> DOM manipulation, events, arrays</li>
+                </div>
+
+                <h2>Code Structure</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;">
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px;">
+                        <h3 style="color: #667eea; margin-bottom: 10px;">HTML</h3>
+                        <p>Input field + Button + List container</p>
+                    </div>
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px;">
+                        <h3 style="color: #667eea; margin-bottom: 10px;">CSS</h3>
+                        <p>Styling form, list, buttons</p>
+                    </div>
+                </div>
+
+                <h2>JavaScript Logic</h2>
+                <ul>
+                    <li>Store todos in an array</li>
+                    <li>Add new todos when button clicked</li>
+                    <li>Render todos to DOM</li>
+                    <li>Toggle completion status</li>
+                    <li>Delete todos from list</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 12: Live Todo App -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>✨ Live Todo App Demo</h1>
+                
+                <div style="max-height: 500px; background: white; padding: 20px; border: 2px solid #667eea; border-radius: 8px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📝 My Todo App</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="todoInput" placeholder="Enter a new todo..." 
+                               style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <button onclick="addTodo()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">Add</button>
+                    </div>
+                    <div id="todoList" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Todos will be added here -->
+                    </div>
+                </div>
+
+                <p style="margin-top: 20px; color: #666; font-size: 0.95em;">
+                    💡 Try adding todos above! This is a fully functional app built with vanilla JavaScript.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 13: Quiz Time -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>🎓 Quiz: Test Your Knowledge</h1>
+
+                <h2>Question 1: What does HTML stand for?</h2>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkAnswer(this, 0)">A) HyperText Markup Language ✓</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 1)">B) High Tech Markup Language</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 2)">C) Home Tool Markup Language</div>
+                </div>
+
+                <h2 style="margin-top: 30px;">Question 2: What does CSS control?</h2>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkAnswer(this, 0)">A) Styling and Layout ✓</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 1)">B) Logic and Interactivity</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 2)">C) Page Structure</div>
+                </div>
+
+                <h2 style="margin-top: 30px;">Question 3: Which selector targets classes in CSS?</h2>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkAnswer(this, 1)">#className</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 0)">.className ✓</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 2)">className {}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Key Takeaways -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>🎯 Key Takeaways</h1>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin: 25px 0;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 3em; margin-bottom: 10px;">🏗️</div>
+                        <h3>HTML</h3>
+                        <p style="margin-top: 10px;">Structure<br>Content Organization</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #764ba2 0%, #f093fb 100%); color: white; padding: 25px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 3em; margin-bottom: 10px;">🎨</div>
+                        <h3>CSS</h3>
+                        <p style="margin-top: 10px;">Styling<br>Layout & Design</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 3em; margin-bottom: 10px;">⚙️</div>
+                        <h3>JavaScript</h3>
+                        <p style="margin-top: 10px;">Interactivity<br>Logic & Behavior</p>
+                    </div>
+                </div>
+
+                <div class="key-points" style="margin-top: 30px;">
+                    <li>✓ HTML provides the <strong>skeleton</strong> of a web page</li>
+                    <li>✓ CSS makes it look <strong>beautiful</strong></li>
+                    <li>✓ JavaScript makes it <strong>interactive</strong> and <strong>responsive</strong></li>
+                    <li>✓ All three work together seamlessly</li>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Next Steps -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>🚀 Next Steps to Master Web Development</h1>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-time">Phase 1</div>
+                        <div class="timeline-content">
+                            <strong>Master Fundamentals</strong><br>
+                            Practice HTML, CSS, JavaScript. Build small projects like portfolio, landing pages, todo apps.
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">Phase 2</div>
+                        <div class="timeline-content">
+                            <strong>Responsive Design</strong><br>
+                            Learn Flexbox, Grid, Media Queries. Make sites work on mobile & desktop.
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">Phase 3</div>
+                        <div class="timeline-content">
+                            <strong>Frameworks</strong><br>
+                            Explore React, Vue, or Angular for building complex applications.
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">Phase 4</div>
+                        <div class="timeline-content">
+                            <strong>Backend & Full Stack</strong><br>
+                            Learn Node.js, databases, APIs. Build complete full-stack applications.
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Resources to Learn More</h2>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                    <span class="badge">MDN Web Docs</span>
+                    <span class="badge">CSS-Tricks</span>
+                    <span class="badge">JavaScript.info</span>
+                    <span class="badge">Codecademy</span>
+                    <span class="badge">freeCodeCamp</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Gaussian Demo -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1>📈 AI Dataset Generation (Gaussian Noise)</h1>
+                <p>Generating 2,800 rows of realistic sensor data using Statistical Mathematics.</p>
+
+                <div class="interactive-editor">
+                    <div class="editor-panel">
+                        <div class="editor-header">⚙️ Gaussian Generator Logic</div>
+                        <textarea class="code-input" id="gaussianInput" readonly style="min-height: 280px;">
+// Example Crop: Wheat
+// Baseline temp required: 15°C - 25°C
+let baseTemp = randomBetween(15, 25);
+
+// Real IoT sensors have electrical/wind noise!
+// Apply normal (Gaussian) distribution
+let noise = randomGaussian(mean=0, stdev=1.5); 
+
+let finalTemp = baseTemp + noise;
+console.log("Simulating ESP32 reading...");
+console.log({"temperature": finalTemp});</textarea>
+                    </div>
+                    <div class="editor-panel">
+                        <div class="editor-header">📊 Live Sensor Simulation</div>
+                        <div class="output-display" id="gaussianOutput" style="background: #1e1e1e; color: #4af626; font-family: 'Courier New', monospace; min-height: 280px;">
+> Ready. Press 'Generate Sensor Data' to simulate an ESP32 sending data...
+                        </div>
+                    </div>
+                </div>
+                <button class="run-button" onclick="runGaussianDemo()">🔄 Generate Sensor Data</button>
+            </div>
+        </div>
+
+        <!-- Slide 17: Thank You -->
+        <div class="slide">
+            <div class="slide-content slide-title">
+                <div class="emoji">🎉</div>
+                <h1>Thank You!</h1>
+                <p style="font-size: 1.3em; margin-top: 30px;">This concludes our Smart Agriculture System Defense</p>
+                <p style="margin-top: 40px; font-size: 1.1em;">Now it's time to test the AI yourself! 💻</p>
+                <p style="margin-top: 40px; opacity: 0.7;">Any questions from the panel?</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="previousSlide()">← Previous</button>
+        <button class="nav-btn" onclick="nextSlide()">Next →</button>
+    </div>
+    <div class="slide-counter">
+        <span id="slideNumber">1</span> / <span id="totalSlides">16</span>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = document.querySelectorAll('.slide').length;
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        let todos = [];
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            
+            if (n > slides.length) currentSlide = 1;
+            if (n < 1) currentSlide = slides.length;
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide - 1].classList.add('active');
+            
+            document.getElementById('slideNumber').textContent = currentSlide;
+        }
+
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+
+        function previousSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        // JavaScript Playground
+        function runJavaScript() {
+            const code = document.getElementById('jsInput').value;
+            const output = document.getElementById('jsOutput');
+            output.innerHTML = '';
+
+            const originalLog = console.log;
+            console.log = function(...args) {
+                output.innerText += args.join(' ') + '\n';
+            };
+
+            try {
+                eval(code);
+            } catch (error) {
+                output.innerText = '❌ Error:\n' + error.message;
+            }
+
+            console.log = originalLog;
+        }
+
+        // Todo App Functions
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+            
+            if (text === '') {
+                alert('Please enter a todo!');
+                return;
+            }
+            
+            todos.push({ id: Date.now(), text: text, completed: false });
+            input.value = '';
+            renderTodos();
+        }
+
+        function deleteTodo(id) {
+            todos = todos.filter(todo => todo.id !== id);
+            renderTodos();
+        }
+
+        function toggleComplete(id) {
+            todos = todos.map(todo => 
+                todo.id === id ? { ...todo, completed: !todo.completed } : todo
+            );
+            renderTodos();
+        }
+
+        function renderTodos() {
+            const list = document.getElementById('todoList');
+            list.innerHTML = '';
+            
+            if (todos.length === 0) {
+                list.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No todos yet. Add one to get started! 👆</p>';
+                return;
+            }
+            
+            todos.forEach(todo => {
+                const div = document.createElement('div');
+                div.style.cssText = `
+                    padding: 12px;
+                    border-bottom: 1px solid #eee;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    ${todo.completed ? 'opacity: 0.6;' : ''}
+                `;
+                div.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                        <input type="checkbox" 
+                               ${todo.completed ? 'checked' : ''}
+                               onchange="toggleComplete(${todo.id})"
+                               style="cursor: pointer;">
+                        <span style="${todo.completed ? 'text-decoration: line-through; color: #999;' : ''}">${todo.text}</span>
+                    </div>
+                    <button onclick="deleteTodo(${todo.id})" 
+                            style="background: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85em;">Delete</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // Allow Enter key to add todo
+        document.getElementById('todoInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addTodo();
+        });
+
+        // Quiz functionality
+        function checkAnswer(element, correct) {
+            const option = element;
+            const parent = element.parentElement;
+            
+            if (element.textContent.includes('✓')) {
+                option.classList.add('correct');
+                option.style.color = '#2e7d32';
+            } else {
+                option.classList.add('incorrect');
+                option.style.color = '#c62828';
+            }
+            
+            Array.from(parent.children).forEach(child => {
+                if (child !== element && !child.classList.contains('selected')) {
+                    child.style.opacity = '0.5';
+                    child.style.cursor = 'default';
+                    child.onclick = null;
+                }
+            });
+        }
+
+        // Gaussian Generator Demo
+        function randomGaussian(mean = 0, stdev = 1) {
+            let u = 1 - Math.random(); // Converting [0,1) to (0,1]
+            let v = Math.random();
+            let z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+            return z * stdev + mean;
+        }
+
+        function runGaussianDemo() {
+            const out = document.getElementById('gaussianOutput');
+            const baseTemp = Math.floor(Math.random() * (25 - 15 + 1)) + 15;
+            const noise = randomGaussian(0, 1.5);
+            const finalTemp = (baseTemp + noise).toFixed(1);
+            
+            out.innerHTML = `
+<div style="margin-bottom: 20px;">📡 <b>Simulating hardware reading in Wheat field...</b></div>
+
+<div style="color: #d4d4d4; margin-bottom: 5px;">Step 1: Get Agronomical Baseline</div>
+<div style="margin-bottom: 15px;">> Ideal Temp Bound: <span style="color: #ffeb3b; font-weight: bold;">${baseTemp}.0 °C</span></div>
+
+<div style="color: #d4d4d4; margin-bottom: 5px;">Step 2: Apply Statistical Sensor Noise</div>
+<div style="margin-bottom: 15px;">> Environmental Fluctuation: <span style="color: #ff9800; font-weight: bold;">${noise > 0 ? '+' : ''}${noise.toFixed(2)} °C</span></div>
+
+<div style="color: #d4d4d4; margin-bottom: 5px;">Step 3: Final Data Point Inserted to Dataset</div>
+<div style="font-size: 1.2em; font-weight: bold; background: #333; padding: 15px; border-left: 4px solid #4af626; margin-top: 10px; color: #fff;">
+> {"temperature": ${finalTemp}}
+</div>`;
+        }
+
+        // Initialize
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>

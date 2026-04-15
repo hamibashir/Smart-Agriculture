@@ -10,25 +10,32 @@ export const getDashboardStats = async (req, res) => {
       `SELECT 
         (SELECT COUNT(*) FROM fields WHERE user_id = ? AND is_active = TRUE) as total_fields,
         (SELECT COUNT(*) FROM sensors s JOIN fields f ON s.field_id = f.field_id WHERE f.user_id = ? AND s.is_active = TRUE) as active_sensors,
-        (SELECT COUNT(*) FROM alerts WHERE user_id = ?) as total_alerts,
         (SELECT COUNT(*) FROM alerts WHERE user_id = ? AND is_read = FALSE) as unread_alerts,
-        (SELECT COALESCE(SUM(water_used_liters), 0) FROM irrigation_logs il JOIN fields f ON il.field_id = f.field_id WHERE f.user_id = ? AND DATE(il.start_time) = CURDATE()) as water_saved_today`,
-      [userId, userId, userId, userId, userId]
+        (SELECT COUNT(*) FROM crop_recommendations cr JOIN fields f ON cr.field_id = f.field_id WHERE f.user_id = ? AND cr.is_accepted = FALSE) as ai_tips`,
+      [userId, userId, userId, userId]
     );
 
-    // Get latest sensor reading (prioritize sensor 14)
+    // Get latest sensor reading for any active sensor belonging to the logged-in user
     const [sensorReading] = await pool.query(
-      `SELECT soil_moisture, temperature, humidity FROM sensor_readings 
-       WHERE sensor_id = 14 ORDER BY reading_time DESC LIMIT 1`
+      `SELECT sr.soil_moisture, sr.temperature, sr.humidity, sr.light_intensity, sr.rainfall, f.field_name 
+       FROM sensor_readings sr
+       JOIN sensors s ON sr.sensor_id = s.sensor_id
+       JOIN fields f ON s.field_id = f.field_id
+       WHERE f.user_id = ? AND s.is_active = TRUE
+       ORDER BY sr.reading_time DESC LIMIT 1`,
+      [userId]
     );
 
     const currentConditions = sensorReading.length > 0
       ? {
         avg_soil_moisture: parseFloat(sensorReading[0].soil_moisture || 0),
         avg_temperature: parseFloat(sensorReading[0].temperature || 0),
-        avg_humidity: parseFloat(sensorReading[0].humidity || 0)
+        avg_humidity: parseFloat(sensorReading[0].humidity || 0),
+        light_intensity: parseFloat(sensorReading[0].light_intensity || 0),
+        rainfall: parseInt(sensorReading[0].rainfall || 0),
+        latest_field_name: sensorReading[0].field_name || 'Farm'
       }
-      : { avg_soil_moisture: 0, avg_temperature: 0, avg_humidity: 0 };
+      : { avg_soil_moisture: 0, avg_temperature: 0, avg_humidity: 0, light_intensity: 0, rainfall: 0, latest_field_name: 'Farm' };
 
     res.json({
       success: true,

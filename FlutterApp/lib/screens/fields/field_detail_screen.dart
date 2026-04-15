@@ -4,6 +4,7 @@ import '../../models/field.dart';
 import '../../models/sensor.dart';
 import '../../services/api_service.dart';
 import '../../config/app_theme.dart';
+import '../sensor_management/add_sensor_screen.dart';
 
 class FieldDetailScreen extends StatefulWidget {
   final Field field;
@@ -144,6 +145,17 @@ class _SensorsTab extends StatelessWidget {
             Text('No sensors installed', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             Text('Add sensors to monitor this field', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary)),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () async {
+                 // ignore: unused_local_variable
+                 final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddSensorScreen()));
+                 // Actually this parent widget doesn't have access to reload but we could add a callback or rely on user refresh
+                 // for simplicity right now we'll just let the user pull to refresh or go back and forth
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Add Sensor'),
+            ),
           ],
         ),
       );
