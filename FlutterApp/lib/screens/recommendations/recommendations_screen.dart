@@ -97,6 +97,23 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
     } catch (_) {}
   }
 
+  Future<void> _deleteRecommendation(int id) async {
+    try {
+      final res = await _apiService.deleteRecommendation(id);
+      if (!mounted) return;
+      if (res['success'] == true) {
+        setState(() {
+          _recommendations.removeWhere((r) => r.recommendationId == id);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('🗑️ Recommendation deleted.'),
+          backgroundColor: AppTheme.textSecondary,
+          duration: Duration(seconds: 2),
+        ));
+      }
+    } catch (_) {}
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,6 +172,8 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                             recommendation: _recommendations.first,
                             onAccept: () => _acceptRecommendation(
                                 _recommendations.first.recommendationId),
+                            onDelete: () => _deleteRecommendation(
+                                _recommendations.first.recommendationId),
                           ),
                         ),
 
@@ -174,16 +193,56 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                             ),
                           ),
 
-                        // History list
+                        // History list — swipe left to delete
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
-                            (_, i) => _HistoryCard(
-                              recommendation: _recommendations[i + 1],
-                              onAccept: () => _acceptRecommendation(
-                                  _recommendations[i + 1].recommendationId),
-                            ),
-                            childCount:
-                                (_recommendations.length - 1).clamp(0, 999),
+                            (_, i) {
+                              final rec = _recommendations[i + 1];
+                              return Dismissible(
+                                key: ValueKey(rec.recommendationId),
+                                direction: DismissDirection.endToStart,
+                                background: Container(
+                                  alignment: Alignment.centerRight,
+                                  padding: const EdgeInsets.only(right: 24),
+                                  margin: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.errorColor,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.delete_outline_rounded, color: Colors.white, size: 26),
+                                      SizedBox(height: 4),
+                                      Text('Delete', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                                    ],
+                                  ),
+                                ),
+                                confirmDismiss: (_) async {
+                                  return await showDialog<bool>(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      title: const Text('Delete Recommendation?'),
+                                      content: const Text('This recommendation will be permanently removed.'),
+                                      actions: [
+                                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, true),
+                                          style: TextButton.styleFrom(foregroundColor: AppTheme.errorColor),
+                                          child: const Text('Delete'),
+                                        ),
+                                      ],
+                                    ),
+                                  ) ?? false;
+                                },
+                                onDismissed: (_) => _deleteRecommendation(rec.recommendationId),
+                                child: _HistoryCard(
+                                  recommendation: rec,
+                                  onAccept: () => _acceptRecommendation(rec.recommendationId),
+                                ),
+                              );
+                            },
+                            childCount: (_recommendations.length - 1).clamp(0, 999),
                           ),
                         ),
                         const SliverToBoxAdapter(child: SizedBox(height: 24)),
@@ -296,10 +355,11 @@ class _FieldSelector extends StatelessWidget {
 
 // ── Hero Card (latest recommendation) ────────────────────────
 class _HeroCard extends StatelessWidget {
-  const _HeroCard({required this.recommendation, required this.onAccept});
+  const _HeroCard({required this.recommendation, required this.onAccept, required this.onDelete});
 
   final CropRecommendation recommendation;
   final VoidCallback onAccept;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -333,8 +393,10 @@ class _HeroCard extends StatelessWidget {
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(20)),
             ),
-            child: Column(
+            child: Stack(
               children: [
+                Column(
+                  children: [
                 // Badge
                 Container(
                   padding:
@@ -379,9 +441,22 @@ class _HeroCard extends StatelessWidget {
                     style: const TextStyle(
                         color: AppTheme.textSecondary, fontSize: 13),
                   ),
-              ],
-            ),
+                ],
+              ),
+              // Delete icon — top right
+              Positioned(
+                top: -4,
+                right: -4,
+                child: IconButton(
+                  icon: const Icon(Icons.delete_outline_rounded, size: 20),
+                  color: Colors.black26,
+                  tooltip: 'Delete recommendation',
+                  onPressed: onDelete,
+                ),
+              ),
+            ],
           ),
+        ),
 
           Padding(
             padding: const EdgeInsets.all(20),

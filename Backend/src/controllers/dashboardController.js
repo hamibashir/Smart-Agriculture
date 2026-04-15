@@ -17,7 +17,7 @@ export const getDashboardStats = async (req, res) => {
 
     // Get latest sensor reading for any active sensor belonging to the logged-in user
     const [sensorReading] = await pool.query(
-      `SELECT sr.soil_moisture, sr.temperature, sr.humidity, sr.light_intensity, sr.rainfall, f.field_name 
+      `SELECT sr.soil_moisture, sr.temperature, sr.humidity, sr.light_intensity, sr.rainfall, sr.pump_on, f.field_name 
        FROM sensor_readings sr
        JOIN sensors s ON sr.sensor_id = s.sensor_id
        JOIN fields f ON s.field_id = f.field_id
@@ -33,9 +33,10 @@ export const getDashboardStats = async (req, res) => {
         avg_humidity: parseFloat(sensorReading[0].humidity || 0),
         light_intensity: parseFloat(sensorReading[0].light_intensity || 0),
         rainfall: parseInt(sensorReading[0].rainfall || 0),
+        pump_on: parseInt(sensorReading[0].pump_on || 0),
         latest_field_name: sensorReading[0].field_name || 'Farm'
       }
-      : { avg_soil_moisture: 0, avg_temperature: 0, avg_humidity: 0, light_intensity: 0, rainfall: 0, latest_field_name: 'Farm' };
+      : { avg_soil_moisture: 0, avg_temperature: 0, avg_humidity: 0, light_intensity: 0, rainfall: 0, pump_on: 0, latest_field_name: 'Farm' };
 
     res.json({
       success: true,

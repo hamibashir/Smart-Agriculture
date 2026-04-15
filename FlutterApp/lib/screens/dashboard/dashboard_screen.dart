@@ -251,6 +251,8 @@ class _ConditionsCard extends StatelessWidget {
           _ConditionRow('Light Level', '${stats['light_intensity']?.toStringAsFixed(1) ?? '0'}%', Icons.wb_sunny, const Color(0xFFeab308)),
           const Divider(height: 16),
           _ConditionRow('Rainfall', (stats['rainfall'] == 1 || (stats['rainfall'] ?? 0) > 0) ? 'Raining' : 'Clear', Icons.grain, const Color(0xFF64748b)),
+          const Divider(height: 16),
+          _PumpStatusRow(isOn: (stats['pump_on'] == 1 || (stats['pump_on'] ?? 0) > 0)),
         ],
       ),
     );
@@ -273,6 +275,50 @@ class _ConditionRow extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(child: Text(label, style: const TextStyle(fontSize: 14))),
         Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)),
+      ],
+    );
+  }
+}
+
+class _PumpStatusRow extends StatelessWidget {
+  const _PumpStatusRow({required this.isOn});
+
+  final bool isOn;
+
+  @override
+  Widget build(BuildContext context) {
+    const activeColor = Color(0xFF22c55e);
+    const inactiveColor = Color(0xFF94a3b8);
+    final color = isOn ? activeColor : inactiveColor;
+
+    return Row(
+      children: [
+        Icon(Icons.water_outlined, color: color, size: 20),
+        const SizedBox(width: 12),
+        const Expanded(child: Text('Water Pump', style: TextStyle(fontSize: 14))),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: color.withValues(alpha: 0.4)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 7,
+                height: 7,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                isOn ? 'ON' : 'OFF',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: color),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

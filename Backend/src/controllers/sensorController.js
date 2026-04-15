@@ -20,12 +20,12 @@ const triggerAIRecommendation = async (fieldId, sensorId) => {
   try {
     // Get field info (soil_type, current_crop, planting_date)
     const [[field]] = await pool.query(
-      'SELECT soil_type, planting_date FROM fields WHERE field_id = ?',
+      'SELECT soil_type, current_crop, planting_date FROM fields WHERE field_id = ?',
       [fieldId]
     );
     if (!field || !field.soil_type) return;
 
-    // Average of the 5 most recent rows (matches Database/smart_agriculture.sql column reading_time)
+    // Average of the 5 most recent rows
     const [readings] = await pool.query(
       `SELECT 
         AVG(soil_moisture) AS soil_moisture,
@@ -68,6 +68,22 @@ const triggerAIRecommendation = async (fieldId, sensorId) => {
     const aiResult = await response.json();
     if (!aiResult.success) return;
 
+    // --- SMART RATE LIMITING (NO SPAM) ---
+    // 1. If the AI recommends what the farmer is already growing, do NOT spam them!
+    if (field.current_crop && field.current_crop.toLowerCase() === aiResult.recommended_crop.toLowerCase()) {
+      console.log(`🤖 AI Tip Skipped: Field ${fieldId} is already growing ${field.current_crop}`);
+      return;
+    }
+
+    // 2. Avoid duplicate unread recommendations. If the AI already told them to grow Maize, don't tell them again.
+    const [[existingRec]] = await pool.query(
+      'SELECT recommendation_id FROM crop_recommendations WHERE field_id = ? AND recommended_crop = ? AND is_accepted = FALSE',
+      [fieldId, aiResult.recommended_crop]
+    );
+    if (existingRec) {
+      return; 
+    }
+
     // Save recommendation to DB
     await pool.query(
       `INSERT INTO crop_recommendations 
@@ -92,7 +108,7 @@ const triggerAIRecommendation = async (fieldId, sensorId) => {
       ]
     );
 
-    console.log(`🤖 AI Recommendation for field ${fieldId}: ${aiResult.recommended_crop} (${aiResult.confidence_score}%)`);
+    console.log(`🤖 NEW AI Recommendation for field ${fieldId}: ${aiResult.recommended_crop} (${aiResult.confidence_score}%)`);
   } catch (err) {
     // Non-critical — never crash the main request
     console.warn(`⚠️  AI recommendation skipped: ${err.message}`);

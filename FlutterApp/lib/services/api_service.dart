@@ -96,4 +96,5 @@ class ApiService {
 
   Future<Map<String, dynamic>> getRecommendations(int fieldId) => get('/recommendations/$fieldId');
   Future<Map<String, dynamic>> acceptRecommendation(int recommendationId) => put('/recommendations/$recommendationId/accept', {});
+  Future<Map<String, dynamic>> deleteRecommendation(int recommendationId) => delete('/recommendations/$recommendationId');
 }

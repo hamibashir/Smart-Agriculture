@@ -63,6 +63,29 @@ export const acceptRecommendation = async (req, res) => {
   }
 };
 
+// Delete a recommendation
+export const deleteRecommendation = async (req, res) => {
+  try {
+    const [[recommendation]] = await pool.query(
+      `SELECT cr.recommendation_id FROM crop_recommendations cr
+       JOIN fields f ON cr.field_id = f.field_id
+       WHERE cr.recommendation_id = ? AND f.user_id = ?`,
+      [req.params.id, req.user.user_id]
+    );
+
+    if (!recommendation) {
+      return res.status(404).json({ success: false, message: 'Recommendation not found' });
+    }
+
+    await pool.query('DELETE FROM crop_recommendations WHERE recommendation_id = ?', [req.params.id]);
+
+    res.json({ success: true, message: 'Recommendation deleted successfully' });
+  } catch (error) {
+    console.error('Delete recommendation error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 // Create recommendation (for ML service)
 export const createRecommendation = async (req, res) => {
   try {
