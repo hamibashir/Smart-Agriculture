@@ -150,7 +150,7 @@ FlutterApp/
 ## 🎨 Design System
 
 ### Color Palette
-```dart
+```text
 Primary:         #22c55e  // Green
 Primary Dark:    #16a34a
 Primary Light:   #86efac
