@@ -20,10 +20,13 @@ const triggerAIRecommendation = async (fieldId, sensorId) => {
   try {
     // Get field info (soil_type, current_crop, planting_date)
     const [[field]] = await pool.query(
-      'SELECT soil_type, current_crop, planting_date FROM fields WHERE field_id = ?',
+      'SELECT soil_type, planting_date FROM fields WHERE field_id = ?',
       [fieldId]
     );
-    if (!field || !field.soil_type) return;
+    if (!field) return;
+
+    // Default to loamy if soil_type is optional/null, preventing silent logic failure!
+    const soilTypeStr = (field.soil_type || 'loamy').toLowerCase().replace(' ', '_');
 
     // Average of the 5 most recent rows
     const [readings] = await pool.query(
@@ -46,20 +49,20 @@ const triggerAIRecommendation = async (fieldId, sensorId) => {
     if (avg.soil_moisture == null || avg.temperature == null || avg.humidity == null) return;
 
     // Determine season from current month (Pakistan: Rabi=Oct-Mar, Kharif=Apr-Sep)
-    const month   = new Date().getMonth() + 1;
-    const season  = (month >= 10 || month <= 3) ? 'rabi' : 'kharif';
+    const month = new Date().getMonth() + 1;
+    const season = (month >= 10 || month <= 3) ? 'rabi' : 'kharif';
 
     // Call Flask AI API
     const response = await fetch(`${AI_API_URL}/predict`, {
-      method:  'POST',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         soil_moisture: parseFloat(avg.soil_moisture).toFixed(2),
-        temperature:   parseFloat(avg.temperature).toFixed(2),
-        humidity:      parseFloat(avg.humidity).toFixed(2),
-        soil_type:     field.soil_type.toLowerCase().replace(' ', '_'),
-        season:        season,
-        rainfall:      parseFloat(avg.rainfall || 0).toFixed(2)
+        temperature: parseFloat(avg.temperature).toFixed(2),
+        humidity: parseFloat(avg.humidity).toFixed(2),
+        soil_type: soilTypeStr,
+        season: season,
+        rainfall: parseFloat(avg.rainfall || 0).toFixed(2)
       })
     });
 
@@ -67,22 +70,6 @@ const triggerAIRecommendation = async (fieldId, sensorId) => {
 
     const aiResult = await response.json();
     if (!aiResult.success) return;
-
-    // --- SMART RATE LIMITING (NO SPAM) ---
-    // 1. If the AI recommends what the farmer is already growing, do NOT spam them!
-    if (field.current_crop && field.current_crop.toLowerCase() === aiResult.recommended_crop.toLowerCase()) {
-      console.log(`🤖 AI Tip Skipped: Field ${fieldId} is already growing ${field.current_crop}`);
-      return;
-    }
-
-    // 2. Avoid duplicate unread recommendations. If the AI already told them to grow Maize, don't tell them again.
-    const [[existingRec]] = await pool.query(
-      'SELECT recommendation_id FROM crop_recommendations WHERE field_id = ? AND recommended_crop = ? AND is_accepted = FALSE',
-      [fieldId, aiResult.recommended_crop]
-    );
-    if (existingRec) {
-      return; 
-    }
 
     // Save recommendation to DB
     await pool.query(
@@ -108,7 +95,7 @@ const triggerAIRecommendation = async (fieldId, sensorId) => {
       ]
     );
 
-    console.log(`🤖 NEW AI Recommendation for field ${fieldId}: ${aiResult.recommended_crop} (${aiResult.confidence_score}%)`);
+    console.log(`🤖 AI Recommendation for field ${fieldId}: ${aiResult.recommended_crop} (${aiResult.confidence_score}%)`);
   } catch (err) {
     // Non-critical — never crash the main request
     console.warn(`⚠️  AI recommendation skipped: ${err.message}`);
@@ -218,6 +205,59 @@ const toTinyIntBool = (v) => {
   return n >= 1 ? 1 : 0;
 };
 
+// ── Automated Alerts Service (Background Task) ──
+const processSmartAlerts = async (userId, fieldId, sensorId, data) => {
+  try {
+    const alertsToCreate = [];
+    
+    // 1. Soil Moisture Checks
+    if (data.soil != null) {
+      if (data.soil < 20) {
+        alertsToCreate.push({ type: 'critical', category: 'soil_moisture', title: 'Severe Drought Risk', msg: `Soil moisture is critically low (${data.soil.toFixed(1)}%). Irrigation required immediately to prevent crop damage.` });
+      } else if (data.soil > 85) {
+        alertsToCreate.push({ type: 'warning', category: 'soil_moisture', title: 'Waterlogging Risk', msg: `Soil moisture is dangerously high (${data.soil.toFixed(1)}%). Risk of root rot.` });
+      }
+    }
+
+    // 2. Temperature Checks
+    if (data.temp != null) {
+      if (data.temp > 40) {
+        alertsToCreate.push({ type: 'critical', category: 'temperature', title: 'Heat Stress Alert', msg: `Extreme heat detected (${data.temp.toFixed(1)}°C). Crops may suffer heat stress.` });
+      } else if (data.temp < 5) {
+        alertsToCreate.push({ type: 'warning', category: 'temperature', title: 'Frost Warning', msg: `Temperatures have dropped to ${data.temp.toFixed(1)}°C. Frost damage possible.` });
+      }
+    }
+
+    // 3. Humidity/Fungal Risk
+    if (data.hum != null && data.hum > 85 && data.temp != null && data.temp > 25) {
+      alertsToCreate.push({ type: 'warning', category: 'crop_health', title: 'Fungal Infection Risk', msg: `High humidity (${data.hum.toFixed(1)}%) combined with warmth creates ideal conditions for fungal diseases.` });
+    }
+
+    // 4. Waste Warning
+    if (data.rainInsert === 1 && data.pumpInsert === 1) {
+      alertsToCreate.push({ type: 'warning', category: 'irrigation', title: 'Water Waste Detected', msg: 'The irrigation pump is running while it is currently raining. Consider turning it off to save water and prevent flooding.' });
+    }
+
+    for (const a of alertsToCreate) {
+      // Prevent spam: Only create if there isn't an unresolved alert of the exact same title for this field
+      const [[existing]] = await pool.query(
+        'SELECT alert_id FROM alerts WHERE field_id = ? AND title = ? AND is_resolved = FALSE',
+        [fieldId, a.title]
+      );
+      
+      if (!existing) {
+        await pool.query(
+          `INSERT INTO alerts (user_id, field_id, sensor_id, alert_type, alert_category, title, message) 
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [userId, fieldId, sensorId, a.type, a.category, a.title, a.msg]
+        );
+      }
+    }
+  } catch (error) {
+    console.warn(`⚠️ Smart Alerts skipped: ${error.message}`);
+  }
+};
+
 // Create sensor reading (for ESP32/IoT devices)
 export const createSensorReading = async (req, res) => {
   try {
@@ -229,7 +269,7 @@ export const createSensorReading = async (req, res) => {
 
     // Get sensor + its linked field in one query
     const [[sensor]] = await pool.query(
-      'SELECT s.sensor_id, s.field_id FROM sensors s WHERE s.device_id = ?',
+      'SELECT s.sensor_id, s.field_id, f.user_id FROM sensors s JOIN fields f ON s.field_id = f.field_id WHERE s.device_id = ?',
       [device_id]
     );
     if (!sensor) {
@@ -244,18 +284,68 @@ export const createSensorReading = async (req, res) => {
     const rain = toRainfallBool(rainfall);
     const rainInsert = rain != null ? rain : 0;
     const pump = toTinyIntBool(pump_on);
-    const pumpInsert = pump != null ? pump : 0;
+    let pumpInsert = pump != null ? pump : 0;
+
+    // --- CLOUD OVERRIDE & SMART AUTO-START ENGINE ---
+    const [[lastLog]] = await pool.query(
+      'SELECT log_id, pump_status, end_time FROM irrigation_logs WHERE field_id = ? ORDER BY start_time DESC LIMIT 1',
+      [sensor.field_id]
+    );
+
+    if (lastLog && lastLog.pump_status === 'on') {
+      pumpInsert = 1; // Farmer turned it ON manually. Force hardware ON.
+    } 
+    else if (lastLog && lastLog.pump_status === 'off' && soil != null && soil < 20) {
+      // The farmer turned it OFF manually, but the soil is critically dry.
+      
+      const [[existingAlert]] = await pool.query(
+        'SELECT alert_id, is_resolved FROM alerts WHERE field_id = ? AND title = "Manual Override Warning" AND created_at >= ? ORDER BY created_at DESC LIMIT 1',
+        [sensor.field_id, lastLog.end_time]
+      );
+
+      // Check if it's been 10+ minutes since the farmer turned it OFF
+      const minutesSinceOff = (Date.now() - new Date(lastLog.end_time).getTime()) / 60000;
+
+      // Unblock if user actively resolved it OR 10 minutes timed out
+      if (minutesSinceOff > 10 || (existingAlert && existingAlert.is_resolved)) {
+        pumpInsert = 1; // Force Auto-Start!
+        
+        const triggerDesc = (existingAlert && existingAlert.is_resolved) 
+          ? 'Cloud Auto-Start: Farmer resolved critical dryness warning.' 
+          : 'Cloud Auto-Start: 10 minutes timeout on critical dryness.';
+
+        await pool.query(
+          `INSERT INTO irrigation_logs (field_id, sensor_id, irrigation_type, start_time, trigger_reason, soil_moisture_before, pump_status, initiated_by) 
+           VALUES (?, ?, 'auto', NOW(), ?, ?, 'on', ?)`,
+          [sensor.field_id, sensor.sensor_id, triggerDesc, soil, sensor.user_id]
+        );
+      } else {
+        pumpInsert = 0; // Block the hardware! We are still in the 10-minute waiting window.
+        
+        // If alert doesn't exist for this session yet, create it IMMEDIATELY
+        if (!existingAlert) {
+          await pool.query(
+            `INSERT INTO alerts (user_id, field_id, sensor_id, alert_type, alert_category, title, message) 
+             VALUES (?, ?, ?, 'critical', 'irrigation', 'Manual Override Warning', 'You turned off the pump, but soil moisture is extremely low. The system will auto-start in 10 minutes to save crops unless you resolve this warning.')`,
+            [sensor.user_id, sensor.field_id, sensor.sensor_id]
+          );
+        }
+      }
+    }
 
     const [result] = await pool.query(
       'INSERT INTO sensor_readings (sensor_id, soil_moisture, temperature, humidity, light_intensity, rainfall, pump_on) VALUES (?, ?, ?, ?, ?, ?, ?)',
       [sensor.sensor_id, soil, temp, hum, light, rainInsert, pumpInsert]
     );
 
-    // ✅ Respond to ESP32 immediately — don't wait for AI
+    // ✅ Respond to ESP32 immediately — don't wait for background heavy lifting AI/Alerts
     res.status(201).json({ success: true, message: 'Sensor reading recorded successfully', reading_id: result.insertId });
 
-    // 🤖 Trigger AI recommendation in background (every 10th reading to avoid spam)
-    if (result.insertId % 10 === 0) {
+    // 🚨 Trigger automated smart alerts engine continuously (checks limits and dedupes automatically)
+    processSmartAlerts(sensor.user_id, sensor.field_id, sensor.sensor_id, { soil, temp, hum, rainInsert, pumpInsert });
+
+    // 🤖 Trigger AI recommendation in background (every 5th reading to keep flow fast for demos)
+    if (result.insertId % 5 === 0) {
       triggerAIRecommendation(sensor.field_id, sensor.sensor_id);
     }
   } catch (error) {

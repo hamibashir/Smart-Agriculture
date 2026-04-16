@@ -95,6 +95,15 @@ class ApiService {
   Future<Map<String, dynamic>> getDashboardActivity() => get('/dashboard/activity');
 
   Future<Map<String, dynamic>> getRecommendations(int fieldId) => get('/recommendations/$fieldId');
-  Future<Map<String, dynamic>> acceptRecommendation(int recommendationId) => put('/recommendations/$recommendationId/accept', {});
-  Future<Map<String, dynamic>> deleteRecommendation(int recommendationId) => delete('/recommendations/$recommendationId');
+  Future<Map<String, dynamic>> acceptRecommendation(int recommendationId) async {
+    return put('/recommendations/$recommendationId/accept', {});
+  }
+
+  Future<Map<String, dynamic>> deleteRecommendation(int recommendationId) async {
+    return delete('/recommendations/$recommendationId');
+  }
+
+  Future<Map<String, dynamic>> generateRecommendation(int fieldId, String season) async {
+    return post('/recommendations/$fieldId/generate', {'season': season});
+  }
 }

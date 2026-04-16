@@ -83,6 +83,73 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
     if (mounted) setState(() => _isRefreshing = false);
   }
 
+  void _showGenerateConfig() {
+    if (_selectedField == null) return;
+    
+    String selectedSeason = 'kharif';
+    bool generating = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setStateModal) {
+          return AlertDialog(
+            title: const Text('Predict Best Crop'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Choose the target season to analyze based on current exact sensor readings.'),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: selectedSeason,
+                  decoration: const InputDecoration(labelText: 'Target Season', border: OutlineInputBorder()),
+                  items: const [
+                    DropdownMenuItem(value: 'kharif', child: Text('Kharif (Summer/Monsoon)')),
+                    DropdownMenuItem(value: 'rabi', child: Text('Rabi (Winter/Spring)')),
+                  ],
+                  onChanged: (val) => setStateModal(() => selectedSeason = val!),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: generating ? null : () => Navigator.pop(ctx),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton.icon(
+                onPressed: generating ? null : () async {
+                  setStateModal(() => generating = true);
+                  try {
+                    final res = await _apiService.generateRecommendation(_selectedField!.fieldId, selectedSeason);
+                    if (res['success'] == true && mounted) {
+                      Navigator.pop(ctx);
+                      _loadRecommendations();
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('✅ New recommendation generated!'),
+                        backgroundColor: AppTheme.successColor,
+                      ));
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('Failed to generate recommendation. Check sensors.'),
+                          backgroundColor: AppTheme.errorColor,
+                       ));
+                    }
+                  } finally {
+                    if (mounted) setStateModal(() => generating = false);
+                  }
+                },
+                icon: generating ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Icon(Icons.auto_awesome),
+                label: Text(generating ? 'Analyzing...' : 'Ask AI'),
+              ),
+            ],
+          );
+        }
+      )
+    );
+  }
+
   Future<void> _acceptRecommendation(int id) async {
     try {
       final res = await _apiService.acceptRecommendation(id);
@@ -137,6 +204,12 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
               tooltip: 'Refresh',
             ),
         ],
+      ),
+      floatingActionButton: _fields.isEmpty ? null : FloatingActionButton.extended(
+        onPressed: _showGenerateConfig,
+        icon: const Icon(Icons.psychology_rounded),
+        label: const Text('Ask AI'),
+        backgroundColor: AppTheme.primaryGreen,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

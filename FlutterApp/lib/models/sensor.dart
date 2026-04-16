@@ -44,7 +44,7 @@ class Sensor {
 
   static double? _parseDouble(dynamic value) => value != null ? double.tryParse(value.toString()) : null;
 
-  static DateTime? _parseDateTime(dynamic value) => value != null ? DateTime.parse(value) : null;
+  static DateTime? _parseDateTime(dynamic value) => value != null ? DateTime.parse(value).toLocal() : null;
 }
 
 class SensorReading {
@@ -69,7 +69,7 @@ class SensorReading {
   factory SensorReading.fromJson(Map<String, dynamic> json) => SensorReading(
         readingId: json['reading_id'],
         sensorId: json['sensor_id'],
-        timestamp: DateTime.parse(json['reading_time']),
+        timestamp: DateTime.parse(json['reading_time']).toLocal(),
         soilMoisture: _parseDouble(json['soil_moisture']),
         temperature: _parseDouble(json['temperature']),
         humidity: _parseDouble(json['humidity']),

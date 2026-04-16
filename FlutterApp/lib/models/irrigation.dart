@@ -53,7 +53,7 @@ class IrrigationLog {
 
   static double? _parseDouble(dynamic value) => value != null ? double.tryParse(value.toString()) : null;
 
-  static DateTime? _parseDateTime(dynamic value) => value != null ? DateTime.parse(value) : null;
+  static DateTime? _parseDateTime(dynamic value) => value != null ? DateTime.parse(value).toLocal() : null;
 }
 
 class IrrigationSchedule {
@@ -94,5 +94,5 @@ class IrrigationSchedule {
         isActive: json['is_active'] == 1 || json['is_active'] == true,
       );
 
-  static DateTime? _parseDateTime(dynamic value) => value != null ? DateTime.parse(value) : null;
+  static DateTime? _parseDateTime(dynamic value) => value != null ? DateTime.parse(value).toLocal() : null;
 }

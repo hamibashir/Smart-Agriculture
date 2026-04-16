@@ -50,11 +50,11 @@ class Alert {
         currentValue: _parseDouble(json['current_value']),
         isRead: _parseBool(json['is_read']),
         isResolved: _parseBool(json['is_resolved']),
-        resolvedAt: json['resolved_at'] != null ? DateTime.parse(json['resolved_at']) : null,
+        resolvedAt: json['resolved_at'] != null ? DateTime.parse(json['resolved_at']).toLocal() : null,
         actionTaken: json['action_taken'],
         pushNotificationSent: _parseBool(json['push_notification_sent']),
         emailSent: _parseBool(json['email_sent']),
-        createdAt: DateTime.parse(json['created_at']),
+        createdAt: DateTime.parse(json['created_at']).toLocal(),
       );
 
   static double? _parseDouble(dynamic value) => value != null ? double.tryParse(value.toString()) : null;

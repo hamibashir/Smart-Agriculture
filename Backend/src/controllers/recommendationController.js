@@ -104,3 +104,83 @@ export const createRecommendation = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+// Generate manual recommendation from Flutter App explicit request
+export const generateManualRecommendation = async (req, res) => {
+  try {
+    const { fieldId } = req.params;
+    const { season } = req.body; 
+
+    if (!season || !['kharif', 'rabi'].includes(season)) {
+       return res.status(400).json({ success: false, message: 'Invalid season. Must be kharif or rabi.' });
+    }
+
+    if (!await verifyFieldOwnership(fieldId, req.user.user_id)) {
+      return res.status(404).json({ success: false, message: 'Field not found' });
+    }
+
+    const [[field]] = await pool.query('SELECT soil_type FROM fields WHERE field_id = ?', [fieldId]);
+    const soilTypeStr = (field.soil_type || 'loamy').toLowerCase().replace(' ', '_');
+
+    const [readings] = await pool.query(
+      `SELECT 
+        AVG(soil_moisture) AS soil_moisture,
+        AVG(temperature)   AS temperature,
+        AVG(humidity)      AS humidity,
+        AVG(rainfall)      AS rainfall
+       FROM (
+         SELECT soil_moisture, temperature, humidity, rainfall
+         FROM sensor_readings sr
+         JOIN sensors s ON sr.sensor_id = s.sensor_id
+         WHERE s.field_id = ?
+         ORDER BY reading_time DESC
+         LIMIT 5
+       ) AS recent`,
+      [fieldId]
+    );
+
+    const avg = readings[0];
+    if (avg.soil_moisture == null) {
+       return res.status(400).json({ success: false, message: 'No sensor data available for this field to analyze.' });
+    }
+
+    const AI_API_URL = process.env.AI_API_URL || 'http://localhost:5001';
+
+    const response = await fetch(`${AI_API_URL}/predict`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        soil_moisture: parseFloat(avg.soil_moisture).toFixed(2),
+        temperature: parseFloat(avg.temperature).toFixed(2),
+        humidity: parseFloat(avg.humidity).toFixed(2),
+        soil_type: soilTypeStr,
+        season: season,
+        rainfall: parseFloat(avg.rainfall || 0).toFixed(2)
+      })
+    });
+
+    if (!response.ok) throw new Error('AI API Engine could not be reached.');
+    
+    const aiResult = await response.json();
+    if (!aiResult.success) throw new Error('AI logic failed to predict crop.');
+
+    await pool.query(
+      `INSERT INTO crop_recommendations 
+        (field_id, recommended_crop, confidence_score, soil_moisture_avg, temperature_avg, 
+         humidity_avg, soil_type, season, expected_yield, water_requirement, 
+         growth_duration_days, recommendation_reason, model_version)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        fieldId, aiResult.recommended_crop, aiResult.confidence_score, 
+        avg.soil_moisture, avg.temperature, avg.humidity, field.soil_type, 
+        season, aiResult.expected_yield, aiResult.water_requirement, 
+        aiResult.growth_duration_days, aiResult.recommendation_reason, aiResult.model_version
+      ]
+    );
+
+    res.json({ success: true, message: 'Recommendation generated successfully for ' + season });
+  } catch (error) {
+    console.error('Manual recommend error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

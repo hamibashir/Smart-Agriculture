@@ -88,6 +88,26 @@ def predict():
             f"{crop.title()} is the most suitable crop."
         )
 
+        # Generate "What-If" Insights for the presentation panel
+        features_hot = [[soil_moisture, temperature + 4, humidity, soil_enc, season_enc, rainfall]]
+        features_cold = [[soil_moisture, temperature - 4, humidity, soil_enc, season_enc, rainfall]]
+        features_wet = [[soil_moisture + 15, temperature, humidity, soil_enc, season_enc, rainfall]]
+
+        crop_hot = le_crop.inverse_transform([model.predict(features_hot)[0]])[0]
+        crop_cold = le_crop.inverse_transform([model.predict(features_cold)[0]])[0]
+        crop_wet = le_crop.inverse_transform([model.predict(features_wet)[0]])[0]
+
+        what_ifs = []
+        if crop_hot != crop:
+            what_ifs.append(f"If temp was +4°C hotter, {crop_hot.title()} would be recommended.")
+        if crop_cold != crop:
+            what_ifs.append(f"If temp was -4°C cooler, {crop_cold.title()} would be recommended.")
+        if len(what_ifs) < 2 and crop_wet != crop:
+            what_ifs.append(f"If soil moisture was +15% higher, {crop_wet.title()} would be recommended.")
+            
+        if what_ifs:
+            reason += "\n\n💡 Alternative Scenarios: " + " ".join(what_ifs)
+
         return jsonify({
             "success":          True,
             "recommended_crop": crop,

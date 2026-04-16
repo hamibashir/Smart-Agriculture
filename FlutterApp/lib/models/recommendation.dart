@@ -54,10 +54,10 @@ class CropRecommendation {
         modelVersion: json['model_version'],
         isAccepted: json['is_accepted'] == 1 || json['is_accepted'] == true,
         acceptedAt: _parseDateTime(json['accepted_at']),
-        createdAt: DateTime.parse(json['created_at']),
+        createdAt: DateTime.parse(json['created_at']).toLocal(),
       );
 
   static double? _parseDouble(dynamic value) => value != null ? double.tryParse(value.toString()) : null;
 
-  static DateTime? _parseDateTime(dynamic value) => value != null ? DateTime.parse(value) : null;
+  static DateTime? _parseDateTime(dynamic value) => value != null ? DateTime.parse(value).toLocal() : null;
 }

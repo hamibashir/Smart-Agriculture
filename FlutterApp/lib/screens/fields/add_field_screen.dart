@@ -15,8 +15,8 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
 
   final _fieldNameController = TextEditingController();
   final _areaSizeController = TextEditingController();
-  final _soilTypeController = TextEditingController();
-  final _currentCropController = TextEditingController();
+  String? _soilType;
+  String? _currentCrop;
 
   String _areaUnit = 'acres';
   bool _isLoading = false;
@@ -25,8 +25,6 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
   void dispose() {
     _fieldNameController.dispose();
     _areaSizeController.dispose();
-    _soilTypeController.dispose();
-    _currentCropController.dispose();
     super.dispose();
   }
 
@@ -40,8 +38,8 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
         'field_name': _fieldNameController.text.trim(),
         'area_size': double.parse(_areaSizeController.text),
         'area_unit': _areaUnit,
-        'soil_type': _soilTypeController.text.trim().isEmpty ? null : _soilTypeController.text.trim(),
-        'current_crop': _currentCropController.text.trim().isEmpty ? null : _currentCropController.text.trim(),
+        'soil_type': _soilType,
+        'current_crop': _currentCrop,
       });
 
       if (response['success'] == true) {
@@ -84,7 +82,6 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
               Row(
                 children: [
                   Expanded(
-                    flex: 2,
                     child: TextFormField(
                       controller: _areaSizeController,
                       keyboardType: TextInputType.number,
@@ -116,22 +113,41 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _soilTypeController,
+              DropdownButtonFormField<String>(
+                value: _soilType,
                 decoration: const InputDecoration(
-                  labelText: 'Soil Type (Optional)',
-                  hintText: 'e.g., Clay, Sandy, Loamy',
+                  labelText: 'Soil Type *',
                   prefixIcon: Icon(Icons.terrain),
                 ),
+                items: const [
+                  DropdownMenuItem(value: 'loamy', child: Text('Loamy')),
+                  DropdownMenuItem(value: 'clay_loam', child: Text('Clay Loam')),
+                  DropdownMenuItem(value: 'silty', child: Text('Silty')),
+                  DropdownMenuItem(value: 'clay', child: Text('Clay')),
+                  DropdownMenuItem(value: 'sandy', child: Text('Sandy')),
+                ],
+                onChanged: (value) => setState(() => _soilType = value),
+                validator: (value) => value == null ? 'Please select soil type' : null,
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _currentCropController,
+              DropdownButtonFormField<String>(
+                value: _currentCrop,
                 decoration: const InputDecoration(
-                  labelText: 'Current Crop (Optional)',
-                  hintText: 'e.g., Wheat, Rice, Cotton',
+                  labelText: 'Current Crop *',
                   prefixIcon: Icon(Icons.eco),
                 ),
+                items: const [
+                  DropdownMenuItem(value: 'wheat', child: Text('Wheat')),
+                  DropdownMenuItem(value: 'rice', child: Text('Rice')),
+                  DropdownMenuItem(value: 'cotton', child: Text('Cotton')),
+                  DropdownMenuItem(value: 'maize', child: Text('Maize')),
+                  DropdownMenuItem(value: 'sugarcane', child: Text('Sugarcane')),
+                  DropdownMenuItem(value: 'mustard', child: Text('Mustard')),
+                  DropdownMenuItem(value: 'chickpea', child: Text('Chickpea')),
+                  DropdownMenuItem(value: 'sunflower', child: Text('Sunflower')),
+                ],
+                onChanged: (value) => setState(() => _currentCrop = value),
+                validator: (value) => value == null ? 'Please select current crop' : null,
               ),
               const SizedBox(height: 32),
               ElevatedButton(

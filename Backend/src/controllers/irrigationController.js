@@ -49,7 +49,18 @@ export const startIrrigation = async (req, res) => {
 
     const [[log]] = await pool.query('SELECT * FROM irrigation_logs WHERE log_id = ?', [result.insertId]);
 
-    // TODO: Send command to ESP32/IoT device to turn on pump
+    // Insert a new sensor reading with the latest weather but Pump ON, so Dashboard sees it instantly
+    const [[latest]] = await pool.query(
+      'SELECT sr.*, s.sensor_id as s_id FROM sensor_readings sr JOIN sensors s ON sr.sensor_id = s.sensor_id WHERE s.field_id = ? ORDER BY sr.reading_time DESC LIMIT 1',
+      [field_id]
+    );
+    if (latest) {
+      await pool.query(
+        'INSERT INTO sensor_readings (sensor_id, soil_moisture, temperature, humidity, light_intensity, rainfall, pump_on) VALUES (?, ?, ?, ?, ?, ?, 1)',
+        [latest.s_id, latest.soil_moisture, latest.temperature, latest.humidity, latest.light_intensity, latest.rainfall]
+      );
+    }
+
     res.status(201).json({ success: true, message: 'Irrigation started successfully', data: log });
   } catch (error) {
     console.error('Start irrigation error:', error);
@@ -88,7 +99,19 @@ export const stopIrrigation = async (req, res) => {
 
     const [[updatedLog]] = await pool.query('SELECT * FROM irrigation_logs WHERE log_id = ?', [log.log_id]);
 
-    // TODO: Send command to ESP32/IoT device to turn off pump
+    // Insert a new sensor reading with the latest weather but Pump OFF, so Dashboard sees it instantly
+    const fieldIdForSensor = field_id || updatedLog.field_id;
+    const [[latest]] = await pool.query(
+      'SELECT sr.*, s.sensor_id as s_id FROM sensor_readings sr JOIN sensors s ON sr.sensor_id = s.sensor_id WHERE s.field_id = ? ORDER BY sr.reading_time DESC LIMIT 1',
+      [fieldIdForSensor]
+    );
+    if (latest) {
+      await pool.query(
+        'INSERT INTO sensor_readings (sensor_id, soil_moisture, temperature, humidity, light_intensity, rainfall, pump_on) VALUES (?, ?, ?, ?, ?, ?, 0)',
+        [latest.s_id, latest.soil_moisture, latest.temperature, latest.humidity, latest.light_intensity, latest.rainfall]
+      );
+    }
+
     res.json({ success: true, message: 'Irrigation stopped successfully', data: updatedLog });
   } catch (error) {
     console.error('Stop irrigation error:', error);
