@@ -12,6 +12,7 @@ import alertRoutes from './routes/alertRoutes.js';
 import recommendationRoutes from './routes/recommendationRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -51,6 +52,7 @@ app.use('/api/alerts', alertRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/chat', chatRoutes);
 
 // 404 handler
 app.use((req, res) => {

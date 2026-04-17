@@ -5,6 +5,7 @@ import '../irrigation/irrigation_screen.dart';
 import '../recommendations/recommendations_screen.dart';
 import '../alerts/alerts_screen.dart';
 import '../profile/profile_screen.dart';
+import '../../config/app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,19 +16,30 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  late final PageController _pageController;
 
-  void navigateToTab(int index) {
-    if (_currentIndex != index) setState(() => _currentIndex = index);
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentIndex);
   }
 
-  Widget get _currentScreen => switch (_currentIndex) {
-        0 => const DashboardScreen(),
-        1 => const FieldsScreen(),
-        2 => const IrrigationScreen(),
-        3 => const RecommendationsScreen(),
-        4 => const AlertsScreen(),
-        _ => const ProfileScreen(),
-      };
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void navigateToTab(int index) {
+    if (_currentIndex != index) {
+      setState(() => _currentIndex = index);
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,43 +69,46 @@ class HomeScreenState extends State<HomeScreen> {
         if (shouldPop == true && context.mounted) Navigator.pop(context);
       },
       child: Scaffold(
-        body: _currentScreen,
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: navigateToTab,
-          type: BottomNavigationBarType.fixed,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_outlined),
-              activeIcon: Icon(Icons.dashboard),
-              label: 'Dashboard',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.grass_outlined),
-              activeIcon: Icon(Icons.grass),
-              label: 'Fields',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.water_drop_outlined),
-              activeIcon: Icon(Icons.water_drop),
-              label: 'Irrigation',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.eco_outlined),
-              activeIcon: Icon(Icons.eco),
-              label: 'Crops',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.notifications_outlined),
-              activeIcon: Icon(Icons.notifications),
-              label: 'Alerts',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outlined),
-              activeIcon: Icon(Icons.person),
-              label: 'Profile',
-            ),
+        body: PageView(
+          controller: _pageController,
+          physics: const NeverScrollableScrollPhysics(), // Prevents swipe-conflicts with other horizontal scroll widgets
+          children: const [
+            DashboardScreen(),
+            FieldsScreen(),
+            IrrigationScreen(),
+            RecommendationsScreen(),
+            AlertsScreen(),
+            ProfileScreen(),
           ],
+        ),
+        bottomNavigationBar: Theme(
+          data: ThemeData(
+            navigationBarTheme: NavigationBarThemeData(
+              labelTextStyle: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary);
+                }
+                return const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Colors.grey);
+              }),
+            ),
+          ),
+          child: NavigationBar(
+            selectedIndex: _currentIndex,
+            onDestinationSelected: navigateToTab,
+            backgroundColor: Colors.white,
+            indicatorColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            elevation: 8,
+            shadowColor: Colors.black.withValues(alpha: 0.05),
+            destinations: const [
+              NavigationDestination(icon: Icon(Icons.dashboard_outlined), selectedIcon: Icon(Icons.dashboard_rounded, color: AppTheme.primaryGreen), label: 'Dashboard'),
+              NavigationDestination(icon: Icon(Icons.grass_outlined), selectedIcon: Icon(Icons.grass_rounded, color: AppTheme.primaryGreen), label: 'Fields'),
+              NavigationDestination(icon: Icon(Icons.water_drop_outlined), selectedIcon: Icon(Icons.water_drop_rounded, color: AppTheme.primaryGreen), label: 'Irrigation'),
+              NavigationDestination(icon: Icon(Icons.eco_outlined), selectedIcon: Icon(Icons.eco_rounded, color: AppTheme.primaryGreen), label: 'Tips'),
+              NavigationDestination(icon: Icon(Icons.notifications_outlined), selectedIcon: Icon(Icons.notifications_rounded, color: AppTheme.primaryGreen), label: 'Alerts'),
+              NavigationDestination(icon: Icon(Icons.person_outlined), selectedIcon: Icon(Icons.person_rounded, color: AppTheme.primaryGreen), label: 'Profile'),
+            ],
+          ),
         ),
       ),
     );

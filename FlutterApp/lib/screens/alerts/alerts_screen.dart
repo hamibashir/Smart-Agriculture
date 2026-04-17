@@ -61,6 +61,29 @@ class _AlertsScreenState extends State<AlertsScreen> {
     } catch (_) {}
   }
 
+  Future<void> _deleteAlert(int alertId) async {
+    try {
+      final res = await _apiService.deleteAlert(alertId);
+      if (res['success'] == true && mounted) {
+        setState(() {
+          _alerts.removeWhere((a) => a.alertId == alertId);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('✅ Alert deleted'),
+          backgroundColor: AppTheme.textSecondary,
+          duration: Duration(seconds: 2),
+        ));
+      }
+    } catch (_) {
+      if (mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Failed to delete alert'),
+          backgroundColor: AppTheme.errorColor,
+        ));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,11 +102,29 @@ class _AlertsScreenState extends State<AlertsScreen> {
                       child: ListView.builder(
                         padding: const EdgeInsets.all(16),
                         itemCount: _alerts.length,
-                        itemBuilder: (_, index) => _AlertCard(
-                          alert: _alerts[index],
-                          onMarkRead: () => _markAsRead(_alerts[index].alertId),
-                          onResolve: () => _resolveAlert(_alerts[index].alertId),
-                        ),
+                        itemBuilder: (_, index) {
+                          final alert = _alerts[index];
+                          return Dismissible(
+                            key: ValueKey(alert.alertId),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 24),
+                              margin: const EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                color: AppTheme.errorColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(Icons.delete_outline, color: Colors.white, size: 28),
+                            ),
+                            onDismissed: (_) => _deleteAlert(alert.alertId),
+                            child: _AlertCard(
+                              alert: alert,
+                              onMarkRead: () => _markAsRead(alert.alertId),
+                              onResolve: () => _resolveAlert(alert.alertId),
+                            ),
+                          );
+                        },
                       ),
                     ),
     );

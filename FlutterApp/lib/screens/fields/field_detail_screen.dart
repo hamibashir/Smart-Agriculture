@@ -18,12 +18,14 @@ class FieldDetailScreen extends StatefulWidget {
 class _FieldDetailScreenState extends State<FieldDetailScreen> with SingleTickerProviderStateMixin {
   final ApiService _apiService = ApiService();
   late TabController _tabController;
+  late Field _currentField;
   List<Sensor> _sensors = [];
   bool _isLoadingSensors = true;
 
   @override
   void initState() {
     super.initState();
+    _currentField = widget.field;
     _tabController = TabController(length: 3, vsync: this);
     _loadSensors();
   }
@@ -48,12 +50,113 @@ class _FieldDetailScreenState extends State<FieldDetailScreen> with SingleTicker
     }
   }
 
+  Future<void> _refreshFieldData() async {
+    try {
+      final res = await _apiService.getField(_currentField.fieldId);
+      if (res['success'] == true && mounted) {
+        setState(() {
+          _currentField = Field.fromJson(res['data']);
+        });
+      }
+    } catch (_) {}
+  }
+
+  void _showEditFieldModal() {
+    final TextEditingController nameCtrl = TextEditingController(text: _currentField.fieldName);
+    final TextEditingController cropCtrl = TextEditingController(text: _currentField.currentCrop ?? '');
+    final TextEditingController soilCtrl = TextEditingController(text: _currentField.soilType ?? '');
+    bool isSaving = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateModal) {
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16, right: 16, top: 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Edit Field Info', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: InputDecoration(labelText: 'Field Name', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: cropCtrl,
+                  decoration: InputDecoration(labelText: 'Current Crop', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: soilCtrl,
+                  decoration: InputDecoration(labelText: 'Soil Type', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryGreen,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: isSaving ? null : () async {
+                      if (nameCtrl.text.trim().isEmpty) return;
+                      setStateModal(() => isSaving = true);
+                      try {
+                        final data = {
+                          'field_name': nameCtrl.text.trim(),
+                          'current_crop': cropCtrl.text.trim().isEmpty ? null : cropCtrl.text.trim(),
+                          'soil_type': soilCtrl.text.trim().isEmpty ? null : soilCtrl.text.trim(),
+                        };
+                        final res = await _apiService.updateField(_currentField.fieldId, data);
+                        if (res['success'] == true && mounted) {
+                          Navigator.pop(context);
+                          _refreshFieldData();
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                            content: Text('✅ Field updated successfully!'), backgroundColor: AppTheme.successColor
+                          ));
+                        }
+                      } catch (e) {
+                         if (mounted) {
+                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              content: Text('Failed to update field'), backgroundColor: AppTheme.errorColor
+                           ));
+                         }
+                      } finally {
+                         if (mounted) setStateModal(() => isSaving = false);
+                      }
+                    },
+                    child: isSaving ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text('Save Changes', style: TextStyle(fontSize: 16, color: Colors.white)),
+                  )
+                ),
+                const SizedBox(height: 24),
+              ]
+            )
+          );
+        }
+      )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.field.fieldName),
-        actions: [IconButton(icon: const Icon(Icons.edit), onPressed: () {})],
+        title: Text(_currentField.fieldName),
+        actions: [IconButton(icon: const Icon(Icons.edit_rounded), onPressed: _showEditFieldModal)],
         bottom: TabBar(
           controller: _tabController,
           tabs: const [Tab(text: 'Overview'), Tab(text: 'Sensors'), Tab(text: 'History')],
@@ -62,7 +165,7 @@ class _FieldDetailScreenState extends State<FieldDetailScreen> with SingleTicker
       body: TabBarView(
         controller: _tabController,
         children: [
-          _OverviewTab(field: widget.field),
+          _OverviewTab(field: _currentField),
           _SensorsTab(sensors: _sensors, isLoading: _isLoadingSensors),
           const _HistoryTab(),
         ],

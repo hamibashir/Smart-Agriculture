@@ -182,63 +182,114 @@ class _ControlTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Fields Selector
+          const Text('Active Field', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+          const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFe2e8f0), width: 1.5),
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<Field>(
+                key: ValueKey(selectedField?.fieldId),
+                value: selectedField,
+                isExpanded: true,
+                icon: const Icon(Icons.expand_more_rounded, color: AppTheme.textPrimary),
+                items: fields.map((field) => DropdownMenuItem(
+                  value: field, 
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(color: AppTheme.primaryGreen.withValues(alpha: 0.1), shape: BoxShape.circle),
+                        child: const Icon(Icons.grass, size: 16, color: AppTheme.primaryGreen),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(field.fieldName, style: const TextStyle(fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+                    ],
+                  )
+                )).toList(),
+                onChanged: onFieldChanged,
+              ),
+            ),
+          ),
+          const SizedBox(height: 48),
+
+          // Central Graphic
+          Container(
+            padding: const EdgeInsets.all(40),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(color: AppTheme.primaryGreen.withValues(alpha: 0.1), blurRadius: 40, spreadRadius: 10, offset: const Offset(0, 10)),
+              ],
+            ),
+            child: const Column(
               children: [
-                const Text('Select Field', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<Field>(
-                  key: ValueKey(selectedField?.fieldId),
-                  initialValue: selectedField,
-                  decoration: const InputDecoration(prefixIcon: Icon(Icons.grass)),
-                  items: fields.map((field) => DropdownMenuItem(value: field, child: Text(field.fieldName))).toList(),
-                  onChanged: onFieldChanged,
-                ),
+                 Icon(Icons.water_drop, size: 64, color: AppTheme.primaryGreen),
+                 SizedBox(height: 16),
+                 Text('Water Pump', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                 Text('Manual Override', style: TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Manual Control', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: isIrrigating ? null : onStart,
-                        icon: isIrrigating ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.play_arrow),
-                        label: const Text('Start'),
-                        style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16)),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: onStop,
-                        icon: const Icon(Icons.stop),
-                        label: const Text('Stop'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.all(16),
-                          foregroundColor: AppTheme.errorColor,
-                          side: const BorderSide(color: AppTheme.errorColor),
+          const SizedBox(height: 54),
+
+          // Start & Stop Actions
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: isIrrigating ? null : onStart,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryGreen,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 0,
+                  ),
+                  child: isIrrigating 
+                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.play_arrow_rounded),
+                            SizedBox(width: 8),
+                            Text('Start', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          ],
                         ),
-                      ),
-                    ),
-                  ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onStop,
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    foregroundColor: AppTheme.errorColor,
+                    side: const BorderSide(color: AppTheme.errorColor, width: 2),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.stop_rounded),
+                      SizedBox(width: 8),
+                      Text('Stop', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -284,46 +335,67 @@ class _LogCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: Colors.white, 
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFf1f5f9), width: 1.5),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2))],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(log.irrigationType == 'automatic' ? Icons.auto_mode : Icons.touch_app, color: AppTheme.infoColor, size: 20),
-              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: log.irrigationType == 'automatic' ? AppTheme.infoColor.withValues(alpha: 0.1) : const Color(0xFF8b5cf6).withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(log.irrigationType == 'automatic' ? Icons.auto_mode_rounded : Icons.touch_app_rounded, color: log.irrigationType == 'automatic' ? AppTheme.infoColor : const Color(0xFF8b5cf6), size: 20),
+              ),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(log.irrigationType.toUpperCase(), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                    Text(DateFormat('MMM dd, yyyy • hh:mm a').format(log.startTime), style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+                    Text(log.irrigationType.toUpperCase(), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.textPrimary)),
+                    const SizedBox(height: 2),
+                    Text(DateFormat('MMM dd, yyyy • hh:mm a').format(log.startTime), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: log.pumpStatus == 'on' ? AppTheme.successColor.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: Text(
-                  log.pumpStatus.toUpperCase(),
-                  style: TextStyle(
-                    color: log.pumpStatus == 'on' ? AppTheme.successColor : Colors.grey,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Row(
+                  children: [
+                    Container(width: 6, height: 6, decoration: BoxDecoration(color: log.pumpStatus == 'on' ? AppTheme.successColor : Colors.grey, shape: BoxShape.circle)),
+                    const SizedBox(width: 4),
+                    Text(
+                      log.pumpStatus.toUpperCase(),
+                      style: TextStyle(
+                        color: log.pumpStatus == 'on' ? AppTheme.successColor : Colors.grey,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
           if (log.waterUsedLiters != null || log.durationMinutes != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Row(
               children: [
-                if (log.waterUsedLiters != null) Expanded(child: Text('💧 ${log.waterUsedLiters!.toStringAsFixed(1)}L', style: const TextStyle(fontSize: 12))),
-                if (log.durationMinutes != null) Expanded(child: Text('⏱️ ${log.durationMinutes} min', style: const TextStyle(fontSize: 12))),
+                if (log.waterUsedLiters != null) 
+                   Expanded(child: Text('💧 Volume: ${log.waterUsedLiters!.toStringAsFixed(1)}L', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600))),
+                if (log.durationMinutes != null) 
+                   Expanded(child: Text('⏱️ Duration: ${log.durationMinutes} min', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600), textAlign: TextAlign.right)),
               ],
             ),
           ],
@@ -332,3 +404,4 @@ class _LogCard extends StatelessWidget {
     );
   }
 }
+

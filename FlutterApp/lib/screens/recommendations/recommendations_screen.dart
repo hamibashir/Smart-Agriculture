@@ -4,6 +4,7 @@ import '../../services/api_service.dart';
 import '../../models/field.dart';
 import '../../models/recommendation.dart';
 import '../../config/app_theme.dart';
+import 'chatbot_screen.dart';
 
 // ── Crop emoji + color lookup ────────────────────────────────
 const _cropMeta = {
@@ -39,6 +40,8 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
   Field? _selectedField;
   bool _isLoading = true;
   bool _isRefreshing = false;
+  int _currentPage = 1;
+  static const int _itemsPerPage = 3;
 
   @override
   void initState() {
@@ -81,6 +84,12 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
       }
     } catch (_) {}
     if (mounted) setState(() => _isRefreshing = false);
+  }
+
+  void _openChatBot() {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (_) => ChatBotScreen(initialField: _selectedField),
+    ));
   }
 
   void _showGenerateConfig() {
@@ -141,7 +150,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                   }
                 },
                 icon: generating ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Icon(Icons.auto_awesome),
-                label: Text(generating ? 'Analyzing...' : 'Ask AI'),
+                label: Text(generating ? 'Analyzing...' : 'Predict'),
               ),
             ],
           );
@@ -171,6 +180,8 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
       if (res['success'] == true) {
         setState(() {
           _recommendations.removeWhere((r) => r.recommendationId == id);
+          final maxPages = (_recommendations.length / _itemsPerPage).ceil();
+          if (_currentPage > maxPages) _currentPage = maxPages > 0 ? maxPages : 1;
         });
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('🗑️ Recommendation deleted.'),
@@ -205,11 +216,72 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
             ),
         ],
       ),
-      floatingActionButton: _fields.isEmpty ? null : FloatingActionButton.extended(
-        onPressed: _showGenerateConfig,
-        icon: const Icon(Icons.psychology_rounded),
-        label: const Text('Ask AI'),
+      floatingActionButton: _fields.isEmpty ? null : FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            builder: (context) => SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 24),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const Text('AI Actions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+                    ListTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0ea5e9).withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.auto_awesome, color: Color(0xFF0ea5e9)),
+                      ),
+                      title: const Text('Predict Crop', style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: const Text('Run Random Forest ML model'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _showGenerateConfig();
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    ListTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.forum_rounded, color: AppTheme.primaryGreen),
+                      ),
+                      title: const Text('Chat with AgriBot', style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: const Text('Get instant context-aware farm advice'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _openChatBot();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
         backgroundColor: AppTheme.primaryGreen,
+        heroTag: 'ai_actions_fab',
+        child: const Icon(Icons.auto_awesome, color: Colors.white),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -239,85 +311,122 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                       if (_recommendations.isEmpty)
                         const SliverFillRemaining(child: _NoRecommendations())
                       else ...[
-                        // Latest / top recommendation hero
-                        SliverToBoxAdapter(
-                          child: _HeroCard(
-                            recommendation: _recommendations.first,
-                            onAccept: () => _acceptRecommendation(
-                                _recommendations.first.recommendationId),
-                            onDelete: () => _deleteRecommendation(
-                                _recommendations.first.recommendationId),
-                          ),
-                        ),
+                        ...() {
+                          final totalPages = (_recommendations.length / _itemsPerPage).ceil();
+                          final startIndex = (_currentPage - 1) * _itemsPerPage;
+                          final endIndex = (startIndex + _itemsPerPage).clamp(0, _recommendations.length);
+                          final currentItems = _recommendations.sublist(startIndex, endIndex);
 
-                        // History header
-                        if (_recommendations.length > 1)
-                          const SliverToBoxAdapter(
-                            child: Padding(
-                              padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
-                              child: Text(
-                                'Previous Recommendations',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.textSecondary,
+                          return [
+                            // Latest / top recommendation hero (Only on page 1)
+                            if (_currentPage == 1 && currentItems.isNotEmpty)
+                              SliverToBoxAdapter(
+                                child: _HeroCard(
+                                  recommendation: currentItems.first,
+                                  onAccept: () => _acceptRecommendation(currentItems.first.recommendationId),
+                                  onDelete: () => _deleteRecommendation(currentItems.first.recommendationId),
                                 ),
                               ),
-                            ),
-                          ),
 
-                        // History list — swipe left to delete
-                        SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (_, i) {
-                              final rec = _recommendations[i + 1];
-                              return Dismissible(
-                                key: ValueKey(rec.recommendationId),
-                                direction: DismissDirection.endToStart,
-                                background: Container(
-                                  alignment: Alignment.centerRight,
-                                  padding: const EdgeInsets.only(right: 24),
-                                  margin: const EdgeInsets.fromLTRB(16, 6, 16, 0),
-                                  decoration: BoxDecoration(
-                                    color: AppTheme.errorColor,
-                                    borderRadius: BorderRadius.circular(12),
+                            // History header
+                            if (_recommendations.length > 1 && (_currentPage == 1 ? currentItems.length > 1 : currentItems.isNotEmpty))
+                              const SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+                                  child: Text(
+                                    'Previous Recommendations',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.textSecondary,
+                                    ),
                                   ),
-                                  child: const Column(
-                                    mainAxisSize: MainAxisSize.min,
+                                ),
+                              ),
+
+                            // History list — swipe left to delete
+                            SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (_, i) {
+                                  // If we are on page 1, skip index 0 because it's the Hero card
+                                  final renderIndex = _currentPage == 1 ? i + 1 : i;
+                                  if (renderIndex >= currentItems.length) return const SizedBox.shrink();
+                                  
+                                  final rec = currentItems[renderIndex];
+                                  return Dismissible(
+                                    key: ValueKey(rec.recommendationId),
+                                    direction: DismissDirection.endToStart,
+                                    background: Container(
+                                      alignment: Alignment.centerRight,
+                                      padding: const EdgeInsets.only(right: 24),
+                                      margin: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.errorColor,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.delete_outline_rounded, color: Colors.white, size: 26),
+                                          SizedBox(height: 4),
+                                          Text('Delete', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                                        ],
+                                      ),
+                                    ),
+                                    confirmDismiss: (_) async {
+                                      return await showDialog<bool>(
+                                        context: context,
+                                        builder: (_) => AlertDialog(
+                                          title: const Text('Delete Recommendation?'),
+                                          content: const Text('This recommendation will be permanently removed.'),
+                                          actions: [
+                                            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(context, true),
+                                              style: TextButton.styleFrom(foregroundColor: AppTheme.errorColor),
+                                              child: const Text('Delete'),
+                                            ),
+                                          ],
+                                        ),
+                                      ) ?? false;
+                                    },
+                                    onDismissed: (_) => _deleteRecommendation(rec.recommendationId),
+                                    child: _HistoryCard(
+                                      recommendation: rec,
+                                      onAccept: () => _acceptRecommendation(rec.recommendationId),
+                                    ),
+                                  );
+                                },
+                                childCount: _currentPage == 1 ? (currentItems.length - 1).clamp(0, 999) : currentItems.length,
+                              ),
+                            ),
+
+                            // Pagination Controls
+                            if (totalPages > 1)
+                              SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 24),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.delete_outline_rounded, color: Colors.white, size: 26),
-                                      SizedBox(height: 4),
-                                      Text('Delete', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                                      IconButton(
+                                        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 16),
+                                        onPressed: _currentPage > 1 ? () => setState(() => _currentPage--) : null,
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Text('Page $_currentPage of $totalPages', 
+                                        style: const TextStyle(fontWeight: FontWeight.w600, color: AppTheme.primaryGreen)),
+                                      const SizedBox(width: 16),
+                                      IconButton(
+                                        icon: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                                        onPressed: _currentPage < totalPages ? () => setState(() => _currentPage++) : null,
+                                      ),
                                     ],
                                   ),
                                 ),
-                                confirmDismiss: (_) async {
-                                  return await showDialog<bool>(
-                                    context: context,
-                                    builder: (_) => AlertDialog(
-                                      title: const Text('Delete Recommendation?'),
-                                      content: const Text('This recommendation will be permanently removed.'),
-                                      actions: [
-                                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context, true),
-                                          style: TextButton.styleFrom(foregroundColor: AppTheme.errorColor),
-                                          child: const Text('Delete'),
-                                        ),
-                                      ],
-                                    ),
-                                  ) ?? false;
-                                },
-                                onDismissed: (_) => _deleteRecommendation(rec.recommendationId),
-                                child: _HistoryCard(
-                                  recommendation: rec,
-                                  onAccept: () => _acceptRecommendation(rec.recommendationId),
-                                ),
-                              );
-                            },
-                            childCount: (_recommendations.length - 1).clamp(0, 999),
-                          ),
-                        ),
+                              ),
+                          ];
+                        }(),
                         const SliverToBoxAdapter(child: SizedBox(height: 24)),
                       ],
                     ],

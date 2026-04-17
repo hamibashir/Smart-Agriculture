@@ -5,6 +5,7 @@ import '../../services/api_service.dart';
 import '../../config/app_theme.dart';
 import '../fields/add_field_screen.dart';
 import '../home/home_screen.dart';
+import '../../models/field.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -18,6 +19,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Map<String, dynamic>? _stats;
   bool _isLoading = true;
   String? _error;
+  List<Field> _fields = [];
+  int? _selectedFieldId;
+
+  String _getGreetingTime() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Morning';
+    if (hour < 17) return 'Afternoon';
+    return 'Evening';
+  }
 
   @override
   void initState() {
@@ -34,11 +44,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final authProvider = context.read<AuthProvider>();
 
     try {
-      final response = await _apiService.getDashboardStats();
+      final fieldsRes = await _apiService.getFields();
+      if (!mounted) return;
+      if (fieldsRes['success'] == true) {
+        _fields = (fieldsRes['data'] as List).map((j) => Field.fromJson(j)).toList();
+      }
+
+      final response = await _apiService.getDashboardStats(fieldId: _selectedFieldId);
       if (!mounted) return;
       if (response['success'] == true) {
         setState(() {
           _stats = response['data'];
+          if (_selectedFieldId == null && _fields.isNotEmpty && _stats!['field_id'] != null) {
+            _selectedFieldId = _stats!['field_id'] as int;
+          }
           _isLoading = false;
         });
       }
@@ -70,52 +89,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverAppBar(
-              expandedHeight: 120,
               pinned: true,
-              backgroundColor: AppTheme.primaryGreen,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [AppTheme.primaryGreen, AppTheme.darkGreen],
+              floating: true,
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.transparent,
+              shape: const Border(bottom: BorderSide(color: Color(0xFFf1f5f9), width: 1.5)),
+              elevation: 0,
+              toolbarHeight: 80,
+              title: Row(
+                children: [
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
                     ),
+                    child: const Center(child: Text('👨‍🌾', style: TextStyle(fontSize: 22))),
                   ),
-                  child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Hi, $firstName!',
-                            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Welcome to Smart Agriculture',
-                            style: TextStyle(color: Colors.white70, fontSize: 14),
-                          ),
-                        ],
+                  const SizedBox(width: 14),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Good ${_getGreetingTime()}',
+                        style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13, fontWeight: FontWeight.w500),
                       ),
-                    ),
+                      Text(
+                        firstName,
+                        style: const TextStyle(color: AppTheme.textPrimary, fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: -0.5),
+                      ),
+                    ],
                   ),
-                ),
+                ],
               ),
               actions: [
                 Stack(
+                  alignment: Alignment.center,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.notifications_outlined),
-                      onPressed: () => context.findAncestorStateOfType<HomeScreenState>()?.navigateToTab(4),
+                    Container(
+                      margin: const EdgeInsets.only(right: 16),
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 2))
+                        ],
+                        border: Border.all(color: const Color(0xFFf1f5f9), width: 1.5),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.notifications_outlined, color: AppTheme.textPrimary, size: 22),
+                        onPressed: () => context.findAncestorStateOfType<HomeScreenState>()?.navigateToTab(4),
+                      ),
                     ),
                     if ((_stats?['unread_alerts'] ?? 0) > 0)
-                      const Positioned(
-                        right: 8,
-                        top: 8,
-                        child: _NotificationDot(),
+                      Positioned(
+                        right: 18,
+                        top: 20,
+                        child: Container(
+                          width: 8, height: 8,
+                          decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                        ),
                       ),
                   ],
                 ),
@@ -145,7 +182,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   delegate: SliverChildListDelegate([
                     _StatsGrid(stats: _stats!),
                     const SizedBox(height: 24),
-                    Text('Conditions: ${_stats!['latest_field_name'] ?? 'Farm'}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text('Field Conditions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 12),
+                    if (_fields.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFe5e7eb)),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<int>(
+                            value: _selectedFieldId,
+                            isExpanded: true,
+                            hint: const Text('Select a field...'),
+                            icon: const Icon(Icons.expand_more_rounded, color: AppTheme.primaryGreen),
+                            items: _fields.map((f) => DropdownMenuItem<int>(
+                              value: f.fieldId,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.grass, size: 18, color: AppTheme.primaryGreen),
+                                  const SizedBox(width: 8),
+                                  Text(f.fieldName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                            )).toList(),
+                            onChanged: (fieldId) {
+                              if (fieldId != null) {
+                                setState(() => _selectedFieldId = fieldId);
+                                _loadDashboardData();
+                              }
+                            },
+                          ),
+                        ),
+                      )
+                    else
+                      Text('Conditions: ${_stats!['latest_field_name'] ?? 'Farm'}', style: const TextStyle(fontSize: 16)),
                     const SizedBox(height: 12),
                     _ConditionsCard(stats: _stats!),
                     const SizedBox(height: 24),
@@ -182,25 +255,40 @@ class _StatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 1.5,
-      children: [
-        _StatCard('Active Fields', stats['total_fields']?.toString() ?? '0', Icons.landscape, const Color(0xFF22c55e)),
-        _StatCard('Live Sensors', stats['active_sensors']?.toString() ?? '0', Icons.sensors, const Color(0xFF3b82f6)),
-        _StatCard('Pending AI Tips', stats['ai_tips']?.toString() ?? '0', Icons.psychology, const Color(0xFF8b5cf6)),
-        _StatCard('System Issues', stats['unread_alerts']?.toString() ?? '0', Icons.warning_amber_rounded, const Color(0xFFf59e0b)),
-      ],
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFf1f5f9), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _StatItem('Fields', stats['total_fields']?.toString() ?? '0', Icons.landscape, const Color(0xFF22c55e)),
+          _divider(),
+          _StatItem('Sensors', stats['active_sensors']?.toString() ?? '0', Icons.sensors, const Color(0xFF3b82f6)),
+          _divider(),
+          _StatItem('AI Tips', stats['ai_tips']?.toString() ?? '0', Icons.psychology, const Color(0xFF8b5cf6)),
+          _divider(),
+          _StatItem('Issues', stats['unread_alerts']?.toString() ?? '0', Icons.warning_amber_rounded, const Color(0xFFf59e0b)),
+        ],
+      ),
     );
   }
+
+  Widget _divider() => Container(height: 40, width: 1.5, color: const Color(0xFFf1f5f9));
 }
 
-class _StatCard extends StatelessWidget {
-  const _StatCard(this.title, this.value, this.icon, this.color);
+class _StatItem extends StatelessWidget {
+  const _StatItem(this.title, this.value, this.icon, this.color);
 
   final String title;
   final String value;
@@ -209,21 +297,15 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+    return Expanded(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(icon, color: color, size: 24),
-              Text(title, style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
-            ],
-          ),
-          Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color)),
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+          const SizedBox(height: 4),
+          Text(title, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textSecondary), textAlign: TextAlign.center),
         ],
       ),
     );
@@ -237,30 +319,38 @@ class _ConditionsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        children: [
-          _ConditionRow('Soil Moisture', '${stats['avg_soil_moisture']?.toStringAsFixed(1) ?? '0'}%', Icons.water_drop, const Color(0xFF3b82f6)),
-          const Divider(height: 16),
-          _ConditionRow('Temperature', '${stats['avg_temperature']?.toStringAsFixed(1) ?? '0'}°C', Icons.thermostat, const Color(0xFFf59e0b)),
-          const Divider(height: 16),
-          _ConditionRow('Humidity', '${stats['avg_humidity']?.toStringAsFixed(1) ?? '0'}%', Icons.cloud, const Color(0xFF22c55e)),
-          const Divider(height: 16),
-          _ConditionRow('Light Level', '${stats['light_intensity']?.toStringAsFixed(1) ?? '0'}%', Icons.wb_sunny, const Color(0xFFeab308)),
-          const Divider(height: 16),
-          _ConditionRow('Rainfall', (stats['rainfall'] == 1 || (stats['rainfall'] ?? 0) > 0) ? 'Raining' : 'Clear', Icons.grain, const Color(0xFF64748b)),
-          const Divider(height: 16),
-          _PumpStatusRow(isOn: (stats['pump_on'] == 1 || (stats['pump_on'] ?? 0) > 0)),
-        ],
-      ),
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(child: _ConditionGridItem('Moisture', '${stats['avg_soil_moisture']?.toStringAsFixed(1) ?? '0'}%', Icons.water_drop_rounded, const Color(0xFF3b82f6))),
+            const SizedBox(width: 12),
+            Expanded(child: _ConditionGridItem('Temperature', '${stats['avg_temperature']?.toStringAsFixed(1) ?? '0'}°C', Icons.thermostat_rounded, const Color(0xFFf59e0b))),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(child: _ConditionGridItem('Humidity', '${stats['avg_humidity']?.toStringAsFixed(1) ?? '0'}%', Icons.cloud_rounded, const Color(0xFF22c55e))),
+            const SizedBox(width: 12),
+            Expanded(child: _ConditionGridItem('Light', '${stats['light_intensity']?.toStringAsFixed(1) ?? '0'}%', Icons.wb_sunny_rounded, const Color(0xFFeab308))),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(child: _ConditionGridItem('Rainfall', (stats['rainfall'] == 1 || (stats['rainfall'] ?? 0) > 0) ? 'Raining' : 'Clear', Icons.grain_rounded, const Color(0xFF64748b))),
+            const SizedBox(width: 12),
+            Expanded(child: _PumpGridItem(isOn: (stats['pump_on'] == 1 || (stats['pump_on'] ?? 0) > 0))),
+          ],
+        ),
+      ],
     );
   }
 }
 
-class _ConditionRow extends StatelessWidget {
-  const _ConditionRow(this.label, this.value, this.icon, this.color);
+class _ConditionGridItem extends StatelessWidget {
+  const _ConditionGridItem(this.label, this.value, this.icon, this.color);
 
   final String label;
   final String value;
@@ -269,57 +359,82 @@ class _ConditionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, color: color, size: 20),
-        const SizedBox(width: 12),
-        Expanded(child: Text(label, style: const TextStyle(fontSize: 14))),
-        Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)),
-      ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFf1f5f9), width: 1.5),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2))
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textPrimary), maxLines: 1),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _PumpStatusRow extends StatelessWidget {
-  const _PumpStatusRow({required this.isOn});
-
+class _PumpGridItem extends StatelessWidget {
+  const _PumpGridItem({required this.isOn});
   final bool isOn;
 
   @override
   Widget build(BuildContext context) {
-    const activeColor = Color(0xFF22c55e);
-    const inactiveColor = Color(0xFF94a3b8);
-    final color = isOn ? activeColor : inactiveColor;
-
-    return Row(
-      children: [
-        Icon(Icons.water_outlined, color: color, size: 20),
-        const SizedBox(width: 12),
-        const Expanded(child: Text('Water Pump', style: TextStyle(fontSize: 14))),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: color.withValues(alpha: 0.4)),
+    final color = isOn ? AppTheme.successColor : const Color(0xFF94a3b8);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFf1f5f9), width: 1.5),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2))
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+            child: Icon(Icons.water_rounded, color: color, size: 20),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 7,
-                height: 7,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-              ),
-              const SizedBox(width: 5),
-              Text(
-                isOn ? 'ON' : 'OFF',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: color),
-              ),
-            ],
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Pump', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+                const SizedBox(height: 2),
+                Text(
+                  isOn ? 'ON' : 'OFF',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: color),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

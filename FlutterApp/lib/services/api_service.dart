@@ -90,8 +90,12 @@ class ApiService {
   Future<Map<String, dynamic>> getUnreadCount() => get('/alerts/unread-count');
   Future<Map<String, dynamic>> markAsRead(int alertId) => put('/alerts/$alertId/read', {});
   Future<Map<String, dynamic>> resolveAlert(int alertId) => put('/alerts/$alertId/resolve', {});
+  Future<Map<String, dynamic>> deleteAlert(int alertId) => delete('/alerts/$alertId');
 
-  Future<Map<String, dynamic>> getDashboardStats() => get('/dashboard/stats');
+  Future<Map<String, dynamic>> getDashboardStats({int? fieldId}) {
+    final query = fieldId != null ? '?field_id=$fieldId' : '';
+    return get('/dashboard/stats$query');
+  }
   Future<Map<String, dynamic>> getDashboardActivity() => get('/dashboard/activity');
 
   Future<Map<String, dynamic>> getRecommendations(int fieldId) => get('/recommendations/$fieldId');
@@ -105,5 +109,12 @@ class ApiService {
 
   Future<Map<String, dynamic>> generateRecommendation(int fieldId, String season) async {
     return post('/recommendations/$fieldId/generate', {'season': season});
+  }
+
+  Future<Map<String, dynamic>> sendChatMessage(String message, {int? fieldId}) async {
+    return post('/chat', {
+      'message': message,
+      if (fieldId != null) 'fieldId': fieldId,
+    });
   }
 }

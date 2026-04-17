@@ -15,16 +15,22 @@ export const getDashboardStats = async (req, res) => {
       [userId, userId, userId, userId]
     );
 
-    // Get latest sensor reading for any active sensor belonging to the logged-in user
-    const [sensorReading] = await pool.query(
-      `SELECT sr.soil_moisture, sr.temperature, sr.humidity, sr.light_intensity, sr.rainfall, sr.pump_on, f.field_name 
+    let sensorQuery = `
+       SELECT sr.soil_moisture, sr.temperature, sr.humidity, sr.light_intensity, sr.rainfall, sr.pump_on, f.field_name, f.field_id
        FROM sensor_readings sr
        JOIN sensors s ON sr.sensor_id = s.sensor_id
        JOIN fields f ON s.field_id = f.field_id
        WHERE f.user_id = ? AND s.is_active = TRUE
-       ORDER BY sr.reading_time DESC LIMIT 1`,
-      [userId]
-    );
+    `;
+    const queryParams = [userId];
+
+    if (req.query.field_id) {
+       sensorQuery += ` AND f.field_id = ?`;
+       queryParams.push(req.query.field_id);
+    }
+    sensorQuery += ` ORDER BY sr.reading_time DESC LIMIT 1`;
+
+    const [sensorReading] = await pool.query(sensorQuery, queryParams);
 
     const currentConditions = sensorReading.length > 0
       ? {
@@ -34,7 +40,9 @@ export const getDashboardStats = async (req, res) => {
         light_intensity: parseFloat(sensorReading[0].light_intensity || 0),
         rainfall: parseInt(sensorReading[0].rainfall || 0),
         pump_on: parseInt(sensorReading[0].pump_on || 0),
-        latest_field_name: sensorReading[0].field_name || 'Farm'
+        latest_field_name: sensorReading[0].field_name || 'Farm',
+        field_id: sensorReading[0].field_id
+
       }
       : { avg_soil_moisture: 0, avg_temperature: 0, avg_humidity: 0, light_intensity: 0, rainfall: 0, pump_on: 0, latest_field_name: 'Farm' };
 

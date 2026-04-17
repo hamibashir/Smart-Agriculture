@@ -164,3 +164,38 @@ export const getUnreadCount = async (req, res) => {
     });
   }
 };
+
+// Delete alert
+export const deleteAlert = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [alerts] = await pool.query(
+      'SELECT * FROM alerts WHERE alert_id = ? AND user_id = ?',
+      [id, req.user.user_id]
+    );
+
+    if (alerts.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Alert not found'
+      });
+    }
+
+    await pool.query(
+      'DELETE FROM alerts WHERE alert_id = ?',
+      [id]
+    );
+
+    res.json({
+      success: true,
+      message: 'Alert deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete alert error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
