@@ -47,7 +47,6 @@ def predict():
         humidity      = float(data["humidity"])
         soil_type     = data["soil_type"].lower()
         season        = data["season"].lower()
-        rainfall      = float(data.get("rainfall", 0))
 
         # Validate soil_type & season
         if soil_type not in le_soil.classes_:
@@ -67,31 +66,39 @@ def predict():
         season_enc = le_season.transform([season])[0]
 
         # Predict
-        features   = [[soil_moisture, temperature, humidity, soil_enc, season_enc, rainfall]]
+        features   = [[soil_moisture, temperature, humidity, soil_enc, season_enc]]
         prediction = model.predict(features)[0]
         proba      = model.predict_proba(features)[0]
         crop       = le_crop.inverse_transform([prediction])[0]
         confidence = round(max(proba) * 100, 2)
 
-        # Get top 3 alternatives
-        top3_idx  = proba.argsort()[-3:][::-1]
-        top3      = [
-            {"crop": le_crop.inverse_transform([i])[0], "confidence": round(proba[i] * 100, 2)}
-            for i in top3_idx
-        ]
+        # Get top 3 ALREADY sorted probabilities
+        sorted_idx = proba.argsort()[::-1]
+        # Main crop is at sorted_idx[0]. Let's get the next 3.
+        alt_indices = sorted_idx[1:4]
+        
+        alt_crops = []
+        for idx in alt_indices:
+            alt_crop = le_crop.inverse_transform([idx])[0]
+            alt_conf = round(proba[idx] * 100, 2)
+            if alt_conf > 0: # Only show if confidence isn't 0
+                alt_crops.append(f"{alt_crop.title()} ({alt_conf}%)")
 
         # Crop metadata
         info   = CROP_INFO.get(crop, {})
         reason = (
             f"Based on soil moisture ({soil_moisture}%), temperature ({temperature}°C), "
-            f"humidity ({humidity}%), {soil_type} soil, and {season} season conditions, "
-            f"{crop.title()} is the most suitable crop."
+            f"humidity ({humidity}%), {soil_type} soil, and {season.title()} season conditions, "
+            f"{crop.title()} is the most optimal crop."
         )
 
+        if alt_crops:
+            reason += "\n\n🌱 Alternative Options for this Season:\n• " + "\n• ".join(alt_crops)
+
         # Generate "What-If" Insights for the presentation panel
-        features_hot = [[soil_moisture, temperature + 4, humidity, soil_enc, season_enc, rainfall]]
-        features_cold = [[soil_moisture, temperature - 4, humidity, soil_enc, season_enc, rainfall]]
-        features_wet = [[soil_moisture + 15, temperature, humidity, soil_enc, season_enc, rainfall]]
+        features_hot = [[soil_moisture, temperature + 4, humidity, soil_enc, season_enc]]
+        features_cold = [[soil_moisture, temperature - 4, humidity, soil_enc, season_enc]]
+        features_wet = [[soil_moisture + 15, temperature, humidity, soil_enc, season_enc]]
 
         crop_hot = le_crop.inverse_transform([model.predict(features_hot)[0]])[0]
         crop_cold = le_crop.inverse_transform([model.predict(features_cold)[0]])[0]
@@ -106,7 +113,7 @@ def predict():
             what_ifs.append(f"If soil moisture was +15% higher, {crop_wet.title()} would be recommended.")
             
         if what_ifs:
-            reason += "\n\n💡 Alternative Scenarios: " + " ".join(what_ifs)
+            reason += "\n\n💡 Environmental Alerts:\n" + "\n".join(what_ifs)
 
         return jsonify({
             "success":          True,
@@ -123,8 +130,7 @@ def predict():
                 "temperature":   temperature,
                 "humidity":      humidity,
                 "soil_type":     soil_type,
-                "season":        season,
-                "rainfall":      rainfall
+                "season":        season
             }
         })
 

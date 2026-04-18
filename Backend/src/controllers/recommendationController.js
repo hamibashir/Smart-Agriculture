@@ -126,15 +126,14 @@ export const generateManualRecommendation = async (req, res) => {
       `SELECT 
         AVG(soil_moisture) AS soil_moisture,
         AVG(temperature)   AS temperature,
-        AVG(humidity)      AS humidity,
-        AVG(rainfall)      AS rainfall
+        AVG(humidity)      AS humidity
        FROM (
-         SELECT soil_moisture, temperature, humidity, rainfall
+         SELECT soil_moisture, temperature, humidity
          FROM sensor_readings sr
          JOIN sensors s ON sr.sensor_id = s.sensor_id
          WHERE s.field_id = ?
          ORDER BY reading_time DESC
-         LIMIT 5
+         LIMIT 50
        ) AS recent`,
       [fieldId]
     );
@@ -154,8 +153,7 @@ export const generateManualRecommendation = async (req, res) => {
         temperature: parseFloat(avg.temperature).toFixed(2),
         humidity: parseFloat(avg.humidity).toFixed(2),
         soil_type: soilTypeStr,
-        season: season,
-        rainfall: parseFloat(avg.rainfall || 0).toFixed(2)
+        season: season
       })
     });
 

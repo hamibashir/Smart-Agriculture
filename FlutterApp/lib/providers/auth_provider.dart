@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
 import '../config/app_config.dart';
+import 'field_selection_provider.dart';
 
 class AuthProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();
@@ -66,6 +67,11 @@ class AuthProvider with ChangeNotifier {
     await prefs.remove(AppConfig.userKey);
 
     notifyListeners();
+  }
+
+  Future<void> logoutAndClearFieldSelection(FieldSelectionProvider fieldSelectionProvider) async {
+    await logout();
+    await fieldSelectionProvider.clear();
   }
 
   Future<bool> updateProfile(Map<String, dynamic> data) async {

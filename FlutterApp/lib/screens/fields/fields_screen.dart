@@ -16,6 +16,7 @@ class _FieldsScreenState extends State<FieldsScreen> {
   final ApiService _apiService = ApiService();
   List<Field> _fields = [];
   bool _isLoading = true;
+  int? _deletingFieldId;
   String? _error;
 
   @override
@@ -51,6 +52,75 @@ class _FieldsScreenState extends State<FieldsScreen> {
     if (result == true) await _loadFields();
   }
 
+  Future<void> _openFieldDetails(Field field) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => FieldDetailScreen(field: field)),
+    );
+    await _loadFields();
+  }
+
+  Future<bool> _confirmDeleteField(Field field) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Field'),
+        content: Text('Delete "${field.fieldName}"? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.errorColor),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete != true) return false;
+
+    setState(() => _deletingFieldId = field.fieldId);
+
+    try {
+      final response = await _apiService.deleteField(field.fieldId);
+
+      if (!mounted) return false;
+
+      if (response['success'] == true) {
+        setState(() {
+          _fields.removeWhere((item) => item.fieldId == field.fieldId);
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Field deleted successfully'),
+            backgroundColor: AppTheme.successColor,
+          ),
+        );
+
+        return true;
+      }
+    } catch (_) {
+      if (!mounted) return false;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to delete field'),
+          backgroundColor: AppTheme.errorColor,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _deletingFieldId = null);
+      }
+    }
+
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,7 +140,12 @@ class _FieldsScreenState extends State<FieldsScreen> {
                       child: ListView.builder(
                         padding: const EdgeInsets.all(16),
                         itemCount: _fields.length,
-                        itemBuilder: (_, index) => _FieldCard(field: _fields[index]),
+                        itemBuilder: (_, index) => _FieldCard(
+                          field: _fields[index],
+                          isDeleting: _deletingFieldId == _fields[index].fieldId,
+                          onTap: () => _openFieldDetails(_fields[index]),
+                          onDelete: () => _confirmDeleteField(_fields[index]),
+                        ),
                       ),
                     ),
       floatingActionButton: FloatingActionButton(
@@ -132,57 +207,99 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _FieldCard extends StatelessWidget {
-  const _FieldCard({required this.field});
+  const _FieldCard({
+    required this.field,
+    required this.isDeleting,
+    required this.onTap,
+    required this.onDelete,
+  });
 
   final Field field;
+  final bool isDeleting;
+  final VoidCallback onTap;
+  final Future<bool> Function() onDelete;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FieldDetailScreen(field: field))),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.grass, color: AppTheme.primaryGreen, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(field.fieldName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                        Text('${field.areaSize} ${field.areaUnit}', style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
-                      ],
-                    ),
-                  ),
-                  _StatusBadge(isActive: field.isActive),
-                ],
-              ),
-              if (field.currentCrop != null || field.soilType != null) ...[
-                const SizedBox(height: 12),
+    return Dismissible(
+      key: ValueKey(field.fieldId),
+      direction: isDeleting ? DismissDirection.none : DismissDirection.endToStart,
+      confirmDismiss: (_) => onDelete(),
+      background: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: AppTheme.errorColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Icon(Icons.delete_outline, color: Colors.white),
+            SizedBox(width: 8),
+            Text(
+              'Delete',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+        child: InkWell(
+          onTap: isDeleting ? null : onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Row(
                   children: [
-                    if (field.currentCrop != null) Expanded(child: _InfoChip(icon: Icons.eco, label: field.currentCrop!, color: AppTheme.primaryGreen)),
-                    if (field.currentCrop != null && field.soilType != null) const SizedBox(width: 8),
-                    if (field.soilType != null) Expanded(child: _InfoChip(icon: Icons.terrain, label: field.soilType!, color: const Color(0xFF8b5cf6))),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.grass, color: AppTheme.primaryGreen, size: 20),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(field.fieldName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                          Text('${field.areaSize} ${field.areaUnit}', style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
+                        ],
+                      ),
+                    ),
+                    if (isDeleting)
+                      const Padding(
+                        padding: EdgeInsets.only(right: 12),
+                        child: SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    _StatusBadge(isActive: field.isActive),
                   ],
                 ),
+                if (field.currentCrop != null || field.soilType != null) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      if (field.currentCrop != null) Expanded(child: _InfoChip(icon: Icons.eco, label: field.currentCrop!, color: AppTheme.primaryGreen)),
+                      if (field.currentCrop != null && field.soilType != null) const SizedBox(width: 8),
+                      if (field.soilType != null) Expanded(child: _InfoChip(icon: Icons.terrain, label: field.soilType!, color: const Color(0xFF8b5cf6))),
+                    ],
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

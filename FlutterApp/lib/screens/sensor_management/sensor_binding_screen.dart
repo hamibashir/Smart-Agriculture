@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../models/sensor.dart';
 import '../../models/field.dart';
 import '../../services/api_service.dart';
 import '../../config/app_theme.dart';
+import '../../providers/field_selection_provider.dart';
 import 'add_sensor_screen.dart';
 
 class SensorBindingScreen extends StatefulWidget {
@@ -40,6 +42,7 @@ class _SensorBindingScreenState extends State<SensorBindingScreen> {
       if (fieldsResponse['success'] == true) {
         final fields = (fieldsResponse['data'] as List).map((field) => Field.fromJson(field)).toList();
         final allSensors = <Sensor>[];
+        final sharedFieldId = context.read<FieldSelectionProvider>().selectedFieldId;
         
         for (final field in fields) {
           try {
@@ -53,8 +56,10 @@ class _SensorBindingScreenState extends State<SensorBindingScreen> {
         setState(() {
           _sensors = allSensors;
           _fields = fields;
+          _selectedFieldId = _resolveSelectedFieldId(fields, sharedFieldId);
           _isLoading = false;
         });
+        await context.read<FieldSelectionProvider>().setSelectedFieldId(_selectedFieldId);
       } else {
         throw Exception('Failed to load fields');
       }
@@ -101,6 +106,14 @@ class _SensorBindingScreenState extends State<SensorBindingScreen> {
     if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  int? _resolveSelectedFieldId(List<Field> fields, int? fieldId) {
+    if (fieldId != null && fields.any((field) => field.fieldId == fieldId)) {
+      return fieldId;
+    }
+
+    return fields.isNotEmpty ? fields.first.fieldId : null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,7 +137,10 @@ class _SensorBindingScreenState extends State<SensorBindingScreen> {
                         selectedFieldId: _selectedFieldId,
                         isBinding: _isBinding,
                         onSensorChanged: (id) => setState(() => _selectedSensorId = id),
-                        onFieldChanged: (id) => setState(() => _selectedFieldId = id),
+                        onFieldChanged: (id) {
+                          setState(() => _selectedFieldId = id);
+                          context.read<FieldSelectionProvider>().setSelectedFieldId(id);
+                        },
                         onBind: _bindSensorToField,
                       ),
                       const SizedBox(height: 24),
@@ -141,6 +157,7 @@ class _SensorBindingScreenState extends State<SensorBindingScreen> {
                                   _selectedSensorId = sensor.sensorId;
                                   _selectedFieldId = sensor.fieldId > 0 ? sensor.fieldId : null;
                                 });
+                                context.read<FieldSelectionProvider>().setSelectedFieldId(_selectedFieldId);
                                 PrimaryScrollController.of(context).animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
                               },
                             )),

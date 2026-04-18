@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
 import '../../models/field.dart';
 import '../../models/recommendation.dart';
 import '../../config/app_theme.dart';
+import '../../providers/field_selection_provider.dart';
 import 'chatbot_screen.dart';
 
 // ── Crop emoji + color lookup ────────────────────────────────
@@ -42,11 +44,38 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
   bool _isRefreshing = false;
   int _currentPage = 1;
   static const int _itemsPerPage = 3;
+  int? _syncedFieldId;
 
   @override
   void initState() {
     super.initState();
     _loadFields();
+  }
+
+  Field? _resolveSelectedField(List<Field> fields, int? fieldId) {
+    for (final field in fields) {
+      if (field.fieldId == fieldId) {
+        return field;
+      }
+    }
+
+    return fields.isNotEmpty ? fields.first : null;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final sharedFieldId = context.watch<FieldSelectionProvider>().selectedFieldId;
+    if (_syncedFieldId == sharedFieldId) return;
+
+    _syncedFieldId = sharedFieldId;
+    if (!_isLoading && _selectedField?.fieldId != sharedFieldId) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _loadFields();
+        }
+      });
+    }
   }
 
   Future<void> _loadFields() async {
@@ -56,11 +85,14 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
       if (response['success'] == true) {
         final fields =
             (response['data'] as List).map((j) => Field.fromJson(j)).toList();
+        final sharedFieldId = context.read<FieldSelectionProvider>().selectedFieldId;
+        final selectedField = _resolveSelectedField(fields, sharedFieldId);
         setState(() {
           _fields = fields;
-          _selectedField = fields.isNotEmpty ? fields.first : null;
+          _selectedField = selectedField;
           _isLoading = false;
         });
+        await context.read<FieldSelectionProvider>().setSelectedFieldId(selectedField?.fieldId);
         if (_selectedField != null) await _loadRecommendations();
       }
     } catch (_) {
@@ -302,6 +334,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                           selectedField: _selectedField,
                           onChanged: (f) {
                             setState(() => _selectedField = f);
+                            context.read<FieldSelectionProvider>().setSelectedFieldId(f?.fieldId);
                             _loadRecommendations();
                           },
                         ),

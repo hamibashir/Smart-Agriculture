@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/field_selection_provider.dart';
 import '../../services/api_service.dart';
 import '../../config/app_theme.dart';
 import '../fields/add_field_screen.dart';
@@ -21,6 +22,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String? _error;
   List<Field> _fields = [];
   int? _selectedFieldId;
+  int? _syncedFieldId;
 
   String _getGreetingTime() {
     final hour = DateTime.now().hour;
@@ -35,6 +37,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadDashboardData();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final sharedFieldId = context.watch<FieldSelectionProvider>().selectedFieldId;
+    if (_syncedFieldId == sharedFieldId) return;
+
+    _syncedFieldId = sharedFieldId;
+    if (!_isLoading && _selectedFieldId != sharedFieldId) {
+      _selectedFieldId = sharedFieldId;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _loadDashboardData();
+        }
+      });
+    }
+  }
+
   Future<void> _loadDashboardData() async {
     setState(() {
       _isLoading = true;
@@ -42,6 +61,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
 
     final authProvider = context.read<AuthProvider>();
+    final fieldSelectionProvider = context.read<FieldSelectionProvider>();
 
     try {
       final fieldsRes = await _apiService.getFields();
@@ -50,20 +70,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _fields = (fieldsRes['data'] as List).map((j) => Field.fromJson(j)).toList();
       }
 
+      final persistedFieldId = fieldSelectionProvider.selectedFieldId;
+      final hasPersistedField = persistedFieldId != null && _fields.any((field) => field.fieldId == persistedFieldId);
+      final activeFieldId = hasPersistedField ? persistedFieldId : (_fields.isNotEmpty ? _fields.first.fieldId : null);
+
+      if (_selectedFieldId != activeFieldId) {
+        _selectedFieldId = activeFieldId;
+      }
+
+      if (!hasPersistedField && activeFieldId != fieldSelectionProvider.selectedFieldId) {
+        await fieldSelectionProvider.setSelectedFieldId(activeFieldId);
+      }
+
       final response = await _apiService.getDashboardStats(fieldId: _selectedFieldId);
       if (!mounted) return;
       if (response['success'] == true) {
         setState(() {
           _stats = response['data'];
-          if (_selectedFieldId == null && _fields.isNotEmpty && _stats!['field_id'] != null) {
-            _selectedFieldId = _stats!['field_id'] as int;
-          }
           _isLoading = false;
         });
       }
     } catch (e) {
       if (e.toString().contains('Unauthorized')) {
-        await authProvider.logout();
+        await authProvider.logoutAndClearFieldSelection(fieldSelectionProvider);
         if (!mounted) return;
         await Navigator.pushReplacementNamed(context, '/login');
         return;
@@ -210,6 +239,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             )).toList(),
                             onChanged: (fieldId) {
                               if (fieldId != null) {
+                                context.read<FieldSelectionProvider>().setSelectedFieldId(fieldId);
                                 setState(() => _selectedFieldId = fieldId);
                                 _loadDashboardData();
                               }

@@ -35,7 +35,7 @@ df["crop_enc"]      = le_crop.fit_transform(df["recommended_crop"])
 
 # ── 3. Features & Label ──────────────────────────────────────
 FEATURES = ["soil_moisture", "temperature", "humidity",
-            "soil_type_enc", "season_enc", "rainfall"]
+            "soil_type_enc", "season_enc"]
 
 X = df[FEATURES]
 y = df["crop_enc"]
@@ -100,10 +100,10 @@ print("\n" + "=" * 55)
 print("  LIVE PREDICTION TEST")
 print("=" * 55)
 
-def predict_crop(soil_moisture, temperature, humidity, soil_type, season, rainfall):
+def predict_crop(soil_moisture, temperature, humidity, soil_type, season):
     soil_enc   = le_soil.transform([soil_type])[0]
     season_enc = le_season.transform([season])[0]
-    features   = [[soil_moisture, temperature, humidity, soil_enc, season_enc, rainfall]]
+    features   = [[soil_moisture, temperature, humidity, soil_enc, season_enc]]
     prediction = model.predict(features)[0]
     proba      = model.predict_proba(features)[0]
     crop       = le_crop.inverse_transform([prediction])[0]
@@ -112,15 +112,15 @@ def predict_crop(soil_moisture, temperature, humidity, soil_type, season, rainfa
 
 # Test cases matching Pakistan conditions
 tests = [
-    (42, 28, 65, "loamy",  "rabi",   0,   "Should → Wheat"),
-    (70, 32, 80, "clay",   "kharif", 7.0, "Should → Rice"),
-    (36, 31, 59, "sandy",  "kharif", 0,   "Should → Cotton"),
-    (55, 25, 70, "loamy",  "kharif", 2.0, "Should → Maize"),
-    (28, 19, 48, "sandy",  "rabi",   0,   "Should → Mustard"),
+    (42, 28, 65, "loamy",  "rabi",   "Should → Wheat"),
+    (70, 32, 80, "clay",   "kharif", "Should → Rice"),
+    (36, 31, 59, "sandy",  "kharif", "Should → Cotton"),
+    (55, 25, 70, "loamy",  "kharif", "Should → Maize"),
+    (28, 19, 48, "sandy",  "rabi",   "Should → Mustard"),
 ]
 
-for sm, temp, hum, soil, season, rain, expected in tests:
-    crop, conf = predict_crop(sm, temp, hum, soil, season, rain)
+for sm, temp, hum, soil, season, expected in tests:
+    crop, conf = predict_crop(sm, temp, hum, soil, season)
     print(f"  Input: moisture={sm}%, temp={temp}°C, soil={soil}, season={season}")
     print(f"  ➜ Predicted: {crop.upper()} ({conf}%) | {expected}")
     print()

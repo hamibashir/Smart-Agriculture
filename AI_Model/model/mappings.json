@@ -25,8 +25,7 @@
     "temperature",
     "humidity",
     "soil_type_enc",
-    "season_enc",
-    "rainfall"
+    "season_enc"
   ],
-  "accuracy": 88.93
+  "accuracy": 85.89
 }

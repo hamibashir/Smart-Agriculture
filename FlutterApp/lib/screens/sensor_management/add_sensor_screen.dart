@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
 import '../../config/app_theme.dart';
 import '../../models/field.dart';
+import '../../providers/field_selection_provider.dart';
 
 class AddSensorScreen extends StatefulWidget {
   const AddSensorScreen({super.key});
@@ -34,10 +36,17 @@ class _AddSensorScreenState extends State<AddSensorScreen> {
     try {
       final response = await _apiService.get('/fields');
       if (response['success'] == true) {
+        final fields = (response['data'] as List).map((f) => Field.fromJson(f)).toList();
+        final selectedFieldId = _resolveSelectedFieldId(
+          fields,
+          context.read<FieldSelectionProvider>().selectedFieldId,
+        );
         setState(() {
-          _fields = (response['data'] as List).map((f) => Field.fromJson(f)).toList();
+          _fields = fields;
+          _selectedFieldId = selectedFieldId;
           _isLoadingFields = false;
         });
+        await context.read<FieldSelectionProvider>().setSelectedFieldId(selectedFieldId);
       }
     } catch (e) {
       if (mounted) {
@@ -55,6 +64,14 @@ class _AddSensorScreenState extends State<AddSensorScreen> {
     _sensorModelController.dispose();
     _locationController.dispose();
     super.dispose();
+  }
+
+  int? _resolveSelectedFieldId(List<Field> fields, int? fieldId) {
+    if (fieldId != null && fields.any((field) => field.fieldId == fieldId)) {
+      return fieldId;
+    }
+
+    return fields.isNotEmpty ? fields.first.fieldId : null;
   }
 
   Future<void> _handleSubmit() async {
@@ -126,7 +143,10 @@ class _AddSensorScreenState extends State<AddSensorScreen> {
                           ),
                           value: _selectedFieldId,
                           items: _fields.map((f) => DropdownMenuItem(value: f.fieldId, child: Text(f.fieldName))).toList(),
-                          onChanged: (val) => setState(() => _selectedFieldId = val),
+                          onChanged: (val) {
+                            setState(() => _selectedFieldId = val);
+                            context.read<FieldSelectionProvider>().setSelectedFieldId(val);
+                          },
                           validator: (val) => val == null ? 'Please choose a field' : null,
                         ),
                         const SizedBox(height: 16),
