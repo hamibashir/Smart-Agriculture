@@ -1,8 +1,3 @@
-"""
-passenger_wsgi.py - cPanel Python App Entry Point
-cPanel's "Setup Python App" uses Phusion Passenger which looks for this file.
-The Flask app must be exposed as a variable named 'application'.
-"""
 import sys
 import os
 
