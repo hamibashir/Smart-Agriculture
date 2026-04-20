@@ -1,5 +1,9 @@
 import jwt from 'jsonwebtoken';
 
+// Development:
+//   JWT_SECRET can be local/test secret.
+// Production:
+//   Use a strong JWT_SECRET from environment variables (never hardcode in code).
 export const authenticateToken = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
 

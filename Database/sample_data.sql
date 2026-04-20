@@ -41,30 +41,30 @@ INSERT INTO sensors (field_id, sensor_type, device_id, sensor_model, installatio
 -- ============================================
 -- Sample Sensor Readings (Recent Data)
 -- ============================================
-INSERT INTO sensor_readings (sensor_id, soil_moisture, temperature, humidity, light_intensity, rainfall, water_flow_rate, battery_voltage, signal_strength, reading_timestamp) VALUES
+INSERT INTO sensor_readings (sensor_id, reading_time, soil_moisture, temperature, humidity, light_intensity, rainfall, pump_on) VALUES
 -- Sensor 1 readings (last 24 hours)
-(1, 45.2, 22.5, 65.3, 45000, 0, NULL, 3.7, -45, DATE_SUB(NOW(), INTERVAL 1 HOUR)),
-(1, 44.8, 23.1, 64.8, 48000, 0, NULL, 3.7, -44, DATE_SUB(NOW(), INTERVAL 2 HOUR)),
-(1, 43.5, 24.2, 63.2, 52000, 0, NULL, 3.7, -46, DATE_SUB(NOW(), INTERVAL 3 HOUR)),
-(1, 42.1, 25.8, 61.5, 58000, 0, NULL, 3.7, -45, DATE_SUB(NOW(), INTERVAL 4 HOUR)),
+(1, DATE_SUB(NOW(), INTERVAL 1 HOUR), 45.2, 22.5, 65.3, 45.0, 0, 0),
+(1, DATE_SUB(NOW(), INTERVAL 2 HOUR), 44.8, 23.1, 64.8, 48.0, 0, 0),
+(1, DATE_SUB(NOW(), INTERVAL 3 HOUR), 43.5, 24.2, 63.2, 52.0, 0, 0),
+(1, DATE_SUB(NOW(), INTERVAL 4 HOUR), 42.1, 25.8, 61.5, 58.0, 0, 0),
 
 -- Sensor 2 readings
-(2, 28.5, 23.5, 66.0, 46000, 0, NULL, 3.8, -42, DATE_SUB(NOW(), INTERVAL 1 HOUR)),
-(2, 27.2, 24.0, 65.5, 49000, 0, NULL, 3.8, -43, DATE_SUB(NOW(), INTERVAL 2 HOUR)),
+(2, DATE_SUB(NOW(), INTERVAL 1 HOUR), 28.5, 23.5, 66.0, 46.0, 0, 0),
+(2, DATE_SUB(NOW(), INTERVAL 2 HOUR), 27.2, 24.0, 65.5, 49.0, 0, 0),
 
 -- Sensor 3 readings
-(3, 52.3, 21.8, 68.5, 42000, 0, NULL, 3.6, -48, DATE_SUB(NOW(), INTERVAL 1 HOUR)),
-(3, 51.9, 22.3, 67.8, 44000, 0, NULL, 3.6, -47, DATE_SUB(NOW(), INTERVAL 2 HOUR)),
+(3, DATE_SUB(NOW(), INTERVAL 1 HOUR), 52.3, 21.8, 68.5, 42.0, 0, 0),
+(3, DATE_SUB(NOW(), INTERVAL 2 HOUR), 51.9, 22.3, 67.8, 44.0, 0, 0),
 
 -- Sensor 4 readings
-(4, 38.7, 26.5, 58.3, 55000, 0, NULL, 3.9, -40, DATE_SUB(NOW(), INTERVAL 1 HOUR)),
-(4, 37.5, 27.2, 57.1, 58000, 0, NULL, 3.9, -41, DATE_SUB(NOW(), INTERVAL 2 HOUR)),
+(4, DATE_SUB(NOW(), INTERVAL 1 HOUR), 38.7, 26.5, 58.3, 55.0, 0, 0),
+(4, DATE_SUB(NOW(), INTERVAL 2 HOUR), 37.5, 27.2, 57.1, 58.0, 0, 0),
 
 -- Sensor 5 readings
-(5, 32.1, 24.8, 62.5, 50000, 0, NULL, 3.7, -44, DATE_SUB(NOW(), INTERVAL 1 HOUR)),
+(5, DATE_SUB(NOW(), INTERVAL 1 HOUR), 32.1, 24.8, 62.5, 50.0, 0, 0),
 
 -- Sensor 6 readings
-(6, 55.8, 20.5, 72.3, 38000, 0, NULL, 4.0, -38, DATE_SUB(NOW(), INTERVAL 30 MINUTE));
+(6, DATE_SUB(NOW(), INTERVAL 30 MINUTE), 55.8, 20.5, 72.3, 38.0, 0, 0);
 
 -- ============================================
 -- Sample Irrigation Logs

@@ -36,26 +36,26 @@ INSERT INTO sensors (field_id, sensor_type, device_id, sensor_model, installatio
 -- Sample Sensor Readings (Recent data)
 -- ============================================
 -- Main Field - Wheat readings
-INSERT INTO sensor_readings (sensor_id, soil_moisture, temperature, humidity, light_intensity, battery_voltage, signal_strength, reading_timestamp) VALUES
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-001'), 45.2, 22.5, 62.3, 48000, 3.8, -45, NOW() - INTERVAL 5 MINUTE),
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-001'), 44.8, 23.1, 61.5, 52000, 3.8, -43, NOW() - INTERVAL 10 MINUTE),
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-001'), 46.1, 21.8, 63.2, 45000, 3.8, -46, NOW() - INTERVAL 15 MINUTE),
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-002'), 43.5, NULL, NULL, NULL, 3.7, -48, NOW() - INTERVAL 5 MINUTE),
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-002'), 44.2, NULL, NULL, NULL, 3.7, -47, NOW() - INTERVAL 10 MINUTE),
+INSERT INTO sensor_readings (sensor_id, reading_time, soil_moisture, temperature, humidity, light_intensity, rainfall, pump_on) VALUES
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-001'), NOW() - INTERVAL 5 MINUTE, 45.2, 22.5, 62.3, 48.0, 0, 0),
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-001'), NOW() - INTERVAL 10 MINUTE, 44.8, 23.1, 61.5, 52.0, 0, 0),
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-001'), NOW() - INTERVAL 15 MINUTE, 46.1, 21.8, 63.2, 45.0, 0, 0),
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-002'), NOW() - INTERVAL 5 MINUTE, 43.5, NULL, NULL, NULL, 0, 0),
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-002'), NOW() - INTERVAL 10 MINUTE, 44.2, NULL, NULL, NULL, 0, 0),
 
 -- South Field - Rice readings
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-003'), 68.5, 28.2, 75.8, 55000, 3.9, -42, NOW() - INTERVAL 5 MINUTE),
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-003'), 67.8, 28.5, 76.2, 56000, 3.9, -41, NOW() - INTERVAL 10 MINUTE),
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-004'), NULL, NULL, NULL, NULL, 3.8, -44, NOW() - INTERVAL 5 MINUTE),
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-003'), NOW() - INTERVAL 5 MINUTE, 68.5, 28.2, 75.8, 55.0, 0, 0),
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-003'), NOW() - INTERVAL 10 MINUTE, 67.8, 28.5, 76.2, 56.0, 0, 0),
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-004'), NOW() - INTERVAL 5 MINUTE, NULL, NULL, NULL, NULL, 0, 0),
 
 -- East Field - Vegetables readings
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-005'), 52.3, 24.8, 68.5, 50000, 3.9, -40, NOW() - INTERVAL 5 MINUTE),
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-005'), 51.8, 25.2, 67.8, 51000, 3.9, -39, NOW() - INTERVAL 10 MINUTE),
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-005'), NOW() - INTERVAL 5 MINUTE, 52.3, 24.8, 68.5, 50.0, 0, 0),
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-005'), NOW() - INTERVAL 10 MINUTE, 51.8, 25.2, 67.8, 51.0, 0, 0),
 
 -- North Field - Cotton readings
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-006'), 38.2, 26.5, 58.3, 58000, 3.6, -50, NOW() - INTERVAL 5 MINUTE),
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-006'), 37.8, 27.1, 57.5, 59000, 3.6, -51, NOW() - INTERVAL 10 MINUTE),
-((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-007'), NULL, 26.8, NULL, NULL, 3.7, -49, NOW() - INTERVAL 5 MINUTE);
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-006'), NOW() - INTERVAL 5 MINUTE, 38.2, 26.5, 58.3, 58.0, 0, 0),
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-006'), NOW() - INTERVAL 10 MINUTE, 37.8, 27.1, 57.5, 59.0, 0, 0),
+((SELECT sensor_id FROM sensors WHERE device_id = 'ESP32-HAMZA-007'), NOW() - INTERVAL 5 MINUTE, NULL, 26.8, NULL, NULL, 0, 0);
 
 -- ============================================
 -- Sample Irrigation Logs

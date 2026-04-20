@@ -1,5 +1,9 @@
 import pool from '../config/database.js';
 
+// Development:
+//   AI_API_URL=http://localhost:5001
+// Production:
+//   AI_API_URL=https://ai.yourdomain.com
 const AI_API_URL = process.env.AI_API_URL || 'http://localhost:5001';
 
 const verifyFieldOwnership = async (fieldId, userId) => {
@@ -287,50 +291,54 @@ export const createSensorReading = async (req, res) => {
     let pumpInsert = pump != null ? pump : 0;
 
     // --- CLOUD OVERRIDE & SMART AUTO-START ENGINE ---
-    const [[lastLog]] = await pool.query(
-      'SELECT log_id, pump_status, end_time FROM irrigation_logs WHERE field_id = ? ORDER BY start_time DESC LIMIT 1',
-      [sensor.field_id]
-    );
-
-    if (lastLog && lastLog.pump_status === 'on') {
-      pumpInsert = 1; // Farmer turned it ON manually. Force hardware ON.
-    } 
-    else if (lastLog && lastLog.pump_status === 'off' && soil != null && soil < 20) {
-      // The farmer turned it OFF manually, but the soil is critically dry.
-      
-      const [[existingAlert]] = await pool.query(
-        'SELECT alert_id, is_resolved FROM alerts WHERE field_id = ? AND title = "Manual Override Warning" AND created_at >= ? ORDER BY created_at DESC LIMIT 1',
-        [sensor.field_id, lastLog.end_time]
+    // Never allow this optional automation block to fail the core sensor ingestion.
+    try {
+      const [[lastLog]] = await pool.query(
+        'SELECT log_id, pump_status, end_time FROM irrigation_logs WHERE field_id = ? ORDER BY start_time DESC LIMIT 1',
+        [sensor.field_id]
       );
 
-      // Check if it's been 10+ minutes since the farmer turned it OFF
-      const minutesSinceOff = (Date.now() - new Date(lastLog.end_time).getTime()) / 60000;
-
-      // Unblock if user actively resolved it OR 10 minutes timed out
-      if (minutesSinceOff > 10 || (existingAlert && existingAlert.is_resolved)) {
-        pumpInsert = 1; // Force Auto-Start!
-        
-        const triggerDesc = (existingAlert && existingAlert.is_resolved) 
-          ? 'Cloud Auto-Start: Farmer resolved critical dryness warning.' 
-          : 'Cloud Auto-Start: 10 minutes timeout on critical dryness.';
-
-        await pool.query(
-          `INSERT INTO irrigation_logs (field_id, sensor_id, irrigation_type, start_time, trigger_reason, soil_moisture_before, pump_status, initiated_by) 
-           VALUES (?, ?, 'auto', NOW(), ?, ?, 'on', ?)`,
-          [sensor.field_id, sensor.sensor_id, triggerDesc, soil, sensor.user_id]
+      if (lastLog && lastLog.pump_status === 'on') {
+        pumpInsert = 1; // Farmer turned it ON manually. Force hardware ON.
+      } 
+      else if (lastLog && lastLog.pump_status === 'off' && soil != null && soil < 20) {
+        // The farmer turned it OFF manually, but the soil is critically dry.
+        const [[existingAlert]] = await pool.query(
+          'SELECT alert_id, is_resolved FROM alerts WHERE field_id = ? AND title = ? AND created_at >= ? ORDER BY created_at DESC LIMIT 1',
+          [sensor.field_id, 'Manual Override Warning', lastLog.end_time]
         );
-      } else {
-        pumpInsert = 0; // Block the hardware! We are still in the 10-minute waiting window.
-        
-        // If alert doesn't exist for this session yet, create it IMMEDIATELY
-        if (!existingAlert) {
+
+        // Check if it's been 10+ minutes since the farmer turned it OFF
+        const minutesSinceOff = (Date.now() - new Date(lastLog.end_time).getTime()) / 60000;
+
+        // Unblock if user actively resolved it OR 10 minutes timed out
+        if (minutesSinceOff > 10 || (existingAlert && existingAlert.is_resolved)) {
+          pumpInsert = 1; // Force Auto-Start!
+          
+          const triggerDesc = (existingAlert && existingAlert.is_resolved) 
+            ? 'Cloud Auto-Start: Farmer resolved critical dryness warning.' 
+            : 'Cloud Auto-Start: 10 minutes timeout on critical dryness.';
+
           await pool.query(
-            `INSERT INTO alerts (user_id, field_id, sensor_id, alert_type, alert_category, title, message) 
-             VALUES (?, ?, ?, 'critical', 'irrigation', 'Manual Override Warning', 'You turned off the pump, but soil moisture is extremely low. The system will auto-start in 10 minutes to save crops unless you resolve this warning.')`,
-            [sensor.user_id, sensor.field_id, sensor.sensor_id]
+            `INSERT INTO irrigation_logs (field_id, sensor_id, irrigation_type, start_time, trigger_reason, soil_moisture_before, pump_status, initiated_by) 
+             VALUES (?, ?, 'auto', NOW(), ?, ?, 'on', ?)`,
+            [sensor.field_id, sensor.sensor_id, triggerDesc, soil, sensor.user_id]
           );
+        } else {
+          pumpInsert = 0; // Block the hardware! We are still in the 10-minute waiting window.
+          
+          // If alert doesn't exist for this session yet, create it immediately.
+          if (!existingAlert) {
+            await pool.query(
+              `INSERT INTO alerts (user_id, field_id, sensor_id, alert_type, alert_category, title, message) 
+               VALUES (?, ?, ?, 'critical', 'irrigation', 'Manual Override Warning', 'You turned off the pump, but soil moisture is extremely low. The system will auto-start in 10 minutes to save crops unless you resolve this warning.')`,
+              [sensor.user_id, sensor.field_id, sensor.sensor_id]
+            );
+          }
         }
       }
+    } catch (overrideErr) {
+      console.warn(`Cloud override skipped: ${overrideErr.message}`);
     }
 
     const [result] = await pool.query(
@@ -359,18 +367,72 @@ export const createSensor = async (req, res) => {
   try {
     const { field_id, sensor_type, device_id, sensor_model, installation_date, location_description } = req.body;
 
+    if (!field_id || !device_id) {
+      return res.status(400).json({ success: false, message: 'field_id and device_id are required' });
+    }
+
     if (!await verifyFieldOwnership(field_id, req.user.user_id)) {
       return res.status(404).json({ success: false, message: 'Field not found' });
     }
 
-    const [[existing]] = await pool.query('SELECT sensor_id FROM sensors WHERE device_id = ?', [device_id]);
+    // If device already exists, bind it to the selected field instead of failing.
+    const [[existing]] = await pool.query(
+      `SELECT s.sensor_id, s.field_id, f.user_id
+       FROM sensors s
+       JOIN fields f ON s.field_id = f.field_id
+       WHERE s.device_id = ?`,
+      [device_id]
+    );
+
     if (existing) {
-      return res.status(400).json({ success: false, message: 'Sensor with this device ID already exists' });
+      // Prevent cross-user device hijacking.
+      if (existing.user_id !== req.user.user_id) {
+        return res.status(403).json({ success: false, message: 'This device ID is already linked to another user' });
+      }
+
+      // If already linked to this field, return success clearly.
+      if (Number(existing.field_id) === Number(field_id)) {
+        const [[alreadyLinked]] = await pool.query('SELECT * FROM sensors WHERE sensor_id = ?', [existing.sensor_id]);
+        return res.status(200).json({
+          success: true,
+          message: 'Device already linked to this field',
+          data: alreadyLinked
+        });
+      }
+
+      // Re-bind existing device to selected field.
+      await pool.query(
+        `UPDATE sensors
+         SET field_id = ?,
+             sensor_type = COALESCE(?, sensor_type),
+             sensor_model = COALESCE(?, sensor_model),
+             installation_date = COALESCE(?, installation_date),
+             location_description = COALESCE(?, location_description),
+             updated_at = NOW()
+         WHERE sensor_id = ?`,
+        [
+          field_id,
+          sensor_type || null,
+          sensor_model || null,
+          installation_date || null,
+          location_description || null,
+          existing.sensor_id
+        ]
+      );
+
+      const [[boundSensor]] = await pool.query('SELECT * FROM sensors WHERE sensor_id = ?', [existing.sensor_id]);
+      return res.status(200).json({
+        success: true,
+        message: 'Existing device linked to selected field successfully',
+        data: boundSensor
+      });
     }
+
+    const today = new Date().toISOString().slice(0, 10);
 
     const [result] = await pool.query(
       'INSERT INTO sensors (field_id, sensor_type, device_id, sensor_model, installation_date, location_description) VALUES (?, ?, ?, ?, ?, ?)',
-      [field_id, sensor_type, device_id, sensor_model, installation_date, location_description]
+      [field_id, sensor_type || 'combined', device_id, sensor_model || null, installation_date || today, location_description || null]
     );
 
     const [[sensor]] = await pool.query('SELECT * FROM sensors WHERE sensor_id = ?', [result.insertId]);
@@ -427,6 +489,152 @@ export const updateSensor = async (req, res) => {
     res.json({ success: true, message: 'Sensor updated successfully', data: updatedSensor });
   } catch (error) {
     console.error('Update sensor error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// Demo mode shared device binding:
+// - Allows same device_id across multiple users/fields.
+// - Requires DB migration to drop UNIQUE(device_id) on sensors table.
+export const createSensorSharedDemo = async (req, res) => {
+  try {
+    const { field_id, sensor_type, device_id, sensor_model, installation_date, location_description } = req.body;
+
+    if (!field_id || !device_id) {
+      return res.status(400).json({ success: false, message: 'field_id and device_id are required' });
+    }
+
+    if (!await verifyFieldOwnership(field_id, req.user.user_id)) {
+      return res.status(404).json({ success: false, message: 'Field not found' });
+    }
+
+    const [[alreadyLinkedToField]] = await pool.query(
+      'SELECT sensor_id FROM sensors WHERE device_id = ? AND field_id = ?',
+      [device_id, field_id]
+    );
+
+    if (alreadyLinkedToField) {
+      const [[sensor]] = await pool.query('SELECT * FROM sensors WHERE sensor_id = ?', [alreadyLinkedToField.sensor_id]);
+      return res.status(200).json({
+        success: true,
+        message: 'Device already linked to this field',
+        data: sensor
+      });
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const [result] = await pool.query(
+      'INSERT INTO sensors (field_id, sensor_type, device_id, sensor_model, installation_date, location_description) VALUES (?, ?, ?, ?, ?, ?)',
+      [field_id, sensor_type || 'combined', device_id, sensor_model || null, installation_date || today, location_description || null]
+    );
+
+    const [[sensor]] = await pool.query('SELECT * FROM sensors WHERE sensor_id = ?', [result.insertId]);
+    res.status(201).json({ success: true, message: 'Sensor linked successfully', data: sensor });
+  } catch (error) {
+    console.error('Create shared sensor error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// Demo mode shared device ingestion:
+// - One hardware POST fan-outs to all sensor rows with same device_id.
+export const createSensorReadingSharedDemo = async (req, res) => {
+  try {
+    const { device_id, soil_moisture, temperature, humidity, light_intensity, rainfall, pump_on } = req.body;
+
+    if (!device_id) {
+      return res.status(400).json({ success: false, message: 'Device ID is required' });
+    }
+
+    const [boundSensors] = await pool.query(
+      `SELECT s.sensor_id, s.field_id, f.user_id
+       FROM sensors s
+       JOIN fields f ON s.field_id = f.field_id
+       WHERE s.device_id = ? AND s.is_active = TRUE`,
+      [device_id]
+    );
+
+    if (!boundSensors || boundSensors.length === 0) {
+      return res.status(404).json({ success: false, message: 'Sensor not found with this device ID' });
+    }
+
+    const soil = toNullableDecimal(soil_moisture);
+    const temp = toNullableDecimal(temperature);
+    const hum = toNullableDecimal(humidity);
+    const light = toNullableInt(light_intensity);
+    const rain = toRainfallBool(rainfall);
+    const rainInsert = rain != null ? rain : 0;
+    const pump = toTinyIntBool(pump_on);
+    const basePump = pump != null ? pump : 0;
+
+    const readingIds = [];
+
+    for (const sensor of boundSensors) {
+      let pumpInsert = basePump;
+
+      try {
+        const [[lastLog]] = await pool.query(
+          'SELECT log_id, pump_status, end_time FROM irrigation_logs WHERE field_id = ? ORDER BY start_time DESC LIMIT 1',
+          [sensor.field_id]
+        );
+
+        if (lastLog && lastLog.pump_status === 'on') {
+          pumpInsert = 1;
+        } else if (lastLog && lastLog.pump_status === 'off' && soil != null && soil < 20) {
+          const [[existingAlert]] = await pool.query(
+            'SELECT alert_id, is_resolved FROM alerts WHERE field_id = ? AND title = ? AND created_at >= ? ORDER BY created_at DESC LIMIT 1',
+            [sensor.field_id, 'Manual Override Warning', lastLog.end_time]
+          );
+
+          const minutesSinceOff = (Date.now() - new Date(lastLog.end_time).getTime()) / 60000;
+
+          if (minutesSinceOff > 10 || (existingAlert && existingAlert.is_resolved)) {
+            pumpInsert = 1;
+            const triggerDesc = (existingAlert && existingAlert.is_resolved)
+              ? 'Cloud Auto-Start: Farmer resolved critical dryness warning.'
+              : 'Cloud Auto-Start: 10 minutes timeout on critical dryness.';
+
+            await pool.query(
+              `INSERT INTO irrigation_logs (field_id, sensor_id, irrigation_type, start_time, trigger_reason, soil_moisture_before, pump_status, initiated_by)
+               VALUES (?, ?, 'auto', NOW(), ?, ?, 'on', ?)`,
+              [sensor.field_id, sensor.sensor_id, triggerDesc, soil, sensor.user_id]
+            );
+          } else {
+            pumpInsert = 0;
+            if (!existingAlert) {
+              await pool.query(
+                `INSERT INTO alerts (user_id, field_id, sensor_id, alert_type, alert_category, title, message)
+                 VALUES (?, ?, ?, 'critical', 'irrigation', 'Manual Override Warning', 'You turned off the pump, but soil moisture is extremely low. The system will auto-start in 10 minutes to save crops unless you resolve this warning.')`,
+                [sensor.user_id, sensor.field_id, sensor.sensor_id]
+              );
+            }
+          }
+        }
+      } catch (overrideErr) {
+        console.warn(`Cloud override skipped (sensor ${sensor.sensor_id}): ${overrideErr.message}`);
+      }
+
+      const [result] = await pool.query(
+        'INSERT INTO sensor_readings (sensor_id, soil_moisture, temperature, humidity, light_intensity, rainfall, pump_on) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [sensor.sensor_id, soil, temp, hum, light, rainInsert, pumpInsert]
+      );
+      readingIds.push(result.insertId);
+
+      processSmartAlerts(sensor.user_id, sensor.field_id, sensor.sensor_id, { soil, temp, hum, rainInsert, pumpInsert });
+      if (result.insertId % 5 === 0) {
+        triggerAIRecommendation(sensor.field_id, sensor.sensor_id);
+      }
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Sensor reading recorded successfully',
+      reading_id: readingIds[0],
+      reading_ids: readingIds,
+      bound_sensor_count: boundSensors.length
+    });
+  } catch (error) {
+    console.error('Create shared sensor reading error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };

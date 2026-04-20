@@ -6,10 +6,16 @@ PassengerEnabled On
 PassengerAppType node
 PassengerStartupFile app.js
 
-# Set Node.js version (update this to match your cPanel selection)
+# Development:
+#   Local machine usually does NOT use this .htaccess.
+# Production (cPanel):
+#   Update PassengerNodejs to your actual cPanel Node binary path.
 PassengerNodejs /usr/bin/node
 
-# Application environment
+# Development:
+#   keep NODE_ENV=development in .env
+# Production:
+#   keep PassengerAppEnv production and NODE_ENV=production in cPanel env vars.
 PassengerAppEnv production
 
 # Performance settings

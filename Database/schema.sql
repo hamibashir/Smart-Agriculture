@@ -69,7 +69,9 @@ CREATE TABLE sensors (
     sensor_id INT AUTO_INCREMENT PRIMARY KEY,
     field_id INT NOT NULL,
     sensor_type ENUM('soil_moisture', 'temperature', 'humidity', 'light', 'rain', 'water_flow', 'combined') NOT NULL,
-    device_id VARCHAR(100) UNIQUE NOT NULL COMMENT 'ESP32 MAC address or unique identifier',
+    -- Demo/shared mode: device_id is intentionally NOT unique to allow one hardware
+    -- device to be bound to multiple fields/users.
+    device_id VARCHAR(100) NOT NULL COMMENT 'ESP32 MAC address or unique identifier',
     sensor_model VARCHAR(100) COMMENT 'e.g., YL-69, DHT22, FC-37',
     installation_date DATE NOT NULL,
     location_description TEXT COMMENT 'Specific location within the field',
@@ -94,20 +96,18 @@ CREATE TABLE sensors (
 CREATE TABLE sensor_readings (
     reading_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     sensor_id INT NOT NULL,
+    reading_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     soil_moisture DECIMAL(5, 2) COMMENT 'Percentage (0-100)',
     temperature DECIMAL(5, 2) COMMENT 'Celsius',
     humidity DECIMAL(5, 2) COMMENT 'Percentage (0-100)',
     light_intensity DECIMAL(5, 2) COMMENT 'Percentage (0-100 from ADC mapping)',
     rainfall TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1=raining, 0=not raining',
-    water_flow_rate DECIMAL(8, 2) COMMENT 'Liters per minute',
-    battery_voltage DECIMAL(4, 2) COMMENT 'Volts',
-    signal_strength INT COMMENT 'WiFi signal strength in dBm',
-    reading_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    pump_on TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1=pump on, 0=pump off',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sensor_id) REFERENCES sensors(sensor_id) ON DELETE CASCADE,
     INDEX idx_sensor_id (sensor_id),
-    INDEX idx_reading_timestamp (reading_timestamp),
-    INDEX idx_sensor_timestamp (sensor_id, reading_timestamp)
+    INDEX idx_reading_time (reading_time),
+    INDEX idx_sensor_time (sensor_id, reading_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================

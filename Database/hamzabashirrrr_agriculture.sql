@@ -1,15 +1,15 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Nov 19, 2025 at 04:32 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost:3306
+-- Generation Time: Apr 19, 2026 at 03:13 PM
+-- Server version: 10.11.16-MariaDB-cll-lve
+-- PHP Version: 8.4.17
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+05:00";
+SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,7 +18,7 @@ SET time_zone = "+05:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `smart_agriculture`
+-- Database: `hamzabashirrrr_agriculture`
 --
 
 -- --------------------------------------------------------
@@ -53,8 +53,8 @@ CREATE TABLE `alerts` (
 --
 
 INSERT INTO `alerts` (`alert_id`, `user_id`, `field_id`, `sensor_id`, `alert_type`, `alert_category`, `title`, `message`, `threshold_value`, `current_value`, `is_read`, `is_resolved`, `resolved_at`, `action_taken`, `push_notification_sent`, `email_sent`, `sms_sent`, `created_at`) VALUES
-(7, 5, 6, NULL, 'warning', 'temperature', 'High Temperature Warning', 'Temperature in Main Field - Wheat is 23.1°C. Monitor crop health.', 25.00, 23.10, 1, 1, '2025-11-10 16:44:52', NULL, 0, 0, 0, '2025-11-05 20:40:35'),
-(9, 5, 6, NULL, 'info', 'irrigation', 'Irrigation Completed', 'Automatic irrigation completed successfully. Duration: 45 minutes, Water used: 3200 liters.', NULL, NULL, 1, 1, NULL, NULL, 0, 0, 0, '2025-11-03 21:40:35');
+(7, 5, 6, NULL, 'warning', 'temperature', 'High Temperature Warning', 'Temperature in Main Field - Wheat is 23.1°C. Monitor crop health.', 25.00, 23.10, 1, 1, '2025-11-10 11:44:52', NULL, 0, 0, 0, '2025-11-05 15:40:35'),
+(9, 5, 6, NULL, 'info', 'irrigation', 'Irrigation Completed', 'Automatic irrigation completed successfully. Duration: 45 minutes, Water used: 3200 liters.', NULL, NULL, 1, 1, NULL, NULL, 0, 0, 0, '2025-11-03 16:40:35');
 
 -- --------------------------------------------------------
 
@@ -80,10 +80,10 @@ CREATE TABLE `audit_logs` (
 --
 
 INSERT INTO `audit_logs` (`log_id`, `user_id`, `action_type`, `table_name`, `record_id`, `old_value`, `new_value`, `ip_address`, `user_agent`, `created_at`) VALUES
-(6, 5, 'LOGIN', NULL, NULL, NULL, NULL, '192.168.1.150', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', '2025-11-05 21:40:35'),
-(7, 5, 'CREATE', 'fields', 6, NULL, '{\"field_name\": \"Main Field - Wheat\", \"area_size\": 8.5}', '192.168.1.150', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', '2025-11-05 21:40:35'),
-(8, 5, 'CREATE', 'irrigation_logs', NULL, NULL, '{\"irrigation_type\": \"automatic\", \"duration_minutes\": 45}', '192.168.1.150', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', '2025-11-05 21:40:35'),
-(9, 5, 'UPDATE', 'alerts', NULL, '{\"is_read\": false}', '{\"is_read\": true}', '192.168.1.150', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', '2025-11-05 21:40:35');
+(6, 5, 'LOGIN', NULL, NULL, NULL, NULL, '192.168.1.150', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', '2025-11-05 16:40:35'),
+(7, 5, 'CREATE', 'fields', 6, NULL, '{\"field_name\": \"Main Field - Wheat\", \"area_size\": 8.5}', '192.168.1.150', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', '2025-11-05 16:40:35'),
+(8, 5, 'CREATE', 'irrigation_logs', NULL, NULL, '{\"irrigation_type\": \"automatic\", \"duration_minutes\": 45}', '192.168.1.150', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', '2025-11-05 16:40:35'),
+(9, 5, 'UPDATE', 'alerts', NULL, '{\"is_read\": false}', '{\"is_read\": true}', '192.168.1.150', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', '2025-11-05 16:40:35');
 
 -- --------------------------------------------------------
 
@@ -116,7 +116,7 @@ CREATE TABLE `crop_recommendations` (
 --
 
 INSERT INTO `crop_recommendations` (`recommendation_id`, `field_id`, `recommended_crop`, `confidence_score`, `soil_moisture_avg`, `temperature_avg`, `humidity_avg`, `soil_type`, `season`, `expected_yield`, `water_requirement`, `growth_duration_days`, `recommendation_reason`, `model_version`, `is_accepted`, `accepted_at`, `created_at`) VALUES
-(6, 6, 'Wheat', 94.50, 45.20, 22.50, 62.00, 'Loamy', 'Rabi', 3200.00, 'Medium', 150, 'Excellent soil conditions and optimal temperature for wheat cultivation. Loamy soil provides good drainage and nutrient retention.', NULL, 1, NULL, '2025-10-31 21:40:35');
+(6, 6, 'Wheat', 94.50, 45.20, 22.50, 62.00, 'Loamy', 'Rabi', 3200.00, 'Medium', 150, 'Excellent soil conditions and optimal temperature for wheat cultivation. Loamy soil provides good drainage and nutrient retention.', NULL, 1, NULL, '2025-10-31 16:40:35');
 
 -- --------------------------------------------------------
 
@@ -146,7 +146,7 @@ CREATE TABLE `fields` (
 --
 
 INSERT INTO `fields` (`field_id`, `user_id`, `field_name`, `location_latitude`, `location_longitude`, `area_size`, `area_unit`, `soil_type`, `current_crop`, `planting_date`, `expected_harvest_date`, `is_active`, `created_at`, `updated_at`) VALUES
-(6, 5, 'Main Field - Wheat', 33.56510000, 73.01690000, 8.50, 'acres', 'Loamy', 'Wheat', '2024-11-01', '2025-04-20', 1, '2025-11-05 21:40:35', '2025-11-05 21:40:35');
+(6, 5, 'Main Field - Wheat', 33.56510000, 73.01690000, 8.50, 'acres', 'Loamy', 'Wheat', '2024-11-01', '2025-04-20', 1, '2025-11-05 16:40:35', '2025-11-05 16:40:35');
 
 -- --------------------------------------------------------
 
@@ -177,9 +177,9 @@ CREATE TABLE `irrigation_logs` (
 --
 
 INSERT INTO `irrigation_logs` (`log_id`, `field_id`, `sensor_id`, `irrigation_type`, `start_time`, `end_time`, `duration_minutes`, `water_used_liters`, `trigger_reason`, `soil_moisture_before`, `soil_moisture_after`, `pump_status`, `initiated_by`, `notes`, `created_at`) VALUES
-(6, 6, NULL, 'automatic', '2025-11-03 21:40:35', '2025-11-03 22:25:35', 45, 3200.00, 'Soil moisture below 35%', 32.50, 48.20, 'off', 5, NULL, '2025-11-05 21:40:35'),
-(7, 6, NULL, 'scheduled', '2025-11-01 21:40:35', '2025-11-01 22:20:35', 40, 2850.00, 'Scheduled irrigation - Morning', 38.20, 52.50, 'off', 5, NULL, '2025-11-05 21:40:35'),
-(8, 6, NULL, 'manual', '2025-10-30 21:40:35', '2025-10-30 22:30:35', 50, 3500.00, 'Manual irrigation by farmer', 35.80, 50.20, 'off', 5, NULL, '2025-11-05 21:40:35');
+(6, 6, NULL, 'automatic', '2025-11-03 16:40:35', '2025-11-03 17:25:35', 45, 3200.00, 'Soil moisture below 35%', 32.50, 48.20, 'off', 5, NULL, '2025-11-05 16:40:35'),
+(7, 6, NULL, 'scheduled', '2025-11-01 16:40:35', '2025-11-01 17:20:35', 40, 2850.00, 'Scheduled irrigation - Morning', 38.20, 52.50, 'off', 5, NULL, '2025-11-05 16:40:35'),
+(8, 6, NULL, 'manual', '2025-10-30 16:40:35', '2025-10-30 17:30:35', 50, 3500.00, 'Manual irrigation by farmer', 35.80, 50.20, 'off', 5, NULL, '2025-11-05 16:40:35');
 
 -- --------------------------------------------------------
 
@@ -208,8 +208,8 @@ CREATE TABLE `irrigation_schedules` (
 --
 
 INSERT INTO `irrigation_schedules` (`schedule_id`, `field_id`, `schedule_name`, `start_date`, `end_date`, `time_of_day`, `duration_minutes`, `frequency`, `custom_days`, `is_active`, `created_by`, `created_at`, `updated_at`) VALUES
-(5, 6, 'Morning Irrigation - Wheat', '2024-11-01', '2025-04-20', '06:00:00', 40, 'alternate_days', NULL, 1, 5, '2025-11-05 21:40:35', '2025-11-05 21:40:35'),
-(6, 6, 'Evening Irrigation - Wheat', '2024-11-01', '2025-04-20', '18:00:00', 35, 'weekly', 'Sunday,Wednesday', 1, 5, '2025-11-05 21:40:35', '2025-11-05 21:40:35');
+(5, 6, 'Morning Irrigation - Wheat', '2024-11-01', '2025-04-20', '06:00:00', 40, 'alternate_days', NULL, 1, 5, '2025-11-05 16:40:35', '2025-11-05 16:40:35'),
+(6, 6, 'Evening Irrigation - Wheat', '2024-11-01', '2025-04-20', '18:00:00', 35, 'weekly', 'Sunday,Wednesday', 1, 5, '2025-11-05 16:40:35', '2025-11-05 16:40:35');
 
 -- --------------------------------------------------------
 
@@ -239,7 +239,7 @@ CREATE TABLE `sensors` (
 --
 
 INSERT INTO `sensors` (`sensor_id`, `field_id`, `sensor_type`, `device_id`, `sensor_model`, `installation_date`, `location_description`, `calibration_offset`, `is_active`, `last_maintenance_date`, `battery_level`, `firmware_version`, `created_at`, `updated_at`) VALUES
-(14, 6, 'combined', 'ESP_32test', 'ESP32 + DHT22 + Soil Sensor', '2025-11-17', 'Test Location', 0.00, 1, NULL, 100.00, '1.0.0', '2025-11-17 14:16:52', '2025-11-17 14:16:52');
+(14, 6, 'combined', 'ESP_32test', 'ESP32 + DHT22 + Soil Sensor', '2025-11-17', 'Test Location', 0.00, 1, NULL, 100.00, '1.0.0', '2025-11-17 09:16:52', '2025-11-17 09:16:52');
 
 -- --------------------------------------------------------
 
@@ -265,7 +265,7 @@ CREATE TABLE `sensor_readings` (
 --
 
 INSERT INTO `sensor_readings` (`reading_id`, `sensor_id`, `reading_time`, `soil_moisture`, `temperature`, `humidity`, `light_intensity`, `rainfall`, `pump_on`, `created_at`) VALUES
-(1, 14, '2025-11-19 15:53:26', 45.50, 26.20, 60.50, 80.00, 0, 0, '2025-11-19 15:53:26');
+(1, 14, '2025-11-19 10:53:26', 45.50, 26.20, 60.50, 80.00, 0, 0, '2025-11-19 10:53:26');
 
 -- --------------------------------------------------------
 
@@ -289,10 +289,10 @@ CREATE TABLE `system_settings` (
 --
 
 INSERT INTO `system_settings` (`setting_id`, `user_id`, `setting_key`, `setting_value`, `setting_type`, `description`, `created_at`, `updated_at`) VALUES
-(1, NULL, 'soil_moisture_threshold_low', '30', 'global', 'Global threshold for low soil moisture alert', '2025-11-05 21:25:29', '2025-11-05 21:25:29'),
-(2, NULL, 'soil_moisture_threshold_critical', '20', 'global', 'Global threshold for critical soil moisture alert', '2025-11-05 21:25:29', '2025-11-05 21:25:29'),
-(3, NULL, 'temperature_threshold_high', '35', 'global', 'High temperature warning threshold in Celsius', '2025-11-05 21:25:29', '2025-11-05 21:25:29'),
-(4, NULL, 'auto_irrigation_enabled', 'true', 'global', 'Enable automatic irrigation system-wide', '2025-11-05 21:25:29', '2025-11-05 21:25:29');
+(1, NULL, 'soil_moisture_threshold_low', '30', 'global', 'Global threshold for low soil moisture alert', '2025-11-05 16:25:29', '2025-11-05 16:25:29'),
+(2, NULL, 'soil_moisture_threshold_critical', '20', 'global', 'Global threshold for critical soil moisture alert', '2025-11-05 16:25:29', '2025-11-05 16:25:29'),
+(3, NULL, 'temperature_threshold_high', '35', 'global', 'High temperature warning threshold in Celsius', '2025-11-05 16:25:29', '2025-11-05 16:25:29'),
+(4, NULL, 'auto_irrigation_enabled', 'true', 'global', 'Enable automatic irrigation system-wide', '2025-11-05 16:25:29', '2025-11-05 16:25:29');
 
 -- --------------------------------------------------------
 
@@ -324,7 +324,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `full_name`, `email`, `phone`, `password_hash`, `address`, `city`, `province`, `postal_code`, `role`, `is_active`, `email_verified`, `phone_verified`, `created_at`, `updated_at`, `last_login`) VALUES
-(5, 'HAMZA BASHIR', 'hamzabashir1289@gmail.com', '+923320573993', '$2a$10$zZe2IyLoCX9jc5P.2Swg5e9upf12hHGmb16pGTBjWAwsDSe8RXKge', 'H # 543, Street 25, Sector G, Bahria Town phase 8', 'Rawalpindi', 'punjab', NULL, 'farmer', 1, 0, 0, '2025-11-05 21:31:57', '2025-11-18 17:37:02', '2025-11-18 17:37:02');
+(5, 'HAMZA BASHIR', 'hamzabashir1289@gmail.com', '+923320573993', '$2a$10$zZe2IyLoCX9jc5P.2Swg5e9upf12hHGmb16pGTBjWAwsDSe8RXKge', 'H # 543, Street 25, Sector G, Bahria Town phase 8', 'Rawalpindi', 'punjab', NULL, 'farmer', 1, 0, 0, '2025-11-05 16:31:57', '2025-11-18 12:37:02', '2025-11-18 12:37:02');
 
 -- --------------------------------------------------------
 
@@ -352,10 +352,10 @@ CREATE TABLE `weather_data` (
 --
 
 INSERT INTO `weather_data` (`weather_id`, `field_id`, `temperature`, `humidity`, `rainfall`, `wind_speed`, `cloud_cover`, `weather_condition`, `forecast_date`, `is_forecast`, `data_source`, `created_at`) VALUES
-(7, 6, '23.50', '62.00', '0.00', '8.50', '25.00', 'Partly Cloudy', '2025-11-06', 0, NULL, '2025-11-05 21:40:35'),
-(11, 6, '24.00', '58.00', '0.00', '10.00', '30.00', 'Sunny', '2025-11-07', 1, NULL, '2025-11-05 21:40:35'),
-(12, 6, '22.50', '65.00', '2.50', '12.00', '60.00', 'Light Rain', '2025-11-08', 1, NULL, '2025-11-05 21:40:35'),
-(13, 6, '21.00', '70.00', '5.00', '15.00', '80.00', 'Rainy', '2025-11-09', 1, NULL, '2025-11-05 21:40:35');
+(7, 6, 23.50, 62.00, 0.00, 8.50, 25.00, 'Partly Cloudy', '2025-11-06', 0, NULL, '2025-11-05 16:40:35'),
+(11, 6, 24.00, 58.00, 0.00, 10.00, 30.00, 'Sunny', '2025-11-07', 1, NULL, '2025-11-05 16:40:35'),
+(12, 6, 22.50, 65.00, 2.50, 12.00, 60.00, 'Light Rain', '2025-11-08', 1, NULL, '2025-11-05 16:40:35'),
+(13, 6, 21.00, 70.00, 5.00, 15.00, 80.00, 'Rainy', '2025-11-09', 1, NULL, '2025-11-05 16:40:35');
 
 --
 -- Indexes for dumped tables
@@ -437,7 +437,7 @@ ALTER TABLE `sensor_readings`
   ADD PRIMARY KEY (`reading_id`),
   ADD KEY `idx_sensor_id` (`sensor_id`),
   ADD KEY `idx_reading_time` (`reading_time`),
-  ADD KEY `idx_sensor_time` (`sensor_id`, `reading_time` DESC);
+  ADD KEY `idx_sensor_time` (`sensor_id`,`reading_time` DESC);
 
 --
 -- Indexes for table `system_settings`
@@ -583,16 +583,16 @@ ALTER TABLE `irrigation_schedules`
   ADD CONSTRAINT `irrigation_schedules_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `sensor_readings`
---
-ALTER TABLE `sensor_readings`
-  ADD CONSTRAINT `sensor_readings_ibfk_1` FOREIGN KEY (`sensor_id`) REFERENCES `sensors` (`sensor_id`) ON DELETE CASCADE;
-
---
 -- Constraints for table `sensors`
 --
 ALTER TABLE `sensors`
   ADD CONSTRAINT `sensors_ibfk_1` FOREIGN KEY (`field_id`) REFERENCES `fields` (`field_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `sensor_readings`
+--
+ALTER TABLE `sensor_readings`
+  ADD CONSTRAINT `sensor_readings_ibfk_1` FOREIGN KEY (`sensor_id`) REFERENCES `sensors` (`sensor_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `system_settings`

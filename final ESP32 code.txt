@@ -1,24 +1,25 @@
-#include <WiFi.h>
+﻿#include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <DHT.h>
 
 // ============================================
-// WiFi Configuration - UPDATE THESE VALUES!
+// WiFi Configuration
 // ============================================
 const char* ssid = "Hamza";
 const char* password = "hamza2004";
 
 // ============================================
-// Backend API Configuration - UPDATE YOUR SERVER IP!
+// Backend API Configuration (Production)
 // ============================================
-// Backend: use host + port + path (IPv4 WiFiClient — avoids URL/parser edge cases)
-const char* BACKEND_HOST = "192.168.18.73";
-const uint16_t BACKEND_PORT = 5000;
-const char* API_PATH = "/api/sensors/reading";
+const char* BACKEND_HOST = "api.hamzabashir.online";
+const uint16_t BACKEND_PORT = 443;
+const char* API_PATH = "/api/sensors/reading/";
+const bool BACKEND_USE_HTTPS = true;
 
 // ============================================
-// Device Configuration - UPDATE THIS!
+// Device Configuration
 // ============================================
 const char* deviceId = "ESP_32test";
 
@@ -101,13 +102,12 @@ void setup() {
     Serial.println(" dBm");
     Serial.print("device_id: ");
     Serial.println(deviceId);
-    Serial.print("POST target: http://");
+    Serial.print("POST target: ");
+    Serial.print(BACKEND_USE_HTTPS ? "https://" : "http://");
     Serial.print(BACKEND_HOST);
-    Serial.print(":");
-    Serial.print(BACKEND_PORT);
     Serial.println(API_PATH);
   } else {
-    Serial.println("WiFi failed — local pump logic only");
+    Serial.println("WiFi failed - local pump logic only");
   }
 
   Serial.println("\nStarting loop.\n");
@@ -123,7 +123,7 @@ void loop() {
   } else {
     wifiConnected = false;
     if (now - lastWifiAttemptMs >= WIFI_RETRY_INTERVAL_MS) {
-      Serial.println("WiFi down — reconnecting...");
+      Serial.println("WiFi down - reconnecting...");
       connectToWiFi();
       lastWifiAttemptMs = millis();
     }
@@ -325,22 +325,13 @@ void printWifiDiag() {
   Serial.println(WiFi.gatewayIP());
   Serial.print("Mask:     ");
   Serial.println(WiFi.subnetMask());
-  IPAddress esp = WiFi.localIP();
-  IPAddress srv;
-  if (!srv.fromString(BACKEND_HOST)) {
-    Serial.println("BACKEND_HOST is not a valid IPv4 address.");
-    return;
-  }
-  IPAddress mask = WiFi.subnetMask();
-  bool same = true;
-  for (int i = 0; i < 4; i++) {
-    if ((esp[i] & mask[i]) != (srv[i] & mask[i])) {
-      same = false;
-      break;
-    }
-  }
-  if (!same) {
-    Serial.println("WARN: ESP32 and BACKEND_HOST differ in subnet — connection refused is likely.");
+
+  IPAddress resolved;
+  if (WiFi.hostByName(BACKEND_HOST, resolved)) {
+    Serial.print("Resolved backend IP: ");
+    Serial.println(resolved);
+  } else {
+    Serial.println("DNS lookup failed for backend host.");
   }
 }
 
@@ -349,20 +340,12 @@ bool sendSensorDataToBackend(int soilRaw, int rainRaw, int lightRaw, float temp,
     return false;
   }
 
-  WiFiClient client;
+  // Keep client objects alive for the full HTTP request lifecycle.
+  WiFiClientSecure secureClient;
+  WiFiClient plainClient;
   HTTPClient http;
-
-  if (!http.begin(client, BACKEND_HOST, BACKEND_PORT, API_PATH)) {
-    Serial.println("HTTP begin() failed");
-    return false;
-  }
-  http.addHeader("Content-Type", "application/json");
-  http.setTimeout(10000);
-  http.setConnectTimeout(8000);
-
   float soilMoisture = convertSoilMoistureToPercentage(soilRaw);
   float lightIntensity = convertLightToPercentage(lightRaw);
-  // Same rule as Serial/pump: raw < RAIN_THRESHOLD => wet pad / raining
   bool raining = (rainRaw < RAIN_THRESHOLD);
 
   StaticJsonDocument<384> doc;
@@ -384,14 +367,44 @@ bool sendSensorDataToBackend(int soilRaw, int rainRaw, int lightRaw, float temp,
   Serial.println("POST sensor reading...");
   Serial.println(jsonString);
 
+  String endpoint = String(BACKEND_USE_HTTPS ? "https://" : "http://") + BACKEND_HOST + API_PATH;
+
+  bool beginOk = false;
+  if (BACKEND_USE_HTTPS) {
+    secureClient.setInsecure();
+    beginOk = http.begin(secureClient, endpoint);
+  } else {
+    beginOk = http.begin(plainClient, endpoint);
+  }
+
+  if (!beginOk) {
+    Serial.println("HTTP begin() failed");
+    return false;
+  }
+
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+  const char* headerKeys[] = {"Location"};
+  http.collectHeaders(headerKeys, 1);
+  http.addHeader("Content-Type", "application/json");
+  http.setConnectTimeout(8000);
+  http.setTimeout(10000);
+
   int code = http.POST(jsonString);
   bool success = false;
+
   if (code > 0) {
     Serial.printf("HTTP %d\n", code);
+    if (code == 301 || code == 302 || code == 307 || code == 308) {
+      Serial.print("Redirect to: ");
+      Serial.println(http.header("Location"));
+    }
+    String response = http.getString();
+    if (response.length()) {
+      Serial.println(response);
+    }
     if (code == 200 || code == 201) {
       success = true;
     }
-    http.getString();
   } else {
     Serial.printf("HTTP error %d: %s\n", code, http.errorToString(code).c_str());
   }

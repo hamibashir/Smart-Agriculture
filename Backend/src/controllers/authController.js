@@ -2,6 +2,10 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import pool from '../config/database.js';
 
+// Development:
+//   JWT_SECRET can be a temporary local value.
+// Production:
+//   JWT_SECRET must be strong, long, and private (set only in cPanel env vars).
 const generateToken = (user) => jwt.sign(
   { user_id: user.user_id, email: user.email, role: user.role },
   process.env.JWT_SECRET,

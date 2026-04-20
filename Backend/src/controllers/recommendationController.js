@@ -1,5 +1,11 @@
 import pool from '../config/database.js';
 
+// Development:
+//   AI_API_URL=http://localhost:5001
+// Production:
+//   AI_API_URL=https://ai.yourdomain.com
+const AI_API_URL = process.env.AI_API_URL || 'http://localhost:5001';
+
 const verifyFieldOwnership = async (fieldId, userId) => {
   const [[field]] = await pool.query('SELECT field_id FROM fields WHERE field_id = ? AND user_id = ?', [fieldId, userId]);
   return field;
@@ -143,8 +149,6 @@ export const generateManualRecommendation = async (req, res) => {
        return res.status(400).json({ success: false, message: 'No sensor data available for this field to analyze.' });
     }
 
-    const AI_API_URL = process.env.AI_API_URL || 'http://localhost:5001';
-
     const response = await fetch(`${AI_API_URL}/predict`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -157,7 +161,16 @@ export const generateManualRecommendation = async (req, res) => {
       })
     });
 
-    if (!response.ok) throw new Error('AI API Engine could not be reached.');
+    if (!response.ok) {
+      let details = '';
+      try {
+        const errJson = await response.json();
+        details = errJson?.message ? ` ${errJson.message}` : '';
+      } catch {
+        // ignore parse failure and use fallback status text
+      }
+      throw new Error(`AI API Engine error (${response.status}):${details || ` ${response.statusText || 'Request failed'}`}`);
+    }
     
     const aiResult = await response.json();
     if (!aiResult.success) throw new Error('AI logic failed to predict crop.');
