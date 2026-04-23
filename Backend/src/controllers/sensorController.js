@@ -294,14 +294,23 @@ export const createSensorReading = async (req, res) => {
     // Never allow this optional automation block to fail the core sensor ingestion.
     try {
       const [[lastLog]] = await pool.query(
-        'SELECT log_id, pump_status, end_time FROM irrigation_logs WHERE field_id = ? ORDER BY start_time DESC LIMIT 1',
+        'SELECT log_id, pump_status, start_time, end_time FROM irrigation_logs WHERE field_id = ? ORDER BY start_time DESC LIMIT 1',
         [sensor.field_id]
       );
 
-      if (lastLog && lastLog.pump_status === 'on') {
+      if (rainInsert === 1) {
+        // Rain safety: always force pump OFF while raining.
+        pumpInsert = 0;
+        if (lastLog && lastLog.pump_status === 'on') {
+          const duration_minutes = Math.max(0, Math.round((Date.now() - new Date(lastLog.start_time).getTime()) / 60000));
+          await pool.query(
+            'UPDATE irrigation_logs SET end_time = NOW(), duration_minutes = ?, soil_moisture_after = ?, pump_status = ? WHERE log_id = ?',
+            [duration_minutes, soil, 'off', lastLog.log_id]
+          );
+        }
+      } else if (lastLog && lastLog.pump_status === 'on') {
         pumpInsert = 1; // Farmer turned it ON manually. Force hardware ON.
-      } 
-      else if (lastLog && lastLog.pump_status === 'off' && soil != null && soil < 20) {
+      } else if (lastLog && lastLog.pump_status === 'off' && soil != null && soil < 20) {
         // The farmer turned it OFF manually, but the soil is critically dry.
         const [[existingAlert]] = await pool.query(
           'SELECT alert_id, is_resolved FROM alerts WHERE field_id = ? AND title = ? AND created_at >= ? ORDER BY created_at DESC LIMIT 1',
@@ -574,11 +583,20 @@ export const createSensorReadingSharedDemo = async (req, res) => {
 
       try {
         const [[lastLog]] = await pool.query(
-          'SELECT log_id, pump_status, end_time FROM irrigation_logs WHERE field_id = ? ORDER BY start_time DESC LIMIT 1',
+          'SELECT log_id, pump_status, start_time, end_time FROM irrigation_logs WHERE field_id = ? ORDER BY start_time DESC LIMIT 1',
           [sensor.field_id]
         );
 
-        if (lastLog && lastLog.pump_status === 'on') {
+        if (rainInsert === 1) {
+          pumpInsert = 0;
+          if (lastLog && lastLog.pump_status === 'on') {
+            const duration_minutes = Math.max(0, Math.round((Date.now() - new Date(lastLog.start_time).getTime()) / 60000));
+            await pool.query(
+              'UPDATE irrigation_logs SET end_time = NOW(), duration_minutes = ?, soil_moisture_after = ?, pump_status = ? WHERE log_id = ?',
+              [duration_minutes, soil, 'off', lastLog.log_id]
+            );
+          }
+        } else if (lastLog && lastLog.pump_status === 'on') {
           pumpInsert = 1;
         } else if (lastLog && lastLog.pump_status === 'off' && soil != null && soil < 20) {
           const [[existingAlert]] = await pool.query(
