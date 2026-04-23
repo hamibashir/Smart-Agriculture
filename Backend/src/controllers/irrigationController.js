@@ -36,7 +36,10 @@ export const startIrrigation = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Field not found' });
     }
 
-    const [[activeLog]] = await pool.query('SELECT log_id FROM irrigation_logs WHERE field_id = ? AND pump_status = "on"', [field_id]);
+    const [[activeLog]] = await pool.query(
+      'SELECT log_id FROM irrigation_logs WHERE field_id = ? AND pump_status = ?',
+      [field_id, 'on']
+    );
     if (activeLog) {
       return res.status(400).json({ success: false, message: 'Irrigation already in progress for this field' });
     }
@@ -83,8 +86,8 @@ export const stopIrrigation = async (req, res) => {
         [log_id, req.user.user_id]
       )
       : await pool.query(
-        'SELECT il.* FROM irrigation_logs il JOIN fields f ON il.field_id = f.field_id WHERE il.field_id = ? AND f.user_id = ? AND il.pump_status = "on" ORDER BY il.start_time DESC LIMIT 1',
-        [field_id, req.user.user_id]
+        'SELECT il.* FROM irrigation_logs il JOIN fields f ON il.field_id = f.field_id WHERE il.field_id = ? AND f.user_id = ? AND il.pump_status = ? ORDER BY il.start_time DESC LIMIT 1',
+        [field_id, req.user.user_id, 'on']
       );
 
     if (!log) return res.status(404).json({ success: false, message: 'No active irrigation found for this field' });
@@ -93,8 +96,8 @@ export const stopIrrigation = async (req, res) => {
     const duration_minutes = Math.round((Date.now() - new Date(log.start_time)) / 60000);
 
     await pool.query(
-      'UPDATE irrigation_logs SET end_time = NOW(), duration_minutes = ?, soil_moisture_after = ?, water_used_liters = ?, pump_status = "off" WHERE log_id = ?',
-      [duration_minutes, soil_moisture_after, water_used_liters, log.log_id]
+      'UPDATE irrigation_logs SET end_time = NOW(), duration_minutes = ?, soil_moisture_after = ?, water_used_liters = ?, pump_status = ? WHERE log_id = ?',
+      [duration_minutes, soil_moisture_after, water_used_liters, 'off', log.log_id]
     );
 
     const [[updatedLog]] = await pool.query('SELECT * FROM irrigation_logs WHERE log_id = ?', [log.log_id]);
