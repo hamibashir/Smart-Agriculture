@@ -321,7 +321,7 @@ export const createSensorReading = async (req, res) => {
 
           await pool.query(
             `INSERT INTO irrigation_logs (field_id, sensor_id, irrigation_type, start_time, trigger_reason, soil_moisture_before, pump_status, initiated_by) 
-             VALUES (?, ?, 'auto', NOW(), ?, ?, 'on', ?)`,
+             VALUES (?, ?, 'automatic', NOW(), ?, ?, 'on', ?)`,
             [sensor.field_id, sensor.sensor_id, triggerDesc, soil, sensor.user_id]
           );
         } else {
@@ -596,7 +596,7 @@ export const createSensorReadingSharedDemo = async (req, res) => {
 
             await pool.query(
               `INSERT INTO irrigation_logs (field_id, sensor_id, irrigation_type, start_time, trigger_reason, soil_moisture_before, pump_status, initiated_by)
-               VALUES (?, ?, 'auto', NOW(), ?, ?, 'on', ?)`,
+               VALUES (?, ?, 'automatic', NOW(), ?, ?, 'on', ?)`,
               [sensor.field_id, sensor.sensor_id, triggerDesc, soil, sensor.user_id]
             );
           } else {
