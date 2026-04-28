@@ -1,4 +1,4 @@
-﻿#include <WiFi.h>
+#include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
@@ -30,7 +30,7 @@ const char* deviceId = "ESP_32test";
 #define RAIN_PIN 33
 #define LIGHT_PIN 32
 #define DHT_PIN 4
-#define RELAY_PIN 14
+#define RELAY_PIN 5
 
 #define DHT_TYPE DHT22
 DHT dht(DHT_PIN, DHT_TYPE);
@@ -85,8 +85,9 @@ void setup() {
   dht.begin();
   Serial.println("DHT initialized");
 
-  pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, LOW);
+  // Using OPEN_DRAIN so HIGH floats the pin instead of driving 3.3V
+  pinMode(RELAY_PIN, OUTPUT_OPEN_DRAIN);
+  digitalWrite(RELAY_PIN, HIGH);
   Serial.println("Relay OFF");
 
   Serial.println("Analog inputs ready");
@@ -272,13 +273,13 @@ void controlPump(int soilValue, int rainValue) {
 }
 
 void turnPumpOn() {
-  digitalWrite(RELAY_PIN, HIGH);
+  digitalWrite(RELAY_PIN, LOW);
   pumpRunning = true;
   pumpStartTime = millis();
 }
 
 void turnPumpOff() {
-  digitalWrite(RELAY_PIN, LOW);
+  digitalWrite(RELAY_PIN, HIGH);
   pumpRunning = false;
 }
 
