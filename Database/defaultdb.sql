@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `hamzabashirrrr_agriculture`
+-- Database: `defaultdb`
 --
 
 -- --------------------------------------------------------
@@ -27,8 +27,9 @@ SET time_zone = "+00:00";
 -- Table structure for table `alerts`
 --
 
+DROP TABLE IF EXISTS `alerts`;
 CREATE TABLE `alerts` (
-  `alert_id` bigint(20) NOT NULL,
+  `alert_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `field_id` int(11) DEFAULT NULL,
   `sensor_id` int(11) DEFAULT NULL,
@@ -45,9 +46,9 @@ CREATE TABLE `alerts` (
   `push_notification_sent` tinyint(1) DEFAULT 0,
   `email_sent` tinyint(1) DEFAULT 0,
   `sms_sent` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`alert_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 --
 -- Dumping data for table `alerts`
 --
@@ -62,6 +63,7 @@ INSERT INTO `alerts` (`alert_id`, `user_id`, `field_id`, `sensor_id`, `alert_typ
 -- Table structure for table `audit_logs`
 --
 
+DROP TABLE IF EXISTS `audit_logs`;
 CREATE TABLE `audit_logs` (
   `log_id` bigint(20) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
@@ -72,7 +74,8 @@ CREATE TABLE `audit_logs` (
   `new_value` text DEFAULT NULL COMMENT 'New value (JSON)',
   `ip_address` varchar(45) DEFAULT NULL,
   `user_agent` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`log_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -91,6 +94,7 @@ INSERT INTO `audit_logs` (`log_id`, `user_id`, `action_type`, `table_name`, `rec
 -- Table structure for table `crop_recommendations`
 --
 
+DROP TABLE IF EXISTS `crop_recommendations`;
 CREATE TABLE `crop_recommendations` (
   `recommendation_id` int(11) NOT NULL,
   `field_id` int(11) NOT NULL,
@@ -108,7 +112,8 @@ CREATE TABLE `crop_recommendations` (
   `model_version` varchar(20) DEFAULT NULL COMMENT 'ML model version used',
   `is_accepted` tinyint(1) DEFAULT 0,
   `accepted_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`recommendation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -124,6 +129,7 @@ INSERT INTO `crop_recommendations` (`recommendation_id`, `field_id`, `recommende
 -- Table structure for table `fields`
 --
 
+DROP TABLE IF EXISTS `fields`;
 CREATE TABLE `fields` (
   `field_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
@@ -138,7 +144,8 @@ CREATE TABLE `fields` (
   `expected_harvest_date` date DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`field_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -154,6 +161,7 @@ INSERT INTO `fields` (`field_id`, `user_id`, `field_name`, `location_latitude`, 
 -- Table structure for table `irrigation_logs`
 --
 
+DROP TABLE IF EXISTS `irrigation_logs`;
 CREATE TABLE `irrigation_logs` (
   `log_id` bigint(20) NOT NULL,
   `field_id` int(11) NOT NULL,
@@ -169,7 +177,8 @@ CREATE TABLE `irrigation_logs` (
   `pump_status` enum('on','off','error') DEFAULT 'off',
   `initiated_by` int(11) DEFAULT NULL COMMENT 'user_id if manual, NULL if automatic',
   `notes` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`log_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -187,6 +196,7 @@ INSERT INTO `irrigation_logs` (`log_id`, `field_id`, `sensor_id`, `irrigation_ty
 -- Table structure for table `irrigation_schedules`
 --
 
+DROP TABLE IF EXISTS `irrigation_schedules`;
 CREATE TABLE `irrigation_schedules` (
   `schedule_id` int(11) NOT NULL,
   `field_id` int(11) NOT NULL,
@@ -200,7 +210,8 @@ CREATE TABLE `irrigation_schedules` (
   `is_active` tinyint(1) DEFAULT 1,
   `created_by` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`schedule_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -217,6 +228,7 @@ INSERT INTO `irrigation_schedules` (`schedule_id`, `field_id`, `schedule_name`, 
 -- Table structure for table `sensors`
 --
 
+DROP TABLE IF EXISTS `sensors`;
 CREATE TABLE `sensors` (
   `sensor_id` int(11) NOT NULL,
   `field_id` int(11) NOT NULL,
@@ -231,7 +243,8 @@ CREATE TABLE `sensors` (
   `battery_level` decimal(5,2) DEFAULT NULL COMMENT 'Battery percentage if applicable',
   `firmware_version` varchar(20) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`sensor_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -247,6 +260,7 @@ INSERT INTO `sensors` (`sensor_id`, `field_id`, `sensor_type`, `device_id`, `sen
 -- Table structure for table `sensor_readings`
 --
 
+DROP TABLE IF EXISTS `sensor_readings`;
 CREATE TABLE `sensor_readings` (
   `reading_id` bigint(20) NOT NULL,
   `sensor_id` int(11) NOT NULL,
@@ -257,7 +271,8 @@ CREATE TABLE `sensor_readings` (
   `light_intensity` decimal(5,2) DEFAULT NULL COMMENT 'Percentage (0-100 from ADC mapping)',
   `rainfall` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1=raining, 0=not raining',
   `pump_on` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1=pump on, 0=pump off',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`reading_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -273,6 +288,7 @@ INSERT INTO `sensor_readings` (`reading_id`, `sensor_id`, `reading_time`, `soil_
 -- Table structure for table `system_settings`
 --
 
+DROP TABLE IF EXISTS `system_settings`;
 CREATE TABLE `system_settings` (
   `setting_id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'NULL for global settings',
@@ -281,7 +297,8 @@ CREATE TABLE `system_settings` (
   `setting_type` enum('global','user','field') DEFAULT 'global',
   `description` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`setting_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -300,6 +317,7 @@ INSERT INTO `system_settings` (`setting_id`, `user_id`, `setting_key`, `setting_
 -- Table structure for table `users`
 --
 
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `user_id` int(11) NOT NULL,
   `full_name` varchar(100) NOT NULL,
@@ -316,7 +334,8 @@ CREATE TABLE `users` (
   `phone_verified` tinyint(1) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `last_login` timestamp NULL DEFAULT NULL
+  `last_login` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -332,6 +351,7 @@ INSERT INTO `users` (`user_id`, `full_name`, `email`, `phone`, `password_hash`, 
 -- Table structure for table `weather_data`
 --
 
+DROP TABLE IF EXISTS `weather_data`;
 CREATE TABLE `weather_data` (
   `weather_id` bigint(20) NOT NULL,
   `field_id` int(11) NOT NULL,
@@ -344,7 +364,8 @@ CREATE TABLE `weather_data` (
   `forecast_date` date NOT NULL,
   `is_forecast` tinyint(1) DEFAULT 0 COMMENT 'TRUE for forecast, FALSE for actual',
   `data_source` varchar(50) DEFAULT NULL COMMENT 'e.g., OpenWeatherMap, Local Sensor',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`weather_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -365,7 +386,6 @@ INSERT INTO `weather_data` (`weather_id`, `field_id`, `temperature`, `humidity`,
 -- Indexes for table `alerts`
 --
 ALTER TABLE `alerts`
-  ADD PRIMARY KEY (`alert_id`),
   ADD KEY `sensor_id` (`sensor_id`),
   ADD KEY `idx_user_id` (`user_id`),
   ADD KEY `idx_field_id` (`field_id`),
@@ -377,7 +397,6 @@ ALTER TABLE `alerts`
 -- Indexes for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  ADD PRIMARY KEY (`log_id`),
   ADD KEY `idx_user_id` (`user_id`),
   ADD KEY `idx_action_type` (`action_type`),
   ADD KEY `idx_created_at` (`created_at`);
@@ -386,7 +405,6 @@ ALTER TABLE `audit_logs`
 -- Indexes for table `crop_recommendations`
 --
 ALTER TABLE `crop_recommendations`
-  ADD PRIMARY KEY (`recommendation_id`),
   ADD KEY `idx_field_id` (`field_id`),
   ADD KEY `idx_recommended_crop` (`recommended_crop`),
   ADD KEY `idx_created_at` (`created_at`);
@@ -395,7 +413,6 @@ ALTER TABLE `crop_recommendations`
 -- Indexes for table `fields`
 --
 ALTER TABLE `fields`
-  ADD PRIMARY KEY (`field_id`),
   ADD KEY `idx_user_id` (`user_id`),
   ADD KEY `idx_is_active` (`is_active`);
 
@@ -403,7 +420,6 @@ ALTER TABLE `fields`
 -- Indexes for table `irrigation_logs`
 --
 ALTER TABLE `irrigation_logs`
-  ADD PRIMARY KEY (`log_id`),
   ADD KEY `sensor_id` (`sensor_id`),
   ADD KEY `initiated_by` (`initiated_by`),
   ADD KEY `idx_field_id` (`field_id`),
@@ -414,7 +430,6 @@ ALTER TABLE `irrigation_logs`
 -- Indexes for table `irrigation_schedules`
 --
 ALTER TABLE `irrigation_schedules`
-  ADD PRIMARY KEY (`schedule_id`),
   ADD KEY `created_by` (`created_by`),
   ADD KEY `idx_field_id` (`field_id`),
   ADD KEY `idx_is_active` (`is_active`);
@@ -423,7 +438,6 @@ ALTER TABLE `irrigation_schedules`
 -- Indexes for table `sensors`
 --
 ALTER TABLE `sensors`
-  ADD PRIMARY KEY (`sensor_id`),
   -- Shared demo mode: keep device_id reusable across users/fields (non-unique index only)
   ADD KEY `idx_field_id` (`field_id`),
   ADD KEY `idx_device_id` (`device_id`),
@@ -434,7 +448,6 @@ ALTER TABLE `sensors`
 -- Indexes for table `sensor_readings`
 --
 ALTER TABLE `sensor_readings`
-  ADD PRIMARY KEY (`reading_id`),
   ADD KEY `idx_sensor_id` (`sensor_id`),
   ADD KEY `idx_reading_time` (`reading_time`),
   ADD KEY `idx_sensor_time` (`sensor_id`,`reading_time` DESC);
@@ -443,7 +456,6 @@ ALTER TABLE `sensor_readings`
 -- Indexes for table `system_settings`
 --
 ALTER TABLE `system_settings`
-  ADD PRIMARY KEY (`setting_id`),
   ADD UNIQUE KEY `unique_user_setting` (`user_id`,`setting_key`),
   ADD KEY `idx_setting_key` (`setting_key`);
 
@@ -451,7 +463,6 @@ ALTER TABLE `system_settings`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `email` (`email`),
   ADD UNIQUE KEY `phone` (`phone`),
   ADD KEY `idx_email` (`email`),
@@ -462,7 +473,6 @@ ALTER TABLE `users`
 -- Indexes for table `weather_data`
 --
 ALTER TABLE `weather_data`
-  ADD PRIMARY KEY (`weather_id`),
   ADD KEY `idx_field_id` (`field_id`),
   ADD KEY `idx_forecast_date` (`forecast_date`),
   ADD KEY `idx_is_forecast` (`is_forecast`);
