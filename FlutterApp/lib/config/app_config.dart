@@ -6,7 +6,7 @@
   // Development: false
   // Production (current): true
   // ============================================================
-  static const bool useProduction = false;
+  static const bool useProduction = true;
 
   // Development URL (local backend)
   static const String developmentApiBaseUrl = 'http://192.168.18.73:5000/api';
