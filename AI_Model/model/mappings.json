@@ -27,5 +27,6 @@
     "soil_type_enc",
     "season_enc"
   ],
-  "accuracy": 85.89
+  "accuracy": 87.86,
+  "cv_accuracy": 85.79
 }
