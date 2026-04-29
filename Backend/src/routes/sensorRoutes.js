@@ -1,11 +1,12 @@
 import express from 'express';
-import { getSensorsByField, getSensorReadings, getLatestReading, createSensorReadingSharedDemo, createSensorSharedDemo, updateSensor } from '../controllers/sensorController.js';
+import { getSensorsByField, getSensorReadings, getLatestReading, createSensorReadingSharedDemo, createSensorSharedDemo, updateSensor, getPumpCommand } from '../controllers/sensorController.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Public route for ESP32/IoT devices
-router.post('/reading', createSensorReadingSharedDemo);
+// Public routes for ESP32/IoT devices (no auth required)
+router.post('/reading', createSensorReadingSharedDemo);  // Full sensor upload (30s)
+router.get('/command/:deviceId', getPumpCommand);         // Lightweight command poll (5s)
 
 // Protected routes
 router.use(authenticateToken);

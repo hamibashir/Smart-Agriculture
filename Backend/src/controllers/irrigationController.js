@@ -36,12 +36,18 @@ export const startIrrigation = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Field not found' });
     }
 
-    const [[activeLog]] = await pool.query(
-      'SELECT log_id FROM irrigation_logs WHERE field_id = ? AND pump_status = ?',
-      [field_id, 'on']
+    // Block if ANY field sharing this device already has an active 'on' log.
+    // Prevents two users from both thinking the pump is theirs to start.
+    const [[deviceActive]] = await pool.query(
+      `SELECT il.log_id
+       FROM irrigation_logs il
+       JOIN sensors s ON il.field_id = s.field_id
+       WHERE s.sensor_id = ? AND il.pump_status = 'on'
+       LIMIT 1`,
+      [sensor_id]
     );
-    if (activeLog) {
-      return res.status(400).json({ success: false, message: 'Irrigation already in progress for this field' });
+    if (deviceActive) {
+      return res.status(400).json({ success: false, message: 'Irrigation already in progress for this device' });
     }
 
     const [result] = await pool.query(
@@ -86,11 +92,24 @@ export const stopIrrigation = async (req, res) => {
         [log_id, req.user.user_id]
       )
       : await pool.query(
-        'SELECT il.* FROM irrigation_logs il JOIN fields f ON il.field_id = f.field_id WHERE il.field_id = ? AND f.user_id = ? AND il.pump_status = ? ORDER BY il.start_time DESC LIMIT 1',
-        [field_id, req.user.user_id, 'on']
-      );
+          // Find the active 'on' log across ALL fields sharing this device.
+          // User B tapping OFF must be able to close a log started by User A.
+          `SELECT il.*
+           FROM irrigation_logs il
+           JOIN sensors s ON il.field_id = s.field_id
+           WHERE s.sensor_id = (
+             SELECT s2.sensor_id FROM sensors s2
+             JOIN fields f2 ON s2.field_id = f2.field_id
+             WHERE f2.field_id = ? AND f2.user_id = ?
+             LIMIT 1
+           )
+           AND il.pump_status = 'on'
+           ORDER BY il.start_time DESC
+           LIMIT 1`,
+          [field_id, req.user.user_id]
+        );
 
-    if (!log) return res.status(404).json({ success: false, message: 'No active irrigation found for this field' });
+    if (!log) return res.status(404).json({ success: false, message: 'No active irrigation found for this device' });
     if (log.pump_status !== 'on') return res.status(400).json({ success: false, message: 'Irrigation is not active' });
 
     const duration_minutes = Math.round((Date.now() - new Date(log.start_time)) / 60000);

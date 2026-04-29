@@ -166,6 +166,81 @@ export const getLatestReading = async (req, res) => {
   }
 };
 
+// ── Lightweight command poll for ESP32 (called every 5 seconds) ──────────────
+// Returns only pump_status + pump_reason. Zero DB writes.
+// Runs the same P1-P5 priority chain as the full sensor POST.
+// Public route — no auth needed (ESP32 uses device_id to identify itself).
+export const getPumpCommand = async (req, res) => {
+  try {
+    const { deviceId } = req.params;
+
+    // ── Primary sensor = lowest sensor_id (first registered for this device) ──
+    // All pump decisions come from this one sensor's field.
+    // Other bound sensors copy the same reading — no independent decisions.
+    const [[sensor]] = await pool.query(
+      `SELECT s.sensor_id, s.field_id
+       FROM sensors s
+       WHERE s.device_id = ? AND s.is_active = TRUE
+       ORDER BY s.sensor_id ASC
+       LIMIT 1`,
+      [deviceId]
+    );
+
+    if (!sensor) {
+      return res.status(404).json({ success: false, message: 'Device not found' });
+    }
+
+    // Get latest sensor reading (soil moisture + rain state)
+    const [[latest]] = await pool.query(
+      'SELECT soil_moisture, rainfall FROM sensor_readings WHERE sensor_id = ? ORDER BY reading_time DESC LIMIT 1',
+      [sensor.sensor_id]
+    );
+
+    // Get the latest irrigation log across ALL fields bound to this device.
+    // This is the source of truth — any user's ON/OFF command wins if it's the most recent.
+    const [[lastLog]] = await pool.query(
+      `SELECT il.pump_status
+       FROM irrigation_logs il
+       JOIN sensors s ON il.field_id = s.field_id
+       WHERE s.device_id = ? AND s.is_active = TRUE
+       ORDER BY il.start_time DESC
+       LIMIT 1`,
+      [deviceId]
+    );
+
+    const SOIL_WET_LIMIT = 70;
+    const SOIL_DRY_LIMIT = 30;
+    const soil = latest?.soil_moisture ?? null;
+    const rainDetected = latest?.rainfall === 1;
+
+    // Run priority chain (read-only — no DB writes)
+    let pump_status = 0;
+    let pump_reason = 'no_change';
+
+    if (rainDetected) {
+      pump_status = 0;
+      pump_reason = 'rain_override';
+    } else if (soil !== null && soil >= SOIL_WET_LIMIT) {
+      pump_status = 0;
+      pump_reason = 'soil_wet_override';
+    } else if (lastLog?.pump_status === 'on') {
+      pump_status = 1;
+      pump_reason = 'manual_on';
+    } else if (lastLog?.pump_status === 'off') {
+      pump_status = 0;
+      pump_reason = 'manual_off';
+    } else if (soil !== null && soil <= SOIL_DRY_LIMIT) {
+      pump_status = 1;
+      pump_reason = 'auto_dry';
+    }
+
+    res.json({ success: true, pump_status, pump_reason });
+  } catch (error) {
+    console.error('Get pump command error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 const toNullableDecimal = (v) => {
   if (v === undefined || v === null || v === '') return null;
   const n = Number(v);
@@ -384,68 +459,57 @@ export const createSensor = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Field not found' });
     }
 
-    // If device already exists, bind it to the selected field instead of failing.
-    const [[existing]] = await pool.query(
-      `SELECT s.sensor_id, s.field_id, f.user_id
+    // ── Multi-field device sharing ──────────────────────────────────────────
+    // A single ESP32 can serve multiple fields (useful for testing/demo).
+    // Strategy:
+    //   1. If this device is already linked to THIS exact field → return it.
+    //   2. If this device belongs to a DIFFERENT user → block (security).
+    //   3. Otherwise → insert a new sensor row for this field.
+    //      The data-ingestion endpoint (createSensorReadingSharedDemo) already
+    //      fans out to ALL rows sharing the same device_id, so data will flow
+    //      into every linked field automatically.
+    // ──────────────────────────────────────────────────────────────────────────
+
+    // Check: is this device already linked to THIS field?
+    const [[alreadyLinkedToField]] = await pool.query(
+      `SELECT s.sensor_id
        FROM sensors s
-       JOIN fields f ON s.field_id = f.field_id
-       WHERE s.device_id = ?`,
-      [device_id]
+       WHERE s.device_id = ? AND s.field_id = ?`,
+      [device_id, field_id]
     );
 
-    if (existing) {
-      // Prevent cross-user device hijacking.
-      if (existing.user_id !== req.user.user_id) {
-        return res.status(403).json({ success: false, message: 'This device ID is already linked to another user' });
-      }
-
-      // If already linked to this field, return success clearly.
-      if (Number(existing.field_id) === Number(field_id)) {
-        const [[alreadyLinked]] = await pool.query('SELECT * FROM sensors WHERE sensor_id = ?', [existing.sensor_id]);
-        return res.status(200).json({
-          success: true,
-          message: 'Device already linked to this field',
-          data: alreadyLinked
-        });
-      }
-
-      // Re-bind existing device to selected field.
-      await pool.query(
-        `UPDATE sensors
-         SET field_id = ?,
-             sensor_type = COALESCE(?, sensor_type),
-             sensor_model = COALESCE(?, sensor_model),
-             installation_date = COALESCE(?, installation_date),
-             location_description = COALESCE(?, location_description),
-             updated_at = NOW()
-         WHERE sensor_id = ?`,
-        [
-          field_id,
-          sensor_type || null,
-          sensor_model || null,
-          installation_date || null,
-          location_description || null,
-          existing.sensor_id
-        ]
-      );
-
-      const [[boundSensor]] = await pool.query('SELECT * FROM sensors WHERE sensor_id = ?', [existing.sensor_id]);
+    if (alreadyLinkedToField) {
+      const [[sensor]] = await pool.query('SELECT * FROM sensors WHERE sensor_id = ?', [alreadyLinkedToField.sensor_id]);
       return res.status(200).json({
         success: true,
-        message: 'Existing device linked to selected field successfully',
-        data: boundSensor
+        message: 'Device already linked to this field',
+        data: sensor
       });
     }
 
-    const today = new Date().toISOString().slice(0, 10);
+    // Check: does this device belong to a different user? (prevent hijacking)
+    const [[foreignLink]] = await pool.query(
+      `SELECT f.user_id
+       FROM sensors s
+       JOIN fields f ON s.field_id = f.field_id
+       WHERE s.device_id = ? AND f.user_id != ?
+       LIMIT 1`,
+      [device_id, req.user.user_id]
+    );
 
+    if (foreignLink) {
+      return res.status(403).json({ success: false, message: 'This device ID is already registered to another user' });
+    }
+
+    // New field → insert a new sensor row (device_id is intentionally duplicated across fields)
+    const today = new Date().toISOString().slice(0, 10);
     const [result] = await pool.query(
       'INSERT INTO sensors (field_id, sensor_type, device_id, sensor_model, installation_date, location_description) VALUES (?, ?, ?, ?, ?, ?)',
       [field_id, sensor_type || 'combined', device_id, sensor_model || null, installation_date || today, location_description || null]
     );
 
     const [[sensor]] = await pool.query('SELECT * FROM sensors WHERE sensor_id = ?', [result.insertId]);
-    res.status(201).json({ success: true, message: 'Sensor created successfully', data: sensor });
+    res.status(201).json({ success: true, message: 'Sensor linked to field successfully', data: sensor });
   } catch (error) {
     console.error('Create sensor error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
@@ -559,7 +623,8 @@ export const createSensorReadingSharedDemo = async (req, res) => {
       `SELECT s.sensor_id, s.field_id, f.user_id
        FROM sensors s
        JOIN fields f ON s.field_id = f.field_id
-       WHERE s.device_id = ? AND s.is_active = TRUE`,
+       WHERE s.device_id = ? AND s.is_active = TRUE
+       ORDER BY s.sensor_id ASC`,   // ASC ensures primary is always first
       [device_id]
     );
 
@@ -569,87 +634,103 @@ export const createSensorReadingSharedDemo = async (req, res) => {
 
     const soil = toNullableDecimal(soil_moisture);
     const temp = toNullableDecimal(temperature);
-    const hum = toNullableDecimal(humidity);
+    const hum  = toNullableDecimal(humidity);
     const light = toNullableInt(light_intensity);
-    const rain = toRainfallBool(rainfall);
+    const rain  = toRainfallBool(rainfall);
     const rainInsert = rain != null ? rain : 0;
-    const pump = toTinyIntBool(pump_on);
+    const pump  = toTinyIntBool(pump_on);
     const basePump = pump != null ? pump : 0;
 
-    const readingIds = [];
+    const SOIL_WET_LIMIT = 70;
+    const SOIL_DRY_LIMIT = 30;
 
-    for (const sensor of boundSensors) {
-      let pumpInsert = basePump;
+    // ── ONE PUMP DECISION PER DEVICE ─────────────────────────────────────────
+    // The PRIMARY sensor (lowest sensor_id = first registered) is the single
+    // source of truth for pump state. All other bound sensors copy that result.
+    // This prevents different fields from giving conflicting ON/OFF answers.
+    // ──────────────────────────────────────────────────────────────────────────
+    const primary = boundSensors[0];
+    let masterPumpInsert = basePump;
+    let masterPumpReason = 'no_change';
 
-      try {
-        const [[lastLog]] = await pool.query(
-          'SELECT log_id, pump_status, start_time, end_time FROM irrigation_logs WHERE field_id = ? ORDER BY start_time DESC LIMIT 1',
-          [sensor.field_id]
-        );
+    try {
+      // Query across ALL fields bound to this device — any user's command counts.
+      const [[lastLog]] = await pool.query(
+        `SELECT il.log_id, il.pump_status, il.start_time
+         FROM irrigation_logs il
+         JOIN sensors s ON il.field_id = s.field_id
+         WHERE s.device_id = ?
+         ORDER BY il.start_time DESC
+         LIMIT 1`,
+        [device_id]
+      );
 
-        if (rainInsert === 1) {
-          pumpInsert = 0;
-          if (lastLog && lastLog.pump_status === 'on') {
-            const duration_minutes = Math.max(0, Math.round((Date.now() - new Date(lastLog.start_time).getTime()) / 60000));
-            await pool.query(
-              'UPDATE irrigation_logs SET end_time = NOW(), duration_minutes = ?, soil_moisture_after = ?, pump_status = ? WHERE log_id = ?',
-              [duration_minutes, soil, 'off', lastLog.log_id]
-            );
-          }
-        } else if (lastLog && lastLog.pump_status === 'on') {
-          pumpInsert = 1;
-        } else if (lastLog && lastLog.pump_status === 'off' && soil != null && soil < 20) {
-          const [[existingAlert]] = await pool.query(
-            'SELECT alert_id, is_resolved FROM alerts WHERE field_id = ? AND title = ? AND created_at >= ? ORDER BY created_at DESC LIMIT 1',
-            [sensor.field_id, 'Manual Override Warning', lastLog.end_time]
-          );
-
-          const minutesSinceOff = (Date.now() - new Date(lastLog.end_time).getTime()) / 60000;
-
-          if (minutesSinceOff > 10 || (existingAlert && existingAlert.is_resolved)) {
-            pumpInsert = 1;
-            const triggerDesc = (existingAlert && existingAlert.is_resolved)
-              ? 'Cloud Auto-Start: Farmer resolved critical dryness warning.'
-              : 'Cloud Auto-Start: 10 minutes timeout on critical dryness.';
-
-            await pool.query(
-              `INSERT INTO irrigation_logs (field_id, sensor_id, irrigation_type, start_time, trigger_reason, soil_moisture_before, pump_status, initiated_by)
-               VALUES (?, ?, 'automatic', NOW(), ?, ?, 'on', ?)`,
-              [sensor.field_id, sensor.sensor_id, triggerDesc, soil, sensor.user_id]
-            );
-          } else {
-            pumpInsert = 0;
-            if (!existingAlert) {
-              await pool.query(
-                `INSERT INTO alerts (user_id, field_id, sensor_id, alert_type, alert_category, title, message)
-                 VALUES (?, ?, ?, 'critical', 'irrigation', 'Manual Override Warning', 'You turned off the pump, but soil moisture is extremely low. The system will auto-start in 10 minutes to save crops unless you resolve this warning.')`,
-                [sensor.user_id, sensor.field_id, sensor.sensor_id]
-              );
-            }
-          }
-        }
-      } catch (overrideErr) {
-        console.warn(`Cloud override skipped (sensor ${sensor.sensor_id}): ${overrideErr.message}`);
+      // P1 ── Rain detected → force relay OFF (temporary override)
+      if (rainInsert === 1) {
+        masterPumpInsert = 0;
+        masterPumpReason = 'rain_override';
       }
+      // P2 ── Soil wet → force relay OFF (temporary override)
+      else if (soil !== null && soil >= SOIL_WET_LIMIT) {
+        masterPumpInsert = 0;
+        masterPumpReason = 'soil_wet_override';
+      }
+      // P3 ── Honor last manual app command from primary field
+      else if (lastLog?.pump_status === 'on') {
+        masterPumpInsert = 1;
+        masterPumpReason = 'manual_on';
+      }
+      else if (lastLog?.pump_status === 'off') {
+        masterPumpInsert = 0;
+        masterPumpReason = 'manual_off';
+      }
+      // P4 ── Soil critically dry → auto-start
+      else if (soil !== null && soil <= SOIL_DRY_LIMIT) {
+        masterPumpInsert = 1;
+        masterPumpReason = 'auto_dry';
+        await pool.query(
+          `INSERT INTO irrigation_logs
+             (field_id, sensor_id, irrigation_type, start_time, trigger_reason, soil_moisture_before, pump_status, initiated_by)
+           VALUES (?, ?, 'automatic', NOW(), 'Auto-start: soil moisture critically low', ?, 'on', ?)`,
+          [primary.field_id, primary.sensor_id, soil, primary.user_id]
+        );
+      }
+      // P5 ── No rule matched → keep ESP32's reported state
+      else {
+        masterPumpInsert = basePump;
+        masterPumpReason = 'no_change';
+      }
+    } catch (decisionErr) {
+      console.warn(`Pump decision skipped (primary sensor ${primary.sensor_id}): ${decisionErr.message}`);
+    }
 
+    // ── Fan out: write the same reading + same pump state to every bound sensor ─
+    const readingIds = [];
+    for (const sensor of boundSensors) {
       const [result] = await pool.query(
         'INSERT INTO sensor_readings (sensor_id, soil_moisture, temperature, humidity, light_intensity, rainfall, pump_on) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [sensor.sensor_id, soil, temp, hum, light, rainInsert, pumpInsert]
+        [sensor.sensor_id, soil, temp, hum, light, rainInsert, masterPumpInsert]
       );
       readingIds.push(result.insertId);
 
-      processSmartAlerts(sensor.user_id, sensor.field_id, sensor.sensor_id, { soil, temp, hum, rainInsert, pumpInsert });
+      processSmartAlerts(sensor.user_id, sensor.field_id, sensor.sensor_id, { soil, temp, hum, rainInsert, pumpInsert: masterPumpInsert });
       if (result.insertId % 5 === 0) {
         triggerAIRecommendation(sensor.field_id, sensor.sensor_id);
       }
     }
 
+    // ── Respond to ESP32 ──────────────────────────────────────────────────────
+    // One consistent pump_status from the primary sensor decision.
+    // pump_reason is visible in Serial Monitor for debugging.
     res.status(201).json({
       success: true,
       message: 'Sensor reading recorded successfully',
       reading_id: readingIds[0],
       reading_ids: readingIds,
-      bound_sensor_count: boundSensors.length
+      bound_sensor_count: boundSensors.length,
+      primary_sensor_id: primary.sensor_id,  // Confirms which sensor controls the pump
+      pump_status: masterPumpInsert,          // ESP32 syncs relay to this
+      pump_reason: masterPumpReason           // Visible in Serial Monitor
     });
   } catch (error) {
     console.error('Create shared sensor reading error:', error);

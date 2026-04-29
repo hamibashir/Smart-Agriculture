@@ -233,7 +233,7 @@ CREATE TABLE `sensors` (
   `sensor_id` int(11) NOT NULL,
   `field_id` int(11) NOT NULL,
   `sensor_type` enum('soil_moisture','temperature','humidity','light','rain','water_flow','combined') NOT NULL,
-  `device_id` varchar(100) NOT NULL COMMENT 'ESP32 MAC address or unique identifier',
+  `device_id` varchar(100) NOT NULL COMMENT 'ESP32 MAC/device ID — non-unique, same device can serve multiple fields',
   `sensor_model` varchar(100) DEFAULT NULL COMMENT 'e.g., YL-69, DHT22, FC-37',
   `installation_date` date NOT NULL,
   `location_description` text DEFAULT NULL COMMENT 'Specific location within the field',
@@ -620,3 +620,48 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+-- ============================================================
+-- MIGRATION: Allow one ESP32 device across multiple fields
+-- Run this ONCE on any existing database that was created
+-- before this change. Safe to skip on fresh installs
+-- (CREATE TABLE above already has no UNIQUE on device_id).
+-- ============================================================
+
+-- Step 1: Drop the old unique index if it exists
+-- (MySQL silently ignores DROP INDEX if it does not exist
+--  when wrapped in a stored procedure, so we use IF EXISTS syntax)
+DROP PROCEDURE IF EXISTS `migrate_device_id_non_unique`;
+
+DELIMITER //
+CREATE PROCEDURE `migrate_device_id_non_unique`()
+BEGIN
+  -- Only drop if a UNIQUE index named 'device_id' actually exists
+  IF EXISTS (
+    SELECT 1 FROM information_schema.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME   = 'sensors'
+      AND INDEX_NAME   = 'device_id'
+      AND NON_UNIQUE   = 0
+  ) THEN
+    ALTER TABLE `sensors` DROP INDEX `device_id`;
+  END IF;
+
+  -- Only add the non-unique index if it does not already exist
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME   = 'sensors'
+      AND INDEX_NAME   = 'idx_device_id'
+  ) THEN
+    ALTER TABLE `sensors` ADD KEY `idx_device_id` (`device_id`);
+  END IF;
+END //
+DELIMITER ;
+
+CALL `migrate_device_id_non_unique`();
+DROP PROCEDURE IF EXISTS `migrate_device_id_non_unique`;
+
+-- Migration complete.
+-- One ESP32 (same device_id) can now be registered to multiple fields.
+-- The sensor reading endpoint fans out data to every linked field row.

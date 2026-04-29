@@ -1,4 +1,4 @@
-﻿from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify
 import joblib
 import json
 import pandas as pd
@@ -42,22 +42,22 @@ CROP_INFO = {
 
 @app.route("/health", methods=["GET"])
 def health():
-    return jsonify(
-        {
-            "status": "ok",
-            "model_accuracy": f"{mappings['accuracy']}%",
-            "crops_supported": mappings["crops"],
-        }
-    )
+    return jsonify({
+        "status": "ok",
+        "model_accuracy":    f"{mappings['accuracy']}%",
+        "cv_accuracy":       f"{mappings.get('cv_accuracy', 'N/A')}%",
+        "crops_supported":   mappings["crops"],
+        "features":          mappings["features"],
+    })
 
 
 def build_features(soil_moisture, temperature, humidity, soil_enc, season_enc):
     row = {
         "soil_moisture": soil_moisture,
-        "temperature": temperature,
-        "humidity": humidity,
+        "temperature":   temperature,
+        "humidity":      humidity,
         "soil_type_enc": soil_enc,
-        "season_enc": season_enc,
+        "season_enc":    season_enc,
     }
     return pd.DataFrame([row])[FEATURES]
 
@@ -73,6 +73,7 @@ def predict():
         humidity = float(data["humidity"])
         soil_type = str(data["soil_type"]).lower()
         season = str(data["season"]).lower()
+
 
         # Validate soil_type and season
         if soil_type not in le_soil.classes_:
@@ -98,11 +99,11 @@ def predict():
             )
 
         # Encode categorical inputs
-        soil_enc = le_soil.transform([soil_type])[0]
+        soil_enc   = le_soil.transform([soil_type])[0]
         season_enc = le_season.transform([season])[0]
 
         # Predict
-        features = build_features(soil_moisture, temperature, humidity, soil_enc, season_enc)
+        features   = build_features(soil_moisture, temperature, humidity, soil_enc, season_enc)
         prediction = model.predict(features)[0]
         proba = model.predict_proba(features)[0]
         crop = le_crop.inverse_transform([prediction])[0]
@@ -129,14 +130,16 @@ def predict():
         if alt_crops:
             reason += "\n\nAlternative options for this season:\n- " + "\n- ".join(alt_crops)
 
-        # What-if insights
-        features_hot = build_features(soil_moisture, temperature + 4, humidity, soil_enc, season_enc)
-        features_cold = build_features(soil_moisture, temperature - 4, humidity, soil_enc, season_enc)
-        features_wet = build_features(soil_moisture + 15, temperature, humidity, soil_enc, season_enc)
-
-        crop_hot = le_crop.inverse_transform([model.predict(features_hot)[0]])[0]
-        crop_cold = le_crop.inverse_transform([model.predict(features_cold)[0]])[0]
-        crop_wet = le_crop.inverse_transform([model.predict(features_wet)[0]])[0]
+        # What-if insights — batch all 3 into one predict() call (3× faster)
+        batch_features = pd.concat([
+            build_features(soil_moisture, temperature + 4, humidity, soil_enc, season_enc),
+            build_features(soil_moisture, temperature - 4, humidity, soil_enc, season_enc),
+            build_features(soil_moisture + 15, temperature, humidity, soil_enc, season_enc),
+        ], ignore_index=True)
+        batch_preds = model.predict(batch_features)
+        crop_hot  = le_crop.inverse_transform([batch_preds[0]])[0]
+        crop_cold = le_crop.inverse_transform([batch_preds[1]])[0]
+        crop_wet  = le_crop.inverse_transform([batch_preds[2]])[0]
 
         what_ifs = []
         if crop_hot != crop:
@@ -149,26 +152,24 @@ def predict():
         if what_ifs:
             reason += "\n\nEnvironmental alerts:\n" + "\n".join(what_ifs)
 
-        return jsonify(
-            {
-                "success": True,
-                "recommended_crop": crop,
-                "confidence_score": confidence,
-                "alternatives": alt_crops,
-                "water_requirement": info.get("water", "Medium"),
-                "expected_yield": info.get("yield", 0),
-                "growth_duration_days": info.get("days", 0),
-                "recommendation_reason": reason,
-                "model_version": "1.0.1",
-                "inputs": {
-                    "soil_moisture": soil_moisture,
-                    "temperature": temperature,
-                    "humidity": humidity,
-                    "soil_type": soil_type,
-                    "season": season,
-                },
-            }
-        )
+        return jsonify({
+            "success":               True,
+            "recommended_crop":      crop,
+            "confidence_score":      confidence,
+            "alternatives":          alt_crops,
+            "water_requirement":     info.get("water", "Medium"),
+            "expected_yield":        info.get("yield", 0),
+            "growth_duration_days":  info.get("days", 0),
+            "recommendation_reason": reason,
+            "model_version":         mappings.get("model_version", "1.0.2"),
+            "inputs": {
+                "soil_moisture": soil_moisture,
+                "temperature":   temperature,
+                "humidity":      humidity,
+                "soil_type":     soil_type,
+                "season":        season,
+            },
+        })
 
     except KeyError as e:
         return jsonify({"success": False, "message": f"Missing field: {e}"}), 400

@@ -6,9 +6,9 @@
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report
 import joblib
 import json
 import os
@@ -48,18 +48,25 @@ print(f"\n✅ Train: {len(X_train)} rows | Test: {len(X_test)} rows")
 
 # ── 5. Train Random Forest ───────────────────────────────────
 model = RandomForestClassifier(
-    n_estimators=100,
+    n_estimators=150,
     max_depth=10,
+    min_samples_leaf=3,
+    n_jobs=-1,
     random_state=42
 )
 model.fit(X_train, y_train)
 print("\n✅ Model trained successfully!")
 
 # ── 6. Evaluate ──────────────────────────────────────────────
-y_pred    = model.predict(X_test)
-accuracy  = accuracy_score(y_test, y_pred)
-print(f"\n📊 Accuracy: {accuracy * 100:.2f}%")
-print("\n📊 Classification Report:")
+y_pred   = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"\n📊 Test Accuracy : {accuracy * 100:.2f}%")
+
+# Cross-validation gives a more honest estimate than a single split
+cv_scores = cross_val_score(model, X, y, cv=5, scoring='accuracy', n_jobs=-1)
+print(f"📊 Cross-Val (5-fold): {cv_scores.mean()*100:.2f}% ± {cv_scores.std()*100:.2f}%")
+
+print("\n📊 Per-class Report:")
 print(classification_report(
     y_test, y_pred,
     target_names=le_crop.classes_
@@ -85,8 +92,9 @@ mappings = {
     "soil_types":  list(le_soil.classes_),
     "seasons":     list(le_season.classes_),
     "crops":       list(le_crop.classes_),
-    "features":    FEATURES,
-    "accuracy":    round(accuracy * 100, 2)
+    "features":    FEATURES,           # app.py reads this — includes rainfall now
+    "accuracy":    round(accuracy * 100, 2),
+    "cv_accuracy": round(float(cv_scores.mean()) * 100, 2)
 }
 with open("model/mappings.json", "w") as f:
     json.dump(mappings, f, indent=2)
@@ -103,7 +111,8 @@ print("=" * 55)
 def predict_crop(soil_moisture, temperature, humidity, soil_type, season):
     soil_enc   = le_soil.transform([soil_type])[0]
     season_enc = le_season.transform([season])[0]
-    features   = [[soil_moisture, temperature, humidity, soil_enc, season_enc]]
+    features   = pd.DataFrame([[soil_moisture, temperature, humidity, soil_enc, season_enc]],
+                               columns=FEATURES)
     prediction = model.predict(features)[0]
     proba      = model.predict_proba(features)[0]
     crop       = le_crop.inverse_transform([prediction])[0]
