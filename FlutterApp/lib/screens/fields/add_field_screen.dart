@@ -76,7 +76,7 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
                   hintText: 'e.g., North Field',
                   prefixIcon: Icon(Icons.grass),
                 ),
-                validator: (value) => value == null || value.isEmpty ? 'Please enter field name' : null,
+                validator: (value) => value == null || value.trim().isEmpty ? 'Please enter field name' : null,
               ),
               const SizedBox(height: 16),
               Row(
@@ -90,8 +90,10 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
                         prefixIcon: Icon(Icons.square_foot),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) return 'Required';
-                        if (double.tryParse(value) == null) return 'Invalid number';
+                        if (value == null || value.trim().isEmpty) return 'Required';
+                        final numValue = double.tryParse(value);
+                        if (numValue == null) return 'Invalid number';
+                        if (numValue <= 0) return 'Must be greater than 0';
                         return null;
                       },
                     ),

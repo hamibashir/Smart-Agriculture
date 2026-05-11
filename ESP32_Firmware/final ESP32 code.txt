@@ -14,9 +14,9 @@ const char* password = "hamza2004";
 // Backend API Configuration
 // ============================================
 // --- LOCAL TESTING ---
-const char* BACKEND_HOST = "192.168.18.73";
-const uint16_t BACKEND_PORT = 5000;
-const bool BACKEND_USE_HTTPS = false;
+const char* BACKEND_HOST = "api.hamzabashir.online";
+const uint16_t BACKEND_PORT = 443;
+const bool BACKEND_USE_HTTPS = true;
 
 // --- PRODUCTION (comment out above, uncomment below) ---
 // const char* BACKEND_HOST = "api.hamzabashir.online";
@@ -70,12 +70,12 @@ DHT dht(DHT_PIN, DHT_TYPE);
 //    → Stores reading, triggers alerts & AI
 //    → Also syncs pump state as fallback
 //
-#define SENSOR_READ_INTERVAL   1000   // 1s  — fast, local safety
-#define COMMAND_POLL_INTERVAL  5000   // 5s  — instant app response
-#define SENSOR_UPLOAD_INTERVAL 30000  // 30s — full data upload
-#define BACKEND_RETRY_INTERVAL 5000   // 5s  — retry after failed upload
-#define WIFI_RETRY_INTERVAL_MS 10000  // 10s — retry WiFi if disconnected
-#define PUMP_MIN_RUN_TIME      1500   // 1.5s — min run time (offline)
+#define SENSOR_READ_INTERVAL   500    // 0.5s — extremely fast, local safety
+#define COMMAND_POLL_INTERVAL  1000   // 1s  — instant app response
+#define SENSOR_UPLOAD_INTERVAL 2000   // 2s  — fast full data upload for FYP demo
+#define BACKEND_RETRY_INTERVAL 2000   // 2s  — retry after failed upload
+#define WIFI_RETRY_INTERVAL_MS 5000   // 5s  — retry WiFi if disconnected
+#define PUMP_MIN_RUN_TIME      1000   // 1s  — min run time (offline)
 
 #define ANALOG_SAMPLES 4
 
@@ -97,7 +97,7 @@ int lastBackendPumpState = -2;
 
 // Offline restore state
 bool requestedPumpState = false;
-bool rainOverrideActive = false;
+bool localSafetyOverrideActive = false;
 
 // Cached sensor values (shared between tiers)
 int  cachedSoilValue  = 0;
@@ -113,7 +113,7 @@ static int   readAnalogSmoothed(uint8_t pin);
 static bool  readDht(float& tempC, float& humPct);
 static void  readAllSensors(int& soil, int& rain, int& light, float& tempC, float& humPct);
 static void  displaySensorData(int soil, int rain, int light, float temp, float hum);
-static void  applyLocalRainSafety(int rainValue);
+static void  applyLocalSafety(int rainValue, int soilValue);
 static void  runOfflinePumpLogic(int soilValue, int rainValue);
 static void  syncRelayToCommand(int commanded, const char* reason);
 static void  turnPumpOn();
@@ -195,9 +195,9 @@ void loop() {
     displaySensorData(cachedSoilValue, cachedRainValue, cachedLightValue, cachedTemp, cachedHum);
 
     if (wifiConnected) {
-      // Online: backend controls the pump, BUT rain safety is applied locally
-      // so the relay turns off INSTANTLY without waiting for the 5s poll.
-      applyLocalRainSafety(cachedRainValue);
+      // Online: backend controls the pump, BUT safety is applied locally
+      // so the relay turns off INSTANTLY without waiting for the poll.
+      applyLocalSafety(cachedRainValue, cachedSoilValue);
     } else {
       // Offline: full sensor-based decision logic runs here
       runOfflinePumpLogic(cachedSoilValue, cachedRainValue);
@@ -230,40 +230,35 @@ void loop() {
 }
 
 // ============================================
-// Tier 1 Helper: Instant local rain safety
-// Turns relay OFF immediately when rain is detected.
-// Sets rainOverrideActive flag so Tier 2 polls
-// cannot turn the pump back ON while rain persists.
+// Tier 1 Helper: Instant local safety (Rain + Soil)
+// Turns relay OFF immediately when rain or wet soil is detected.
+// Sets localSafetyOverrideActive flag so Tier 2 polls
+// cannot turn the pump back ON while condition persists.
 // ============================================
-void applyLocalRainSafety(int rainValue) {
+void applyLocalSafety(int rainValue, int soilValue) {
   bool raining = (rainValue < RAIN_THRESHOLD);
+  bool soilWet = (soilValue < SOIL_WET_THRESHOLD);
 
-  if (raining) {
-    if (!rainOverrideActive) {
-      // Rain just started — force OFF and lock the flag
-      rainOverrideActive = true;
+  if (raining || soilWet) {
+    if (!localSafetyOverrideActive) {
+      // Condition just started — force OFF and lock the flag
+      localSafetyOverrideActive = true;
       turnPumpOff();
-      Serial.println("LOCAL SAFETY: Rain detected — pump OFF, override locked");
-      // NOTE: do NOT reset lastBackendPumpState here.
-      // Keeping it intact means syncRelayToCommand will see
-      // 'same commanded value' on the next poll and do nothing.
-      // The rainOverrideActive gate inside syncRelayToCommand
-      // will block any 'on' command from getting through.
+      Serial.println("LOCAL SAFETY: Rain or Wet Soil detected — pump OFF instantly, override locked");
+      // Keeping lastBackendPumpState intact ensures proper re-sync later
     }
-    // Rain still active — do nothing (pump already OFF, flag already set)
+    // Condition still active — do nothing
     return;
   }
 
-  // ── Rain just cleared ───────────────────────────────────────────────────
-  if (rainOverrideActive) {
-    rainOverrideActive = false;
-    Serial.println("LOCAL SAFETY: Rain cleared — restoring pump state");
-    // Re-evaluate: force syncRelayToCommand to apply lastBackendPumpState
-    // again now that the rain gate is lifted.
-    // Reset to -2 ONLY here (rain cleared) so one clean re-sync happens.
+  // ── Condition just cleared ───────────────────────────────────────────────────
+  if (localSafetyOverrideActive) {
+    localSafetyOverrideActive = false;
+    Serial.println("LOCAL SAFETY: Condition cleared — restoring pump state");
+    // Re-evaluate: force syncRelayToCommand to apply lastBackendPumpState again
     int restoreCmd = lastBackendPumpState;
     lastBackendPumpState = -2;
-    syncRelayToCommand(restoreCmd, "rain_cleared_restore");
+    syncRelayToCommand(restoreCmd, "safety_cleared_restore");
   }
 }
 
@@ -293,15 +288,15 @@ bool fetchPumpCommand() {
 
   if (!beginOk) return false;
 
-  http.setConnectTimeout(3000);
-  http.setTimeout(4000);
+  http.setConnectTimeout(1500); // Reduced from 3000ms to prevent loop blocking
+  http.setTimeout(2000);        // Reduced from 4000ms
 
   int code = http.GET();
   bool success = false;
 
   if (code == 200) {
     String response = http.getString();
-    StaticJsonDocument<128> doc;
+    StaticJsonDocument<256> doc; // Increased from 128 to prevent NoMemory errors
     if (!deserializeJson(doc, response) && doc.containsKey("pump_status")) {
       int commanded       = doc["pump_status"].as<int>();
       const char* reason  = doc["pump_reason"] | "unknown";
@@ -323,12 +318,10 @@ bool fetchPumpCommand() {
 // from the backend while rain is locally detected.
 // ============================================
 void syncRelayToCommand(int commanded, const char* reason) {
-  // ── Rain gate ─────────────────────────────────────────────────────────────
-  // If rain is active locally, block backend 'on' commands completely.
-  // The backend may still say 'on' (because its latest stored reading
-  // was from before the rain started), but we must not follow it.
-  if (rainOverrideActive && commanded == 1) {
-    Serial.printf("SYNC BLOCKED: backend says ON but rain override active [%s]\n", reason);
+  // ── Safety gate ───────────────────────────────────────────────────────────
+  // If safety override is active locally, block backend 'on' commands.
+  if (localSafetyOverrideActive && commanded == 1) {
+    Serial.printf("SYNC BLOCKED: backend says ON but local safety override active [%s]\n", reason);
     return;  // Ignore — relay stays OFF, lastBackendPumpState unchanged
   }
 
@@ -429,8 +422,8 @@ void runOfflinePumpLogic(int soilValue, int rainValue) {
 
   // P1 — Rain override (temporary)
   if (raining) {
-    if (!rainOverrideActive) {
-      rainOverrideActive = true;
+    if (!localSafetyOverrideActive) {
+      localSafetyOverrideActive = true;
       Serial.println("OFFLINE P1: Rain detected — pump forced OFF (intent preserved)");
     }
     if (pumpRunning) turnPumpOff();
@@ -438,8 +431,8 @@ void runOfflinePumpLogic(int soilValue, int rainValue) {
   }
 
   // Rain just cleared — re-evaluate
-  if (rainOverrideActive) {
-    rainOverrideActive = false;
+  if (localSafetyOverrideActive) {
+    localSafetyOverrideActive = false;
     Serial.println("OFFLINE: Rain cleared — restoring pump state...");
   }
 
@@ -579,8 +572,8 @@ bool sendSensorDataToBackend(int soilRaw, int rainRaw, int lightRaw, float temp,
   const char* headerKeys[] = {"Location"};
   http.collectHeaders(headerKeys, 1);
   http.addHeader("Content-Type", "application/json");
-  http.setConnectTimeout(8000);
-  http.setTimeout(10000);
+  http.setConnectTimeout(3000); // Reduced from 8000ms to keep loop fast
+  http.setTimeout(4000);        // Reduced from 10000ms
 
   int  code    = http.POST(jsonString);
   bool success = false;
@@ -595,7 +588,7 @@ bool sendSensorDataToBackend(int soilRaw, int rainRaw, int lightRaw, float temp,
     if (response.length()) {
       Serial.println(response);
       // Fallback sync — command poll handles this faster, but this catches anything missed
-      StaticJsonDocument<256> respDoc;
+      StaticJsonDocument<512> respDoc; // Increased from 256 to handle full response without NoMemory error
       if (!deserializeJson(respDoc, response) && respDoc.containsKey("pump_status")) {
         int commanded      = respDoc["pump_status"].as<int>();
         const char* reason = respDoc["pump_reason"] | "upload_sync";

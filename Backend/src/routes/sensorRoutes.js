@@ -5,8 +5,8 @@ import { authenticateToken } from '../middleware/auth.js';
 const router = express.Router();
 
 // Public routes for ESP32/IoT devices (no auth required)
-router.post('/reading', createSensorReadingSharedDemo);  // Full sensor upload (30s)
-router.get('/command/:deviceId', getPumpCommand);         // Lightweight command poll (5s)
+router.post('/reading', createSensorReadingSharedDemo);  // Full sensor upload (2s)
+router.get('/command/:deviceId', getPumpCommand);         // Lightweight command poll (1s)
 
 // Protected routes
 router.use(authenticateToken);

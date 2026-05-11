@@ -77,7 +77,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     labelText: 'Full Name',
                     prefixIcon: Icon(Icons.person_outlined),
                   ),
-                  validator: (value) => value == null || value.isEmpty ? 'Please enter your full name' : null,
+                  validator: (value) => value == null || value.trim().isEmpty ? 'Please enter your full name' : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -88,7 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     prefixIcon: Icon(Icons.email_outlined),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) return 'Please enter your email';
+                    if (value == null || value.trim().isEmpty) return 'Please enter your email';
                     if (!value.contains('@')) return 'Please enter a valid email';
                     return null;
                   },
@@ -102,7 +102,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     prefixIcon: Icon(Icons.phone_outlined),
                     hintText: '+92-XXX-XXXXXXX',
                   ),
-                  validator: (value) => value == null || value.isEmpty ? 'Please enter your phone number' : null,
+                  validator: (value) => value == null || value.trim().isEmpty ? 'Please enter your phone number' : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(

@@ -159,7 +159,7 @@ class _AddSensorScreenState extends State<AddSensorScreen> {
                             hintText: 'e.g., A1:B2:C3:D4:E5:F6',
                             prefixIcon: Icon(Icons.memory),
                           ),
-                          validator: (value) => value == null || value.isEmpty ? 'Device ID is required' : null,
+                          validator: (value) => value == null || value.trim().isEmpty ? 'Device ID is required' : null,
                         ),
                         const SizedBox(height: 16),
                         
