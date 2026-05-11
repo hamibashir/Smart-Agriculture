@@ -272,7 +272,7 @@ class _BindingForm extends StatelessWidget {
   }
 }
 
-class _SensorBindingCard extends StatelessWidget {
+class _SensorBindingCard extends StatefulWidget {
   const _SensorBindingCard({required this.sensor, required this.field, required this.onTap});
 
   final Sensor sensor;
@@ -280,15 +280,72 @@ class _SensorBindingCard extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
+  State<_SensorBindingCard> createState() => _SensorBindingCardState();
+}
+
+class _SensorBindingCardState extends State<_SensorBindingCard> {
+  bool _isOnline = false;
+  bool _isLoadingStatus = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkStatus();
+  }
+
+  Future<void> _checkStatus() async {
+    try {
+      final res = await ApiService().getLatestReading(widget.sensor.sensorId);
+      if (res['success'] == true && res['data'] != null) {
+        final lastTime = DateTime.parse(res['data']['reading_time']).toLocal();
+        final diff = DateTime.now().difference(lastTime);
+        if (mounted) {
+          setState(() {
+            _isOnline = diff.inMinutes <= 2;
+            _isLoadingStatus = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _isLoadingStatus = false);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoadingStatus = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        leading: Icon(sensor.isActive ? Icons.sensors : Icons.sensors_off, color: sensor.isActive ? AppTheme.successColor : Colors.grey),
-        title: Text('${sensor.sensorType} (ID: ${sensor.sensorId})'),
-        subtitle: Text('Device: ${sensor.deviceId}\nField: ${field.fieldName}'),
+        leading: Icon(widget.sensor.isActive ? Icons.sensors : Icons.sensors_off, color: widget.sensor.isActive ? AppTheme.successColor : Colors.grey),
+        title: Row(
+          children: [
+            Expanded(child: Text('${widget.sensor.sensorType} (ID: ${widget.sensor.sensorId})', overflow: TextOverflow.ellipsis)),
+            const SizedBox(width: 8),
+            _isLoadingStatus
+                ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2))
+                : Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: _isOnline ? AppTheme.successColor.withValues(alpha: 0.1) : AppTheme.errorColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _isOnline ? AppTheme.successColor : AppTheme.errorColor),
+                    ),
+                    child: Text(
+                      _isOnline ? 'ON' : 'OFF',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: _isOnline ? AppTheme.successColor : AppTheme.errorColor,
+                      ),
+                    ),
+                  ),
+          ],
+        ),
+        subtitle: Text('Device: ${widget.sensor.deviceId}\nField: ${widget.field.fieldName}'),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: onTap,
+        onTap: widget.onTap,
       ),
     );
   }

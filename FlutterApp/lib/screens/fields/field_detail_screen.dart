@@ -272,10 +272,44 @@ class _SensorsTab extends StatelessWidget {
   }
 }
 
-class _SensorCard extends StatelessWidget {
+class _SensorCard extends StatefulWidget {
   const _SensorCard({required this.sensor});
 
   final Sensor sensor;
+
+  @override
+  State<_SensorCard> createState() => _SensorCardState();
+}
+
+class _SensorCardState extends State<_SensorCard> {
+  bool _isOnline = false;
+  bool _isLoadingStatus = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkStatus();
+  }
+
+  Future<void> _checkStatus() async {
+    try {
+      final res = await ApiService().getLatestReading(widget.sensor.sensorId);
+      if (res['success'] == true && res['data'] != null) {
+        final lastTime = DateTime.parse(res['data']['reading_time']).toLocal();
+        final diff = DateTime.now().difference(lastTime);
+        if (mounted) {
+          setState(() {
+            _isOnline = diff.inMinutes <= 2; // 2 minutes threshold for online
+            _isLoadingStatus = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _isLoadingStatus = false);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoadingStatus = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -285,19 +319,42 @@ class _SensorCard extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: sensor.isActive ? AppTheme.successColor.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
+            color: widget.sensor.isActive ? AppTheme.successColor.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(Icons.sensors, color: sensor.isActive ? AppTheme.successColor : Colors.grey),
+          child: Icon(Icons.sensors, color: widget.sensor.isActive ? AppTheme.successColor : Colors.grey),
         ),
-        title: Text(sensor.deviceId),
-        subtitle: Text(sensor.sensorType.replaceAll('_', ' ').toUpperCase()),
-        trailing: sensor.batteryLevel != null
+        title: Row(
+          children: [
+            Text(widget.sensor.deviceId),
+            const SizedBox(width: 8),
+            _isLoadingStatus
+                ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2))
+                : Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: _isOnline ? AppTheme.successColor.withValues(alpha: 0.1) : AppTheme.errorColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _isOnline ? AppTheme.successColor : AppTheme.errorColor),
+                    ),
+                    child: Text(
+                      _isOnline ? 'ON' : 'OFF',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: _isOnline ? AppTheme.successColor : AppTheme.errorColor,
+                      ),
+                    ),
+                  ),
+          ],
+        ),
+        subtitle: Text(widget.sensor.sensorType.replaceAll('_', ' ').toUpperCase()),
+        trailing: widget.sensor.batteryLevel != null
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.battery_std, color: sensor.batteryLevel! > 30 ? AppTheme.successColor : AppTheme.warningColor),
-                  Text('${sensor.batteryLevel!.toInt()}%'),
+                  Icon(Icons.battery_std, color: widget.sensor.batteryLevel! > 30 ? AppTheme.successColor : AppTheme.warningColor),
+                  Text('${widget.sensor.batteryLevel!.toInt()}%'),
                 ],
               )
             : null,
