@@ -6,6 +6,8 @@ import 'providers/field_selection_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
 
+import 'screens/splash_screen.dart';
+
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -32,20 +34,43 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class _AuthWrapper extends StatelessWidget {
+class _AuthWrapper extends StatefulWidget {
   const _AuthWrapper();
+
+  @override
+  State<_AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<_AuthWrapper> {
+  bool _showSplash = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Enforce a minimum splash duration of 2.5 seconds for aesthetic animation
+    Future.delayed(const Duration(milliseconds: 2500), () {
+      if (mounted) {
+        setState(() => _showSplash = false);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Selector<AuthProvider, ({bool isLoading, bool isAuth})>(
       selector: (_, auth) => (isLoading: auth.isLoading, isAuth: auth.isAuthenticated),
       builder: (_, state, __) {
-        if (state.isLoading) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        return state.isAuth ? const HomeScreen() : const LoginScreen();
+        // We use AnimatedSwitcher to gracefully fade from Splash to Login/Home
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 800),
+          switchInCurve: Curves.easeInOut,
+          switchOutCurve: Curves.easeInOut,
+          child: (_showSplash || state.isLoading)
+              ? const SplashScreen(key: ValueKey('splash'))
+              : (state.isAuth
+                  ? const HomeScreen(key: ValueKey('home'))
+                  : const LoginScreen(key: ValueKey('login'))),
+        );
       },
     );
   }
