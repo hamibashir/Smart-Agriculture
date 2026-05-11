@@ -7,6 +7,7 @@ import '../../config/app_theme.dart';
 import '../fields/add_field_screen.dart';
 import '../home/home_screen.dart';
 import '../../models/field.dart';
+import '../analytics/analytics_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -488,7 +489,7 @@ class _QuickActions extends StatelessWidget {
           children: [
             Expanded(child: _ActionButton('Sensors', Icons.sensors, () => context.findAncestorStateOfType<HomeScreenState>()?.navigateToTab(1))),
             const SizedBox(width: 12),
-            Expanded(child: _ActionButton('Tips', Icons.lightbulb, () => context.findAncestorStateOfType<HomeScreenState>()?.navigateToTab(3))),
+            Expanded(child: _ActionButton('Analytics', Icons.insights, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AnalyticsScreen())))),
           ],
         ),
       ],
