@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../fields/fields_screen.dart';
 import '../irrigation/irrigation_screen.dart';
@@ -66,7 +67,7 @@ class HomeScreenState extends State<HomeScreen> {
             ],
           ),
         );
-        if (shouldPop == true && context.mounted) Navigator.pop(context);
+        if (shouldPop == true) SystemNavigator.pop();
       },
       child: Scaffold(
         body: PageView(

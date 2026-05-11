@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/app_theme.dart';
@@ -84,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
         );
-        if (shouldPop == true && context.mounted) Navigator.pop(context);
+        if (shouldPop == true) SystemNavigator.pop();
       },
       child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
