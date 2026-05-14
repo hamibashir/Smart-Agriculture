@@ -27,7 +27,7 @@
     }
     .slides-container {
       position: relative;
-      width: 100vw;
+      width: 100%;
       height: 100vh;
       display: flex;
       align-items: center;
@@ -58,7 +58,7 @@
       pointer-events: auto;
     }
     .slide-content {
-      width: 100vw;
+      width: 100%;
       height: 100vh;
       padding: 48px 7vw 96px;
       overflow-y: auto;
@@ -382,8 +382,8 @@
               id: 'TC-E1-US1-01',
               pre: 'User is on the registration screen and backend server is operational.',
               input: 'Name = Ali Khan; Email = ali@test.com; Phone = +923001234567; Password = Pass123.',
-              expected: 'A new user account should be created successfully in the users table and the user should be redirected to the login page.',
-              actual: 'User account was created successfully and redirected to the login page correctly.',
+              expected: 'A new user account should be created successfully in the users table and the user should be redirected to the dashboard.',
+              actual: 'User account was created successfully and redirected to the dashboard correctly.',
               status: 'PASS'
             }
           },
@@ -797,23 +797,22 @@
       </div>`;
     }
 
-    function addSlide(section, content, active = false) {
+    function addSlide(section, content, active = false, extraClasses = '') {
       slidesContainer.insertAdjacentHTML('beforeend', `
         <div class="slide ${active ? 'active' : ''}" data-section="${esc(section)}">
-          <div class="slide-content">${content}</div>
+          <div class="slide-content ${extraClasses}">${content}</div>
         </div>`);
     }
 
     function addTitleSlide() {
       addSlide('Title', `
-        <div class="slide-content title-slide">
           <div class="hero-grid">
             <div>
               <div class="eyebrow">Mid Exam II | Traceability-Driven Engineering Walkthrough</div>
               <h1>Smart AI Powered Agriculture System</h1>
               <p style="font-size:1.3rem;max-width:780px;">Every feature is presented through the same proof chain: Epic → User Story → Implementation → Workflow → Test Case → Validation.</p>
-              <p style="margin-top:18px;">Muhammad Awais (BSE223112) · Hamza Bashir (BSE223108) · Junaid Amin (BSE223107)</p>
-              <p>Supervisor: Adnan Karamat · Spring 2026</p>
+              <p style="margin-top:28px; font-size: 1.5rem; font-weight: 800; color: #ffffff;">Muhammad Awais (BSE223112) · Hamza Bashir (BSE223108) · Junaid Amin (BSE223107)</p>
+              <p style="font-size: 1.1rem; margin-top: 8px;">Supervisor: Adnan Karamat · Spring 2026</p>
             </div>
             <div class="card dark">
               <h2>Presentation Coverage</h2>
@@ -824,28 +823,14 @@
                 <div class="metric"><p>Status</p><strong>PASS</strong></div>
               </div>
             </div>
-          </div>
-        </div>`, true);
+          </div>`, true, 'title-slide');
     }
 
-    function addStrategySlide() {
-      addSlide('Strategy', `
-        <h1>Strict Traceability Strategy</h1>
-        <div class="grid cols-2">
-          <div class="card dark">
-            <h2>Engineering Proof Pattern</h2>
-            ${flowHtml(['Epic', 'User Story', 'Implementation', 'Workflow', 'Test Case', 'Validation'])}
-            <p>Each user story has exactly two focused slides: one implementation slide and one validation slide.</p>
-          </div>
-          <div class="card">
-            <h2>Evaluator Signal</h2>
-            <ul>
-              <li>Requirements are not isolated from code.</li>
-              <li>Workflows are visible at system level.</li>
-              <li>Every formal report test case is shown with expected vs actual result.</li>
-              <li>All six epics are covered without compressing major features together.</li>
-            </ul>
-          </div>
+    function addSystemWorkflowSlide() {
+      addSlide('System Workflow', `
+        <h1>System Workflow</h1>
+        <div class="card" style="display: flex; justify-content: center; align-items: center; padding: 20px; margin-top: 16px;">
+          <img src="images/workflow_diagram.png" alt="System Workflow Diagram" style="max-width: 100%; max-height: 70vh; border-radius: 8px;">
         </div>`);
     }
 
@@ -887,61 +872,34 @@
         </div>`);
     }
 
-    function addImplementationSlide(epic, story) {
-      addSlide(`${story.id} Implementation`, `
-        <h1>${esc(story.id)} Implementation: ${esc(story.title)}</h1>
-        ${traceHtml(epic, story, story.test.id, story.test.status)}
-        <div class="grid cols-2">
-          <div class="card">
-            <h2>User Story Description</h2>
-            <p>${esc(story.description)}</p>
-            <h2>Functional Goal</h2>
-            <p>${esc(story.goal)}</p>
-          </div>
-          <div class="mini-screen">
-            <div class="mini-top">${esc(story.title)} UI</div>
-            <div class="mini-body">
-              <div class="screen-row" style="width:86%"></div>
-              <div class="screen-row" style="width:72%"></div>
-              <div class="screen-row" style="width:58%"></div>
-              <div class="bar" style="--w:76%"><span></span></div>
-              <p style="margin-top:12px">${esc(story.ui)}</p>
-            </div>
-          </div>
-        </div>
-        <div class="grid cols-3">
-          <div class="card"><h2>Frontend UI</h2><p>${esc(story.ui)}</p></div>
-          <div class="card"><h2>Backend Logic</h2><p>${esc(story.backend)}</p></div>
-          <div class="card"><h2>Database Interaction</h2><p>${esc(story.database)}</p></div>
-        </div>
-        <h2>Workflow Diagram</h2>
-        ${flowHtml(story.workflow)}
-        <div class="grid cols-2">
-          <div class="card"><h2>Real-Time Execution Logic</h2><p>${esc(story.realtime)}</p></div>
-          <div class="card"><h2>Architecture Mapping</h2><p>${esc(story.architecture)}</p></div>
-        </div>`);
-    }
 
     function addValidationSlide(epic, story) {
       const t = story.test;
+      const imageName = story.id.replace('-US', 'U') + '.png';
       addSlide(`${story.id} Validation`, `
-        <h1>${esc(t.id)} Validation: ${esc(story.title)}</h1>
-        ${traceHtml(epic, story, t.id, t.status)}
-        <div class="test-grid">
-          <div class="card"><h2>Related User Story</h2><p>${esc(story.id)} ${esc(story.title)}</p></div>
-          <div class="card"><h2>Execution Status</h2><span class="status pass">${esc(t.status)}</span><p style="margin-top:10px">Formal report validation result.</p></div>
-          <div class="card"><h2>Requirement Link</h2><p>${esc(epic.id)} → ${esc(story.id)} → ${esc(t.id)}</p></div>
+        <h1>${esc(t.id)} — ${esc(story.title)}</h1>
+        <p style="margin-bottom: 24px;">This test case verifies the user story: <strong>${esc(story.title)}</strong>.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; justify-content: center;">
+          <div style="flex: 1 1 500px; min-width: 0;">
+            <table style="width: 100%; border-collapse: collapse; background: white; border: 1px solid var(--line);">
+              <tbody>
+                <tr><td style="width:25%; font-weight:bold; border: 1px solid var(--line); padding: 12px; color: var(--ink);">Test ID</td><td style="border: 1px solid var(--line); padding: 12px; color: var(--ink); font-weight: 500;">${esc(t.id)}</td></tr>
+                <tr><td style="font-weight:bold; border: 1px solid var(--line); padding: 12px; color: var(--ink);">User Story ID</td><td style="border: 1px solid var(--line); padding: 12px; color: var(--ink); font-weight: 500;">${esc(story.id)}</td></tr>
+                <tr><td style="font-weight:bold; border: 1px solid var(--line); padding: 12px; color: var(--ink);">Module</td><td style="border: 1px solid var(--line); padding: 12px; color: var(--ink); font-weight: 500;">${esc(epic.name)}</td></tr>
+                <tr><td style="font-weight:bold; border: 1px solid var(--line); padding: 12px; color: var(--ink);">Test Case Description</td><td style="border: 1px solid var(--line); padding: 12px; color: var(--ink); font-weight: 500;">${esc(story.description)}</td></tr>
+                <tr><td style="font-weight:bold; border: 1px solid var(--line); padding: 12px; color: var(--ink);">Preconditions</td><td style="border: 1px solid var(--line); padding: 12px; color: var(--ink); font-weight: 500;">${esc(t.pre)}</td></tr>
+                <tr><td style="font-weight:bold; border: 1px solid var(--line); padding: 12px; color: var(--ink);">Test Inputs</td><td style="border: 1px solid var(--line); padding: 12px; color: var(--ink); font-weight: 500;">${esc(t.input)}</td></tr>
+                <tr><td style="font-weight:bold; border: 1px solid var(--line); padding: 12px; color: var(--ink);">Expected Result</td><td style="border: 1px solid var(--line); padding: 12px; color: var(--ink); font-weight: 500;">${esc(t.expected)}</td></tr>
+                <tr><td style="font-weight:bold; border: 1px solid var(--line); padding: 12px; color: var(--ink);">Actual Result</td><td style="border: 1px solid var(--line); padding: 12px; color: var(--ink); font-weight: 500;">${esc(t.actual)}</td></tr>
+                <tr><td style="font-weight:bold; border: 1px solid var(--line); padding: 12px; color: var(--ink);">Status</td><td style="border: 1px solid var(--line); padding: 12px;"><span class="status pass">${esc(t.status)}</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="flex: 0 1 auto; background: white; border: 1px solid var(--line); border-radius: 12px; padding: 8px; box-shadow: 0 10px 28px rgba(16, 33, 24, .08); margin: 0 auto;">
+            <img src="images/ui/${esc(imageName)}" alt="${esc(story.title)} UI" style="max-width: 100%; max-height: 60vh; width: auto; height: auto; border-radius: 8px; display: block;">
+          </div>
         </div>
-        <div class="grid cols-2">
-          <div class="card"><h2>Preconditions</h2><p>${esc(t.pre)}</p></div>
-          <div class="card"><h2>Inputs</h2><p>${esc(t.input)}</p></div>
-        </div>
-        <div class="comparison">
-          <div class="card expected"><h2>Expected Result</h2><p>${esc(t.expected)}</p></div>
-          <div class="card actual"><h2>Actual Result</h2><p>${esc(t.actual)}</p></div>
-        </div>
-        <h2>Validation Flow</h2>
-        ${flowHtml(['Preconditions Met', 'Input Executed', 'Expected Checked', 'Actual Observed', t.status])}`);
+      `);
     }
 
     function addCoverageSlide() {
@@ -963,25 +921,24 @@
 
     function addCloseSlide() {
       addSlide('Close', `
-        <div class="slide-content title-slide" style="align-items:center;text-align:center;">
-          <h1>Requirements, Implementation, And Validation Are Connected</h1>
-          <p style="font-size:1.25rem;max-width:880px;">The project is presented as a complete engineering lifecycle: 6 epics, 18 user stories, 18 implementation walkthroughs, and 18 linked validation slides.</p>
-          <div class="grid cols-3" style="width:min(900px,100%);margin-top:26px;">
-            <div class="card"><h2>CLO1</h2><p>Implementation proof across hardware, firmware, backend, database, AI, and mobile UI.</p></div>
-            <div class="card"><h2>CLO2</h2><p>Formal test cases with preconditions, inputs, expected results, actual results, and Pass status.</p></div>
-            <div class="card"><h2>Defense Signal</h2><p>Every requirement is traceable and every major workflow is validated.</p></div>
-          </div>
-        </div>`);
+          <div style="display:flex; flex-direction:column; align-items:center; text-align:center; width: 100%;">
+            <h1>Requirements, Implementation, And Validation Are Connected</h1>
+            <p style="font-size:1.25rem;max-width:880px;">The project is presented as a complete engineering lifecycle: 6 epics, 18 user stories, 18 implementation walkthroughs, and 18 linked validation slides.</p>
+            <div class="grid cols-3" style="width:min(900px,100%);margin-top:26px;">
+              <div class="card"><h2>CLO1</h2><p>Implementation proof across hardware, firmware, backend, database, AI, and mobile UI.</p></div>
+              <div class="card"><h2>CLO2</h2><p>Formal test cases with preconditions, inputs, expected results, actual results, and Pass status.</p></div>
+              <div class="card"><h2>Defense Signal</h2><p>Every requirement is traceable and every major workflow is validated.</p></div>
+            </div>
+          </div>`, false, 'title-slide');
     }
 
     function buildDeck() {
       addTitleSlide();
-      addStrategySlide();
+      addSystemWorkflowSlide();
       addArchitectureSlide();
       epics.forEach(epic => {
         addEpicOverview(epic);
         epic.stories.forEach(story => {
-          addImplementationSlide(epic, story);
           addValidationSlide(epic, story);
         });
       });
