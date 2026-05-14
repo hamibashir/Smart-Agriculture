@@ -10,6 +10,7 @@ class Field {
   final String? currentCrop;
   final DateTime? plantingDate;
   final DateTime? expectedHarvestDate;
+  final int moistureThreshold;
   final bool isActive;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -26,6 +27,7 @@ class Field {
     this.currentCrop,
     this.plantingDate,
     this.expectedHarvestDate,
+    this.moistureThreshold = 30,
     required this.isActive,
     required this.createdAt,
     this.updatedAt,
@@ -43,6 +45,7 @@ class Field {
         currentCrop: json['current_crop'],
         plantingDate: _parseDateTime(json['planting_date']),
         expectedHarvestDate: _parseDateTime(json['expected_harvest_date']),
+        moistureThreshold: json['moisture_threshold'] ?? 30,
         isActive: json['is_active'] == 1 || json['is_active'] == true,
         createdAt: DateTime.parse(json['created_at']),
         updatedAt: _parseDateTime(json['updated_at']),
@@ -60,6 +63,7 @@ class Field {
         'current_crop': currentCrop,
         'planting_date': plantingDate?.toIso8601String(),
         'expected_harvest_date': expectedHarvestDate?.toIso8601String(),
+        'moisture_threshold': moistureThreshold,
         'is_active': isActive,
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt?.toIso8601String(),

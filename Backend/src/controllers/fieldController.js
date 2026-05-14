@@ -34,16 +34,16 @@ export const getFieldById = async (req, res) => {
 // Create new field
 export const createField = async (req, res) => {
   try {
-    const { field_name, location_latitude, location_longitude, area_size, area_unit, soil_type, current_crop, planting_date, expected_harvest_date } = req.body;
+    const { field_name, location_latitude, location_longitude, area_size, area_unit, soil_type, current_crop, planting_date, expected_harvest_date, moisture_threshold } = req.body;
 
     if (!field_name || !area_size || !area_unit) {
       return res.status(400).json({ success: false, message: 'Please provide field name, area size, and area unit' });
     }
 
     const [result] = await pool.query(
-      `INSERT INTO fields (user_id, field_name, location_latitude, location_longitude, area_size, area_unit, soil_type, current_crop, planting_date, expected_harvest_date) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [req.user.user_id, field_name, location_latitude, location_longitude, area_size, area_unit, soil_type, current_crop, planting_date, expected_harvest_date]
+      `INSERT INTO fields (user_id, field_name, location_latitude, location_longitude, area_size, area_unit, soil_type, current_crop, planting_date, expected_harvest_date, moisture_threshold) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?, 30))`,
+      [req.user.user_id, field_name, location_latitude, location_longitude, area_size, area_unit, soil_type, current_crop, planting_date, expected_harvest_date, moisture_threshold]
     );
 
     const [[field]] = await pool.query('SELECT * FROM fields WHERE field_id = ?', [result.insertId]);
@@ -58,7 +58,7 @@ export const createField = async (req, res) => {
 export const updateField = async (req, res) => {
   try {
     const { id } = req.params;
-    const { field_name, location_latitude, location_longitude, area_size, area_unit, soil_type, current_crop, planting_date, expected_harvest_date, is_active } = req.body;
+    const { field_name, location_latitude, location_longitude, area_size, area_unit, soil_type, current_crop, planting_date, expected_harvest_date, moisture_threshold, is_active } = req.body;
 
     const [[existing]] = await pool.query(
       'SELECT field_id FROM fields WHERE field_id = ? AND user_id = ?',
@@ -69,9 +69,9 @@ export const updateField = async (req, res) => {
 
     await pool.query(
       `UPDATE fields SET field_name = ?, location_latitude = ?, location_longitude = ?, area_size = ?, area_unit = ?, 
-       soil_type = ?, current_crop = ?, planting_date = ?, expected_harvest_date = ?, is_active = ?, updated_at = NOW() 
+       soil_type = ?, current_crop = ?, planting_date = ?, expected_harvest_date = ?, moisture_threshold = COALESCE(?, moisture_threshold), is_active = ?, updated_at = NOW() 
        WHERE field_id = ?`,
-      [field_name, location_latitude, location_longitude, area_size, area_unit, soil_type, current_crop, planting_date, expected_harvest_date, is_active, id]
+      [field_name, location_latitude, location_longitude, area_size, area_unit, soil_type, current_crop, planting_date, expected_harvest_date, moisture_threshold, is_active, id]
     );
 
     const [[field]] = await pool.query('SELECT * FROM fields WHERE field_id = ?', [id]);

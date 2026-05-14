@@ -142,6 +142,7 @@ CREATE TABLE `fields` (
   `current_crop` varchar(100) DEFAULT NULL,
   `planting_date` date DEFAULT NULL,
   `expected_harvest_date` date DEFAULT NULL,
+  `moisture_threshold` int(11) DEFAULT 30 COMMENT 'Threshold for automated irrigation',
   `is_active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -152,8 +153,8 @@ CREATE TABLE `fields` (
 -- Dumping data for table `fields`
 --
 
-INSERT INTO `fields` (`field_id`, `user_id`, `field_name`, `location_latitude`, `location_longitude`, `area_size`, `area_unit`, `soil_type`, `current_crop`, `planting_date`, `expected_harvest_date`, `is_active`, `created_at`, `updated_at`) VALUES
-(6, 5, 'Main Field - Wheat', 33.56510000, 73.01690000, 8.50, 'acres', 'Loamy', 'Wheat', '2024-11-01', '2025-04-20', 1, '2025-11-05 16:40:35', '2025-11-05 16:40:35');
+INSERT INTO `fields` (`field_id`, `user_id`, `field_name`, `location_latitude`, `location_longitude`, `area_size`, `area_unit`, `soil_type`, `current_crop`, `planting_date`, `expected_harvest_date`, `moisture_threshold`, `is_active`, `created_at`, `updated_at`) VALUES
+(6, 5, 'Main Field - Wheat', 33.56510000, 73.01690000, 8.50, 'acres', 'Loamy', 'Wheat', '2024-11-01', '2025-04-20', 30, 1, '2025-11-05 16:40:35', '2025-11-05 16:40:35');
 
 -- --------------------------------------------------------
 

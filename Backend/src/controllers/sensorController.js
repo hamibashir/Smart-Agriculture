@@ -178,8 +178,9 @@ export const getPumpCommand = async (req, res) => {
     // All pump decisions come from this one sensor's field.
     // Other bound sensors copy the same reading — no independent decisions.
     const [[sensor]] = await pool.query(
-      `SELECT s.sensor_id, s.field_id
+      `SELECT s.sensor_id, s.field_id, f.moisture_threshold
        FROM sensors s
+       JOIN fields f ON s.field_id = f.field_id
        WHERE s.device_id = ? AND s.is_active = TRUE
        ORDER BY s.sensor_id ASC
        LIMIT 1`,
@@ -199,7 +200,7 @@ export const getPumpCommand = async (req, res) => {
     // Get the latest irrigation log across ALL fields bound to this device.
     // This is the source of truth — any user's ON/OFF command wins if it's the most recent.
     const [[lastLog]] = await pool.query(
-      `SELECT il.pump_status
+      `SELECT il.pump_status, il.trigger_reason
        FROM irrigation_logs il
        JOIN sensors s ON il.field_id = s.field_id
        WHERE s.device_id = ? AND s.is_active = TRUE
@@ -208,16 +209,21 @@ export const getPumpCommand = async (req, res) => {
       [deviceId]
     );
 
-    const SOIL_WET_LIMIT = 70;
-    const SOIL_DRY_LIMIT = 30;
+    const SOIL_DRY_LIMIT = sensor?.moisture_threshold ?? 30;
+    const SOIL_WET_LIMIT = Math.max(70, SOIL_DRY_LIMIT + 20);
     const soil = latest?.soil_moisture ?? null;
     const rainDetected = latest?.rainfall === 1;
 
     // Run priority chain (read-only — no DB writes)
     let pump_status = 0;
     let pump_reason = 'no_change';
+    
+    const isForce = lastLog?.pump_status === 'on' && lastLog?.trigger_reason === 'Force Start by farmer';
 
-    if (rainDetected) {
+    if (isForce) {
+      pump_status = 1;
+      pump_reason = 'force_on';
+    } else if (rainDetected) {
       pump_status = 0;
       pump_reason = 'rain_override';
     } else if (soil !== null && soil >= SOIL_WET_LIMIT) {
@@ -348,7 +354,7 @@ export const createSensorReading = async (req, res) => {
 
     // Get sensor + its linked field in one query
     const [[sensor]] = await pool.query(
-      'SELECT s.sensor_id, s.field_id, f.user_id FROM sensors s JOIN fields f ON s.field_id = f.field_id WHERE s.device_id = ?',
+      'SELECT s.sensor_id, s.field_id, f.user_id, f.moisture_threshold FROM sensors s JOIN fields f ON s.field_id = f.field_id WHERE s.device_id = ?',
       [device_id]
     );
     if (!sensor) {
@@ -369,11 +375,15 @@ export const createSensorReading = async (req, res) => {
     // Never allow this optional automation block to fail the core sensor ingestion.
     try {
       const [[lastLog]] = await pool.query(
-        'SELECT log_id, pump_status, start_time, end_time FROM irrigation_logs WHERE field_id = ? ORDER BY start_time DESC LIMIT 1',
+        'SELECT log_id, pump_status, start_time, end_time, trigger_reason FROM irrigation_logs WHERE field_id = ? ORDER BY start_time DESC LIMIT 1',
         [sensor.field_id]
       );
+      
+      const isForceLog = lastLog && lastLog.pump_status === 'on' && lastLog.trigger_reason === 'Force Start by farmer';
 
-      if (rainInsert === 1) {
+      if (isForceLog) {
+        pumpInsert = 1; // Force hardware ON. Bypass all checks!
+      } else if (rainInsert === 1) {
         // Rain safety: always force pump OFF while raining.
         pumpInsert = 0;
         if (lastLog && lastLog.pump_status === 'on') {
@@ -385,8 +395,8 @@ export const createSensorReading = async (req, res) => {
         }
       } else if (lastLog && lastLog.pump_status === 'on') {
         pumpInsert = 1; // Farmer turned it ON manually. Force hardware ON.
-      } else if (lastLog && lastLog.pump_status === 'off' && soil != null && soil < 20) {
-        // The farmer turned it OFF manually, but the soil is critically dry.
+      } else if (lastLog && lastLog.pump_status === 'off' && soil != null && soil < (sensor.moisture_threshold ?? 30)) {
+        // The farmer turned it OFF manually, but the soil is critically dry (below custom threshold).
         const [[existingAlert]] = await pool.query(
           'SELECT alert_id, is_resolved FROM alerts WHERE field_id = ? AND title = ? AND created_at >= ? ORDER BY created_at DESC LIMIT 1',
           [sensor.field_id, 'Manual Override Warning', lastLog.end_time]

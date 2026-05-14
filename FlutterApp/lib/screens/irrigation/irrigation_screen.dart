@@ -104,7 +104,7 @@ class _IrrigationScreenState extends State<IrrigationScreen> with SingleTickerPr
     } catch (_) {}
   }
 
-  Future<void> _startIrrigation() async {
+  Future<void> _startIrrigation({bool isForce = false}) async {
     if (_selectedField == null || _isActionInProgress) return;
     setState(() => _isActionInProgress = true);
 
@@ -112,6 +112,7 @@ class _IrrigationScreenState extends State<IrrigationScreen> with SingleTickerPr
       final response = await _apiService.startIrrigation({
         'field_id': _selectedField!.fieldId,
         'irrigation_type': 'manual',
+        'trigger_reason': isForce ? 'Force Start by farmer' : 'Manual irrigation by farmer',
         'duration_minutes': 30,
       });
       if (response['success'] == true) {
@@ -137,6 +138,39 @@ class _IrrigationScreenState extends State<IrrigationScreen> with SingleTickerPr
       );
     } finally {
       if (mounted) setState(() => _isActionInProgress = false);
+    }
+  }
+
+  Future<void> _handleForceStart() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('Force Start Warning'),
+          ],
+        ),
+        content: const Text(
+          'Force starting the pump will bypass all automatic safety checks (such as rain detection or wet soil limits). Over-watering could damage crops or waste water.\n\nAre you sure you want to proceed?'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, elevation: 0),
+            child: const Text('Yes, Force Start', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await _startIrrigation(isForce: true);
     }
   }
 
@@ -168,6 +202,46 @@ class _IrrigationScreenState extends State<IrrigationScreen> with SingleTickerPr
       );
     } finally {
       if (mounted) setState(() => _isActionInProgress = false);
+    }
+  }
+
+  Future<void> _updateThreshold(int newThreshold) async {
+    if (_selectedField == null) return;
+    
+    final updatedField = Field(
+      fieldId: _selectedField!.fieldId,
+      userId: _selectedField!.userId,
+      fieldName: _selectedField!.fieldName,
+      locationLatitude: _selectedField!.locationLatitude,
+      locationLongitude: _selectedField!.locationLongitude,
+      areaSize: _selectedField!.areaSize,
+      areaUnit: _selectedField!.areaUnit,
+      soilType: _selectedField!.soilType,
+      currentCrop: _selectedField!.currentCrop,
+      plantingDate: _selectedField!.plantingDate,
+      expectedHarvestDate: _selectedField!.expectedHarvestDate,
+      moistureThreshold: newThreshold,
+      isActive: _selectedField!.isActive,
+      createdAt: _selectedField!.createdAt,
+      updatedAt: _selectedField!.updatedAt,
+    );
+    
+    setState(() {
+      _selectedField = updatedField;
+      final index = _fields.indexWhere((f) => f.fieldId == updatedField.fieldId);
+      if (index != -1) _fields[index] = updatedField;
+    });
+
+    try {
+      await _apiService.updateField(_selectedField!.fieldId, updatedField.toJson());
+    } catch (e) {
+      if (!mounted) return;
+      _showFeedbackToast(
+        title: 'Error',
+        message: 'Could not save the new threshold.',
+        color: AppTheme.errorColor,
+        icon: Icons.error_outline,
+      );
     }
   }
 
@@ -275,8 +349,10 @@ class _IrrigationScreenState extends State<IrrigationScreen> with SingleTickerPr
                         context.read<FieldSelectionProvider>().setSelectedFieldId(field?.fieldId);
                         _loadLogs();
                       },
-                      onStart: _startIrrigation,
+                      onStart: () => _startIrrigation(isForce: false),
                       onStop: _stopIrrigation,
+                      onForceStart: _handleForceStart,
+                      onThresholdChanged: _updateThreshold,
                     ),
                     _HistoryTab(logs: _logs),
                   ],
@@ -312,6 +388,8 @@ class _ControlTab extends StatelessWidget {
     required this.onFieldChanged,
     required this.onStart,
     required this.onStop,
+    required this.onForceStart,
+    required this.onThresholdChanged,
   });
 
   final List<Field> fields;
@@ -321,6 +399,8 @@ class _ControlTab extends StatelessWidget {
   final ValueChanged<Field?> onFieldChanged;
   final VoidCallback onStart;
   final VoidCallback onStop;
+  final VoidCallback onForceStart;
+  final ValueChanged<int> onThresholdChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -364,7 +444,15 @@ class _ControlTab extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 24),
+
+          // Threshold Slider
+          if (selectedField != null)
+            _ThresholdSlider(
+              threshold: selectedField!.moistureThreshold,
+              onChanged: onThresholdChanged,
+            ),
+          const SizedBox(height: 32),
 
           // Central Graphic
           _PumpStatusDisplay(isPumpRunning: isPumpRunning),
@@ -418,6 +506,19 @@ class _ControlTab extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 16),
+          
+          // Force Start Button
+          TextButton.icon(
+            onPressed: isActionInProgress ? null : onForceStart,
+            icon: const Icon(Icons.bolt_rounded, size: 20),
+            label: const Text('Force Start Pump', style: TextStyle(fontWeight: FontWeight.bold)),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.orange[700],
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
           ),
         ],
       ),
@@ -667,6 +768,100 @@ class _LogCard extends StatelessWidget {
               ],
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ThresholdSlider extends StatefulWidget {
+  final int threshold;
+  final ValueChanged<int> onChanged;
+
+  const _ThresholdSlider({required this.threshold, required this.onChanged});
+
+  @override
+  State<_ThresholdSlider> createState() => _ThresholdSliderState();
+}
+
+class _ThresholdSliderState extends State<_ThresholdSlider> {
+  late double _currentValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentValue = widget.threshold.toDouble();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ThresholdSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.threshold != oldWidget.threshold) {
+      _currentValue = widget.threshold.toDouble();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFe2e8f0), width: 1.5),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.water_drop_outlined, size: 20, color: AppTheme.primaryGreen),
+                  SizedBox(width: 8),
+                  Text('Auto-Irrigate Threshold', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text('${_currentValue.toInt()}%', style: const TextStyle(fontWeight: FontWeight.w800, color: AppTheme.primaryGreen, fontSize: 13)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text('Pump automatically turns on when soil moisture drops below this value.', style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+          const SizedBox(height: 12),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: AppTheme.primaryGreen,
+              inactiveTrackColor: AppTheme.primaryGreen.withValues(alpha: 0.2),
+              thumbColor: AppTheme.primaryGreen,
+              overlayColor: AppTheme.primaryGreen.withValues(alpha: 0.1),
+              valueIndicatorTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            child: Slider(
+              value: _currentValue,
+              min: 0,
+              max: 100,
+              divisions: 100,
+              label: '${_currentValue.toInt()}%',
+              onChanged: (value) => setState(() => _currentValue = value),
+              onChangeEnd: (value) => widget.onChanged(value.toInt()),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('0% (Dry)', style: TextStyle(fontSize: 11, color: Colors.grey[500], fontWeight: FontWeight.w600)),
+              Text('100% (Wet)', style: TextStyle(fontSize: 11, color: Colors.grey[500], fontWeight: FontWeight.w600)),
+            ],
+          ),
         ],
       ),
     );

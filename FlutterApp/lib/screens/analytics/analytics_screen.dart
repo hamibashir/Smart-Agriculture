@@ -134,21 +134,40 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           Expanded(
             child: LineChart(
               LineChartData(
+                minX: 0,
+                maxX: spots.length > 1 ? (spots.length - 1).toDouble() : 6.0, // Default to 7 days width if not enough data
+                minY: 0,
+                maxY: 100, // Moisture is 0-100%
                 gridData: const FlGridData(show: true, drawVerticalLine: false),
-                titlesData: const FlTitlesData(
-                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                titlesData: FlTitlesData(
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 22,
+                      getTitlesWidget: (value, meta) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            'Day ${value.toInt() + 1}',
+                            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 10),
+                          ),
+                        );
+                      },
+                      interval: spots.length > 7 ? (spots.length / 7).ceilToDouble() : 1,
+                    ),
+                  ),
                 ),
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: spots,
+                    spots: spots.isEmpty ? [const FlSpot(0, 0)] : spots,
                     isCurved: true,
                     color: AppTheme.primaryGreen,
                     barWidth: 3,
                     isStrokeCapRound: true,
-                    dotData: const FlDotData(show: false),
+                    dotData: const FlDotData(show: true), // Show dots so single points are visible!
                     belowBarData: BarAreaData(
                       show: true,
                       color: AppTheme.primaryGreen.withValues(alpha: 0.1),
