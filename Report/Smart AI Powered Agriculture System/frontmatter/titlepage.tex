@@ -1,0 +1,154 @@
+% ==============================================================================
+% Title Page & Front Matter Configuration
+% ==============================================================================
+
+% ------------------------------
+% Title Page
+% ------------------------------
+\begin{titlepage}
+  \centering
+
+  % Project Title
+  {\fontsize{24pt}{28pt}\selectfont \textbf{Project Title}} \\[2cm]
+
+  % University Logo
+  \includegraphics[width=0.35\textwidth]{figures/general/cust-logo-1.jpeg} \\[2cm]
+
+  % Student Names with Registration Numbers
+  {\fontsize{16pt}{20pt}\selectfont
+  \begin{tabular}{l @{\hspace{2cm}} c}
+    \textbf{Name 1} & \textbf{(Reg1)} \\
+    \textbf{Name 2} & \textbf{(Reg2)} \\
+    \textbf{Name 3} & \textbf{(Reg3)} \\
+  \end{tabular}} \\[1.5cm]
+
+  % Supervisor
+  {\fontsize{16pt}{20pt}\selectfont \textbf{Supervised By}} \\[0.5cm]
+  {\fontsize{16pt}{20pt}\selectfont \textbf{Supervisor Name}} \\[2cm]
+
+  % Semester / Program
+  {\fontsize{16pt}{20pt}\selectfont \textbf{Spring 2026}} \\[0.5cm]
+  {\fontsize{16pt}{20pt}\selectfont \textbf{Program Name}} \\[0.5cm]
+
+  % Department and University
+  {\fontsize{16pt}{20pt}\selectfont \textbf{Department of Software Engineering}} \\[0.5cm]
+  {\fontsize{16pt}{20pt}\selectfont \textbf{Capital University of Science \& Technology, Islamabad}} \\
+
+\end{titlepage}
+
+% ------------------------------
+% Page 3: Project Report Approval/Signature Page
+% ------------------------------
+
+% Force Roman numbering to start here (i, ii, iii...)
+\pagenumbering{roman}
+\setcounter{page}{2}
+
+% Increase table row height for better aesthetics
+\renewcommand{\arraystretch}{1.5}
+
+% Redefine X column to use m (middle vertical alignment) for this page
+% This ensures that text in X columns is vertically centered relative to the row.
+\renewcommand{\tabularxcolumn}[1]{>{\raggedright\arraybackslash}m{#1}}
+
+% Header with Logo
+\begin{center}
+  \begin{minipage}{0.7\textwidth}
+    \centering
+    {\fontsize{16pt}{20pt}\selectfont \textbf{Project Report}} \\[0.5cm]
+  \end{minipage}%
+  \begin{minipage}{0.29\textwidth}
+    \flushright
+    \includegraphics[width=3cm]{figures/general/cust-logo-1.jpeg}
+  \end{minipage}
+\end{center}
+
+\vspace{0.5cm}
+
+% Version and Member Count
+% Version and Member Count
+\noindent
+\begin{minipage}{0.56\textwidth}
+  % Scope for centering X column
+  \renewcommand{\tabularxcolumn}[1]{>{\centering\arraybackslash}m{#1}}
+  \begin{tabularx}{\linewidth}{|>{\columncolor{black}\color{white}\centering\arraybackslash}m{4cm}|X|}
+    \hline
+    VERSION & V X.0 \\
+    \hline
+  \end{tabularx}
+\end{minipage}
+\hfill
+\begin{minipage}{0.43\textwidth}
+  \raggedleft
+  \begin{tabular}{|>{\columncolor{black}\color{white}\centering\arraybackslash}m{4.6cm}|>{\centering\arraybackslash}m{1cm}|}
+    \hline
+    NUMBER OF MEMBERS & 3 \\
+    \hline
+  \end{tabular}
+\end{minipage}
+
+\vspace{0.8cm}
+
+% Project Title Row
+\noindent
+\begin{tabularx}{\textwidth}{|>{\columncolor{black}\color{white}\centering\arraybackslash}m{4cm}|X|}
+  \hline
+  TITLE & YOUR PROJECT TITLE\\
+  \hline
+\end{tabularx}
+
+\vspace{0.8cm}
+
+% Supervisor Name Row
+\noindent
+\begin{tabularx}{\textwidth}{|>{\columncolor{black}\color{white}\centering\arraybackslash}m{4cm}|X|}
+  \hline
+  SUPERVISOR NAME & YOUR SUPERVISOR NAME\\
+  \hline
+\end{tabularx}
+
+\vspace{1.2cm}
+
+% Members Details Table
+\noindent
+% X column is now vertically centered due to \tabularxcolumn redefinition
+\begin{tabularx}{\textwidth}{|X|m{3cm}|m{5cm}|}
+  \hline
+  \rowcolor{black} 
+  \color{white}\textbf{MEMBER NAME} & 
+  \color{white}\textbf{REG. NO.} & 
+  \color{white}\textbf{EMAIL ADDRESS} \\ 
+  \hline
+  NAME & REG NO & EMAIL \\ \hline
+  NAME & REG NO & EMAIL \\ \hline
+  NAME & REG NO & EMAIL \\ \hline
+\end{tabularx}
+
+\vspace{1.5cm}
+
+% Signatures Section
+\noindent
+\begin{minipage}{0.50\textwidth}
+  \begin{tabular}{|>{\columncolor{black}\color{white}\centering\arraybackslash}m{7cm}|}
+    \hline
+    MEMBERS' SIGNATURES \\
+  \end{tabular} \\[1.3cm]
+  \rule{7.5cm}{0.4pt} \\[0.8cm]
+  \rule{7.5cm}{0.4pt} \\[0.8cm]
+  \rule{7.5cm}{0.4pt}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+  \raggedleft % Align content to the right
+  \fbox{
+    \parbox{6cm}{
+      \vspace{3.6cm}
+      \centering \textbf{Supervisor's Signature}
+      \vspace{1cm}
+    }
+  }
+\end{minipage}
+
+\vfill
+
+

@@ -1,0 +1,141 @@
+
+% =============================================================================
+%              Chapter 2: Requirements Specification and Analysis
+% =============================================================================
+
+
+\setcounter{chapter}{2}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\chapter*{Chapter 2}
+\markboth{Requirement Specification and Analysis}{Requirement Specification and Analysis} 
+\section{Requirement Specification and Analysis}
+
+The emphasis of this chapter is on getting an idea of what the requirements are for the intended software. Students who are doing a research related project would provide literature survey for their problems. They are expected to understand the relevant papers and provide summary of the existing work presented in each research paper. Such students should consult their project supervisor for the detailed instructions related to this chapter.
+
+You should write SRS in precise, clear and plain language so that it can be reviewed by a business analyst or customer representative with minimal technical expertise. However it also contains analytical models (use case diagrams, entity relationship diagrams, data dictionary etc.), which can be used for the detailed design and the development of the software system.
+
+Requirements specification involves frequent communication with system users to determine specific feature expectations, resolution of conflict or ambiguity in requirements as demanded by the various users or groups of users and documentation of all aspects of the project development process from start to finish. Requirements are a description of how a system should behave or a description of system properties or attributes. It can alternatively be a statement of 'what' an application is expected to do.
+
+\subsection{Epics}
+
+Epics are large, high-level features that describe significant functionalities of a system or in simply a functionality with some business value. They represent broad goals or requirements that are too big to be completed in a single iteration and are therefore broken down into smaller, manageable user stories. Epics help in organizing work, maintaining a big-picture view, and aligning development with business objectives.
+
+Its \textit{Syntax} is:
+
+\hspace*{2em} Epic: <Title/Theme> \newline
+\hspace*{2em} Description: As a \textit{<role>}, I want \textit{<high-level goal>} so that \textit{<business value>}.
+
+\subsubsection{Epic 1}
+
+Epic 1, its title and its description (format given above). \newline
+Include all the epics of your system here along with their descriptions. Use Epic ID like E1, E2, etc.
+
+\subsection{User-Stories}
+
+User Stories are concise, user-focused descriptions of specific features derived from epics. They represent small, actionable requirements that can be completed within a short development cycle. Each user story captures what the user needs and why, ensuring the system is developed from the end user's perspective.
+
+It's \textit{Syntax} is:
+
+\hspace*{2em} Description: As a \textit{<role>}, I want \textit{<goal>} so that \textit{<reason>}. \newline
+\hspace*{2em} Acceptance Criteria: Given \textit{<context>}, When \textit{<action>}, Then \textit{<expected outcome>}.
+
+\subsubsection{User-story 1}
+
+User-story 1 (US 1), its title and its description (according to the format given above).
+Include all the user-stories of your system here along with their descriptions. Use user-story ID like E1-US1 (where E1 is epic that is broken down into US 1, 2 etc), E1-US2, etc.
+
+\subsection{Test-cases}
+
+Test Cases are defined scenarios that describe the specific inputs, execution conditions, and expected outcomes used to verify whether a particular feature of the system works as intended. They help ensure that requirements are met, identify defects, and validate the overall quality of the software.
+
+\subsubsection{Test Case 1}
+
+Provide all the relevant information like test-case description, inputs and expected output. You should provide the following table against each test-case.
+
+{
+\setModernTableStyle
+\begin{xltabular}{\textwidth}{|X|X|}
+
+    \hiderowcolors
+    \caption{Test Case 1} \label{tab:test_case_ch2_1} \\
+    \hline
+    \showrowcolors
+
+    Test ID: (E.g. E1-US1-TC1 etc.) & US ID: \\ \hline
+
+    \multicolumn{2}{|p{\dimexpr\textwidth-2\tabcolsep-2\arrayrulewidth\relax}|}
+    {Test Case Description: } \\ \hline
+
+    \multicolumn{2}{|p{\dimexpr\textwidth-2\tabcolsep-2\arrayrulewidth\relax}|}
+    {Inputs:} \\ \hline
+
+    \multicolumn{2}{|p{\dimexpr\textwidth-2\tabcolsep-2\arrayrulewidth\relax}|}
+    {Expected Result:} \\ \hline
+
+\end{xltabular}
+}
+
+\subsection{User Interface Design (Prototypes)}
+
+User Interface (UI) Design focuses on anticipating what users might need to do and ensuring that the interface has elements that are easy to access, understand, and use to facilitate those actions. UI brings together concepts from interaction design, visual design, and information architecture.
+
+You should describe the UI design in such a way that it remains simple and consistent along different views. Common GUI elements are shown in the Figure \ref{fig:common_gui_elements}. You should describe the UI design of each page.
+
+% ----- FIGURE -----
+\begin{figure}[H]
+    \centering
+    % Change width as needed (0.5 - 1.0 is standard)
+    \includegraphics[width=1\textwidth]{figures/chapter2/image12.png} 
+    \caption{Common GUI elements}
+    \label{fig:common_gui_elements}
+\end{figure}
+
+Example Login Page as shown in Figure \ref{fig:login_page} will contain one text field and one password field. Max length of text field is 8 and min is 4 whereas maximum length off password is 6 and minimum is 3.
+
+% ----- FIGURE -----
+\begin{figure}[H]
+    \centering
+    % Change width as needed (0.5 - 1.0 is standard)
+    \includegraphics[width=0.5\textwidth]{figures/chapter2/image09.png} 
+    \caption{Example Login Page UI Design}
+    \label{fig:login_page}
+\end{figure}
+
+\subsection{Traceability  Matrix}
+
+Traceability Matrix is a structured table that establishes the relationship between different artifacts of the system, including Epics, User Stories, Test Cases, and User Interfaces (UIs) as shown in table \ref{tab:epic_mapping}. It ensures that each epic is broken down into user stories, validated through test cases, and supported by appropriate UI components. This matrix helps maintain consistency, verifies coverage of requirements, and ensures that no functionality is missed during development.
+
+{
+\setModernTableStyle 
+\begin{xltabular}{\textwidth}{|l|X|X|X|}
+    \hiderowcolors
+    
+    \caption{Traceability Matrix}
+    \label{tab:epic_mapping} \\
+    \hline
+    
+    \tableHeaderStyle Epic & \textbf{User-Story} & \textbf{Test-case} & \textbf{UI} \\ \thickhline
+    \endfirsthead
+    
+    \tableHeaderStyle Epic & \textbf{User-Story} & \textbf{Test-case} & \textbf{UI} \\ \thickhline
+    \endhead
+    \showrowcolors
+    
+    \endfoot
+    
+    \endlastfoot
+
+    E1  &  
+    E1-US1 \newline E1-US2 \newline . \newline . \newline .  &  
+    E1-US1-TC1 \newline E1-US1-TC2 \newline . \newline . \newline .  &  
+    E1-US1-UI1 \newline E1-US1-UI2 \newline . \newline . \newline .  \\ \hline
+    
+        &    &    &    \\ \hline
+    
+        &    &    &    \\ \hline
+    
+\end{xltabular}
+}
+
+\setcounter{chapter}{2}           % Ensures this will be Chapter 2

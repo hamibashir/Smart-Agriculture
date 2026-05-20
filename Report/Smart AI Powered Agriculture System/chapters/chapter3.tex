@@ -1,0 +1,178 @@
+
+% =============================================================================
+%                       Chapter 3: System Design
+% =============================================================================
+
+
+\setcounter{chapter}{3}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\chapter*{Chapter 3}
+\markboth{System Design}{System Design} 
+\section{System Design}
+
+The design chapter provides the blueprint of the proposed system, bridging the gap between requirements and implementation. It outlines how different components of the system are structured, interact with each other, and support the required functionality. The goal of this chapter is to present a clear and organized design that ensures all user requirements are properly addressed and can be effectively translated into development.
+
+
+\subsection{Software Architecture}
+
+In system architecture, students need to identify and select the suitable architecture from the following mentioned architectures based on the project scope, system requirements, and related functionality.
+
+% ----- BULLET POINTS ----- 
+\begin{itemize}
+    \item \textbf{Layered:} Common in eCommerce applications. Messages pass through multiple layers. 
+    \item \textbf{Event-driven:} Suitable for agile and high-performance systems. Data blocks interact with modules.
+    \item \textbf{Microkernel:} Independent plug-in modules with a scheduler.
+    \item \textbf{Microservices:} Each component is deployed as a separate unit (e.g., Netflix).
+    \item \textbf{Space-Based:} Distributed shared memory, commonly used in bidding/auction sites.
+    \item \textbf{Client-Server:} Example: Email Server.
+    \item \textbf{Master-Slave:} Database applications requiring heavy multitasking.
+    \item \textbf{Pipe-Filter:} Processes data in streams (e.g., compilers).
+    \item \textbf{Broker:} Structures distributed systems with decoupled clients, servers, and brokers.
+    \item \textbf{Peer-to-Peer:} Individual components act as both client and server (e.g., Skype, BitTorrent, Napster).
+\end{itemize}
+
+\noindent
+\textbf{Link:} \href{https://www.simform.com/blog/software-architecture-patterns/}{https://www.simform.com/blog/software-architecture-patterns/}
+
+% ----- FIGURE -----
+\begin{figure}[H]
+    \centering
+    % Change width as needed (0.5 - 1.0 is standard)
+    \includegraphics[width=0.9\textwidth]{figures/chapter3/arc.png} 
+    \caption{Software Architecture Diagram}
+    \label{fig:arch}
+\end{figure}
+
+Fig. \ref{fig:arch} illustrates common application architecture with components grouped by different areas of concern. You should think of architecture as the strategy for how you will build the system. An architectural “layer” is the top-level logical view, or an abstraction, of your design. 
+
+\subsection{Components and Connector}
+
+However, all complete IoT systems are the same in that they represent the integration of four distinct components: sensors/devices, connectivity, data processing, and a user interface. Some common hardware is shown in figure \ref{fig:hardware} below.
+
+% ----- FIGURE -----
+\begin{figure}[H]
+    \centering
+    % Change width as needed (0.5 - 1.0 is standard)
+    \includegraphics[width=0.9\textwidth]{figures/chapter3/hardware.png} 
+    \caption{List of Hardware's}
+    \label{fig:hardware}
+\end{figure}
+
+\subsection{Hardware Specifications }
+
+List of all the hardware's required for the project along with their specifications.
+
+% ----- FIGURE -----
+\begin{figure}[H]
+    \centering
+    % Change width as needed (0.5 - 1.0 is standard)
+    \includegraphics[width=0.7\textwidth]{figures/chapter3/hardwaretable.png} 
+    \caption{List of Hardware's}
+    \label{fig:hardwaretable}
+\end{figure}
+
+\subsection{Communication Protocols}
+
+Identify and select appropriate communication protocol from the following mention protocols for data transmission in the proposed IoT project.
+
+% ----- FIGURE -----
+\begin{figure}[H]
+    \centering
+    % Change width as needed (0.5 - 1.0 is standard)
+    \includegraphics[width=0.7\textwidth]{figures/chapter3/protocol.png} 
+    \caption{Communication Protocols Stack}
+    \label{fig:protocol}
+\end{figure}
+
+\subsection{Data Modeling}
+
+Data modeling defines how data will be structured, organized, and managed within the system. It ensures that the database design aligns with the system requirements and supports efficient storage, retrieval, and consistency of information. Depending on the type of database selected, students may choose either Relational Databases (SQL) or NoSQL databases.
+
+\subsubsection{Relational Databases}
+
+Relational Databases organize data into structured tables consisting of rows (records) and columns (attributes). Each table represents an entity, and relationships between tables are established through keys such as primary keys and foreign keys. This model ensures data integrity, consistency, and supports powerful querying using Structured Query Language (SQL). Relational databases are well-suited for applications requiring structured data, complex queries, and strong consistency.
+
+\itemheading{Entity Relationship Diagram}
+
+Entity relationship model diagram (ERD) is a conceptual representation of the data in a software system. During detail design this model is mapped in to the physical database model. There are different diagramming conventions available for creating ER diagrams. A sample ERD is shown in Figure \ref{fig:erd}.
+
+% ----- FIGURE -----
+\begin{figure}[H]
+    \centering
+    % Change width as needed (0.5 - 1.0 is standard)
+    \includegraphics[width=0.7\textwidth]{figures/chapter3/erd.png} 
+    \caption{Entity Relationship Diagram}
+    \label{fig:erd}
+\end{figure}
+
+\itemheading{Database Schema}
+
+A database schema represents the logical configuration of all or part of a relational database. It can exist both as a visual representation and as a set of rules known as integrity constraints that govern a database. These rules are expressed in a data definition language, such as SQL. A database schema indicates how the entities that make up the database relate to one another, including tables, views, stored procedures, and more. A database scheme includes information related to primary and secondary keys, normalization and indexing. 
+
+You may present database scheme using front end tool of any DBMS or any other design tools such as Visio or Enterprise Architecture. A sample database scheme is shown in Figure \ref{fig:db}. 
+
+% ----- FIGURE -----
+\begin{figure}[H]
+    \centering
+    % Change width as needed (0.5 - 1.0 is standard)
+    \includegraphics[width=0.9\textwidth]{figures/chapter3/image08.png} 
+    \caption{Database Schema}
+    \label{fig:db}
+\end{figure}
+
+\subsubsection{NoSQL Databases}
+
+Data is represented using a Node Structure (such as JSON or BSON documents). This approach is suitable for systems requiring flexibility, scalability, and schema-less data storage. It allows developers to represent hierarchical, nested, or unstructured data more effectively.
+
+\textbf{Example (JSON Node Structure for a User in a NoSQL Database)}
+
+\begin{lstlisting}[language=JSON]
+{
+  "user_id": "U12345",
+  "name": "Ali Khan",
+  "email": "ali.khan@example.com",
+  "orders": [
+    {
+      "order_id": "O1001",
+      "date": "2025-09-25",
+      "items": [
+        { "product_id": "P10", "name": "Laptop", "price": 1200 },
+        { "product_id": "P22", "name": "Mouse", "price": 20 }
+      ]
+    }
+  ]
+}
+\end{lstlisting}
+
+This JSON structure shows how a user document can contain nested data such as orders and order items without requiring multiple relational tables.
+
+\subsection{Workflow Diagram}
+
+Workflow represents the sequence of activities, actions, or steps carried out to complete a specific process in the system. It shows how tasks are initiated, the order in which they are performed, and how decisions or conditions affect the flow. Workflow diagrams, such as activity diagrams or flowcharts, are commonly used to visually depict these processes, making it easier to understand the logic and interactions within the system.
+
+For example, a simple flow chart of how to play the game, it will also show how many levels are there with what complexity of game play including players, objects, and enemy which is shown in Figure \ref{fig:workflow}.
+
+% ----- FIGURE -----
+\begin{figure}[H]
+    \centering
+    % Change width as needed (0.5 - 1.0 is standard)
+    \includegraphics[width=0.7\textwidth]{figures/chapter3/workflow.png} 
+    \caption{Workflow Diagram}
+    \label{fig:workflow}
+\end{figure}
+
+\subsection{Third-Party Dependencies}
+
+Third-Party Dependencies refer to external libraries, frameworks, APIs, or modules that are integrated into the system to add functionality or simplify development. Instead of building everything from scratch, these dependencies provide pre-built solutions for common tasks such as authentication, payment processing, data visualization, or communication with external services. Proper documentation of third-party dependencies ensures clarity, maintainability, and transparency in the system design.
+
+Examples of third-party dependencies can be
+
+\begin{itemize}
+    \item Google Maps API - for location and mapping services.
+    \item Firebase Authentication - for user login and authentication.
+    \item Stripe / PayPal SDK - for online payments.
+\end{itemize}
+
+
+\setcounter{chapter}{3}           % Ensures this will be Chapter 3

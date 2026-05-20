@@ -1,0 +1,153 @@
+
+% =============================================================================
+%                       Chapter 4: Software Development
+% =============================================================================
+
+
+\setcounter{chapter}{4}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\chapter*{Chapter 4}
+\markboth{Software Development}{Software Development} 
+\section{Software Development}
+
+The Implementation section is similar to the Specification and Design section in that it describes the system, but it does so at a finer level of detail, down to the code level. This section is about the realization of the concepts and ideas developed earlier. It can also describe any problems that may have arisen during implementation and how you dealt with them.
+
+Make sure that the system design corresponds to the implementation of the project. If there is no relationship between design and implementation, it may downgrade your score in FYP.
+
+You should also mention any unforeseen problems you encountered when implementing the system and how and to what extent you overcame them. Common problems are:
+
+\begin{itemize}
+  \item Difficulties involving existing software, because of e.g.:
+    \begin{itemize}
+      \item Its complexity
+      \item Lack of documentation
+    \end{itemize}
+  \item Lack of suitable supporting software
+  \item Overambitious project aims
+\end{itemize}
+
+A seemingly disproportionate amount of project time can be taken up in dealing with such problems. The Implementation section gives you the opportunity to show where that most of the effort has been spent.
+
+\subsection{Coding Standards}
+
+Describe the indention, declaration,naming convention and statement standard used while coding the project.
+
+\subsection{Development Environment}
+
+In this section you will provide the reason behind using all the existing tools and technologies that you may have used during the development of your project. This includes development environment that you have used. How have you deployed the development environment? What different kind of packages you have used? Are there any third party libraries involved etc?
+
+\subsection{Software Description}
+
+In this section you will identify major modules of the software that you have produced. You will show the class diagram of these major modules for this section. Typical subheadings of this section can be
+
+\begin{itemize}
+    \item \textbf{Login process}
+    \item \textbf{Loading Data}
+    \item \textbf{Data processing}
+    \item \textbf{Report generation}
+    \item \textbf{...}
+\end{itemize}
+
+Moreover you will also discuss the logic that you have implemented in the code of those modules with the help of code snippets as shown below in the examples. Do not attempt to describe all the code in the system, and do not include large pieces of code in this section.
+
+\begin{itemize}
+    \item Are especially critical to the operation of the system.
+    \item You feel might be of particular interest to the reader for some reason
+    \item Illustrate a nonstandard or innovative way of implementing an algorithm, data structure, etc.
+\end{itemize}
+
+
+\subsubsection{Snippet 1 (User Story Name)}
+
+\begin{lstlisting}[language=C]
+#define SWAP(type, x, y) 
+do { 
+    type temp; 
+    temp = x; 
+    x = y; 
+    y = temp; 
+} while(1)
+\end{lstlisting}
+
+\textbf{Description:} This function takes 2 arguments. Then we have an infinite loop that swaps the value of the two passed variables.
+
+You are not allowed to include the complete source code of the software how ever you can include important functions of your major modules to discuss the logic of your code.
+
+\itemheading{Test Case Name}
+
+Execute the Test Case you planned in Chapter 2 by prodiving inputs and then report the finding whether the testcase passed or failed.
+
+{
+\setModernTableStyle % <-- Remove this line to remove alternating color rows
+\begin{xltabular}{\textwidth}{|X|X|}
+
+    \hiderowcolors
+    \caption{Test Case 1} \label{tab:test_case_ch4_1} \\
+    \hline
+    \showrowcolors
+
+    Test ID: (E.g. E1-US1-TC1 etc.) & US ID: \\ \hline
+
+    \multicolumn{2}{|p{\dimexpr\textwidth-2\tabcolsep-2\arrayrulewidth\relax}|}
+    {Test Case Description: } \\ \hline
+
+    \multicolumn{2}{|p{\dimexpr\textwidth-2\tabcolsep-2\arrayrulewidth\relax}|}
+    {Inputs:} \\ \hline
+
+    \multicolumn{2}{|p{\dimexpr\textwidth-2\tabcolsep-2\arrayrulewidth\relax}|}
+    {Expected Result:} \\ \hline
+
+    \multicolumn{2}{|p{\dimexpr\textwidth-2\tabcolsep-2\arrayrulewidth\relax}|}
+    {Actual Result:} \\ \hline
+
+\end{xltabular}
+}
+
+\subsubsection{Snippet 2}
+
+\begin{lstlisting}[language=C]
+#define pop(type, Top) 
+do { 
+    type temp; 
+    temp = Top.item; 
+    Top = Top.next; 
+    return temp; 
+} while(0)
+\end{lstlisting}
+
+\textbf{Description:} This function pops the top of the stack. It places the top pointer to the next item of the stack and return the popped item.
+
+You are not allowed to include the complete source code of the software how ever you can include important functions of your major modules to discuss the logic of your code.
+
+\itemheading{Test Case Name}
+
+Execute the Test Case you planned in Chapter 2 by prodiving inputs and then report the finding whether the testcase passed or failed.
+
+{
+\setModernTableStyle % <-- Remove this line to remove alternating color rows
+\begin{xltabular}{\textwidth}{|X|X|}
+
+    \hiderowcolors
+    \caption{Test Case 1} \label{tab:test_case_ch4_2} \\
+    \hline
+    \showrowcolors
+
+    Test ID: (E.g. E1-US1-TC1 etc.) & US ID: \\ \hline
+
+    \multicolumn{2}{|p{\dimexpr\textwidth-2\tabcolsep-2\arrayrulewidth\relax}|}
+    {Test Case Description: } \\ \hline
+
+    \multicolumn{2}{|p{\dimexpr\textwidth-2\tabcolsep-2\arrayrulewidth\relax}|}
+    {Inputs:} \\ \hline
+
+    \multicolumn{2}{|p{\dimexpr\textwidth-2\tabcolsep-2\arrayrulewidth\relax}|}
+    {Expected Result:} \\ \hline
+
+    \multicolumn{2}{|p{\dimexpr\textwidth-2\tabcolsep-2\arrayrulewidth\relax}|}
+    {Actual Result:} \\ \hline
+
+\end{xltabular}
+}
+
+\setcounter{chapter}{4}           
