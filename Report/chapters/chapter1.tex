@@ -251,6 +251,39 @@ reflecting these specific technical phases.
     \label{fig:wbs}
 \end{figure}
 
+To address the detailed task distribution, Table~\ref{tab:wbs_detailed} outlines the formal Work Breakdown Structure with specific task ownership across the team members (Muhammad Awais, Hamza Bashir, Junaid Amin), explicit phase durations, and deliverables.
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{|p{0.8cm}|p{3.5cm}|p{2cm}|p{3.5cm}|p{4.5cm}|}
+        \hline
+        \rowcolor{black}
+        \color{white}\textbf{ID} & \color{white}\textbf{Task / Phase} & \color{white}\textbf{Duration} & \color{white}\textbf{Ownership} & \color{white}\textbf{Deliverable} \\ \hline
+        \textbf{1} & \textbf{Hardware \& Firmware} & \textbf{4 Weeks} & \textbf{Hamza Bashir} & \textbf{Physical prototype \& ESP32 Code} \\ \hline
+        1.1 & Sensor Calibration & 1 Week & Hamza Bashir & Calibrated DHT22 and Moisture inputs \\ \hline
+        1.2 & Actuator Integration & 1 Week & Hamza Bashir & Functional relay control for pump \\ \hline
+        1.3 & ESP32 Firmware & 2 Weeks & Hamza Bashir & Stable Wi-Fi telemetry and control loop \\ \hline
+        
+        \textbf{2} & \textbf{Backend \& Database} & \textbf{4 Weeks} & \textbf{Junaid Amin} & \textbf{Deployed API \& MySQL Schema} \\ \hline
+        2.1 & Database Design & 1 Week & Junaid Amin & Normalized schema deployed to server \\ \hline
+        2.2 & REST API Dev & 2 Weeks & Junaid Amin & Endpoints for telemetry and control \\ \hline
+        2.3 & Authentication & 1 Week & Junaid Amin & Secure JWT login and field mapping \\ \hline
+        
+        \textbf{3} & \textbf{AI \& Machine Learning} & \textbf{3 Weeks} & \textbf{Muhammad Awais} & \textbf{Trained Scikit-Learn Model} \\ \hline
+        3.1 & Dataset Preparation & 1 Week & Muhammad Awais & Dataset generation and cleaning \\ \hline
+        3.2 & Model Training & 1 Week & Muhammad Awais & Tuned Random Forest (n\_estimators=150) \\ \hline
+        3.3 & API Integration & 1 Week & Muhammad Awais & Wrapper returning confidence score \\ \hline
+        
+        \textbf{4} & \textbf{Frontend Application} & \textbf{4 Weeks} & \textbf{Team} & \textbf{Compiled Flutter APK} \\ \hline
+        4.1 & UI Mockups \& Flow & 1 Week & Junaid Amin & Figma designs for all screens \\ \hline
+        4.2 & Core Development & 2 Weeks & Team & Flutter UI and backend API binding \\ \hline
+        4.3 & System Testing & 1 Week & Hamza Bashir & Passed test cases across devices \\ \hline
+    \end{tabular}
+    \caption{Detailed Work Breakdown Structure with Ownership}
+    \label{tab:wbs_detailed}
+\end{table}
+
 \subsection{Project Time Line}
 The project timeline spans from 29 September 2025 to 10 July 2026. 
 The schedule allocates dedicated time blocks for isolated component 
