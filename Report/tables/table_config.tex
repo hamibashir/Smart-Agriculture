@@ -1,0 +1,41 @@
+% ==============================
+% Table Configuration
+% ==============================
+
+% Define Colors
+\definecolor{TableHeadColor}{HTML}{EAEAEA}   % Light Gray Header
+\definecolor{TableBorderColor}{HTML}{BFBFBF} % Darker Gray Border
+\definecolor{TableRowAltColor}{HTML}{F2F2F2} % Very Light Gray Alternating Row
+
+% Custom Table Style Command
+% Usage: Call \setModernTableStyle inside the table environment before \begin{tabular}
+\newcommand{\setModernTableStyle}{%
+    \rowcolors{2}{TableRowAltColor}{white} % Alternating colors: Start at row 2, odd=alt, even=white
+    \arrayrulecolor{TableBorderColor}      % Set global border color
+    \renewcommand{\arraystretch}{1.3}      % More vertical spacing
+    \setlength{\tabcolsep}{10pt}           % More horizontal spacing
+}
+    
+% Default Table Style Reset (if needed specifically)
+\newcommand{\setDefaultTableStyle}{%
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+    \renewcommand{\arraystretch}{1.0}
+    \setlength{\tabcolsep}{6pt}
+}
+
+% Define Thick Border Command
+\newlength{\thickarraysrulewidth}
+\setlength{\thickarraysrulewidth}{2pt}
+\newcommand{\thickhline}{
+    \noalign{\global\savedwidth\arrayrulewidth\global\arrayrulewidth\thickarraysrulewidth}%
+    \hline
+    \noalign{\global\arrayrulewidth\savedwidth}%
+}
+\newlength{\savedwidth}
+
+% Command to Bold a Row and add thick bottom border
+% Usage: \tableHeaderStyle Column 1 & Column 2 \\ \thickhline
+\newcommand{\tableHeaderStyle}{%
+    \rowcolor{TableHeadColor}\bfseries
+}

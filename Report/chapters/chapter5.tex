@@ -1,0 +1,305 @@
+
+% =============================================================================
+%                          Chapter 5: Software Deployment
+% =============================================================================
+
+
+
+
+% ==========================================================
+% Pending Missing Visual Assets
+% ==========================================================
+\subsection{Pending Missing Visual Assets}
+
+% TODO: Required Asset Name: Backend Deployment Logs
+% Asset Type: Missing Technical Visual Asset
+% Status: Pending Asset Collection
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/chapter5/backend_deployment_logs.png}
+    \caption{[Placeholder] Backend Deployment Logs}
+    \label{fig:placeholder_backend_deployment_logs}
+\end{figure}
+
+[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+
+% TODO: Required Asset Name: AI API Deployment
+% Asset Type: Missing Technical Visual Asset
+% Status: Pending Asset Collection
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/chapter5/ai_api_deployment.png}
+    \caption{[Placeholder] AI API Deployment}
+    \label{fig:placeholder_ai_api_deployment}
+\end{figure}
+
+[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+
+\setcounter{chapter}{5}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\chapter*{Chapter 5}
+\markboth{Software Deployment}{Software Deployment} 
+\section{Software Deployment}
+
+This chapter describes the installation and deployment process of the Smart AI Powered Agriculture System. The deployment includes four major deliverables: (1) ESP32 firmware on the field unit, (2) backend server deployment, (3) database configuration, and (4) mobile application installation. The goal is to ensure the complete system can be set up reliably and used by end users (farmers) with minimal technical effort.
+
+% ----------------------------------------------------------
+% 5.1 Installation / Deployment Process Description
+% ----------------------------------------------------------
+\subsection{Installation / Deployment Process Description}
+\label{sec:deployment-process}
+
+\subsubsection{Deployment Overview}
+The deployment is performed in the following order to ensure correct integration:
+\begin{enumerate}[leftmargin=1.2cm]
+    \item Prepare and connect hardware components (sensors, ESP32, relay, pump/valve).
+    \item Flash ESP32 firmware and configure Wi-Fi/device identifiers.
+    \item Deploy backend services (Node.js) and configure environment variables.
+    \item Configure the database (Firebase Realtime Database and/or MySQL).
+    \item Install and connect the mobile application to the backend.
+    \item Perform end-to-end verification (live readings, control actions, alerts, and AI output).
+\end{enumerate}
+
+% ----------------------------------------------------------
+% 5.1.2 Hardware Setup and Field Installation
+% ----------------------------------------------------------
+\subsubsection{Hardware Setup and Field Installation}
+\label{subsec:hardware-install}
+
+The field unit installation ensures correct sensor placement and safe electrical connections.
+
+\begin{itemize}[leftmargin=1.2cm]
+    \item \textbf{ESP32 and Sensors:} Connect soil moisture sensor to ESP32 ADC pin, DHT22 to digital pin, LDR to ADC pin, rain sensor to digital pin, and flow sensor to interrupt-capable pin.
+    \item \textbf{Relay and Pump/Valve:} Relay input is connected to ESP32 GPIO output. The relay output is wired to the pump/valve power line to allow switching.
+    \item \textbf{Power:} Use regulated supply for ESP32 and sensors. If the pump requires higher voltage/current, use a separate power source with proper isolation.
+    \item \textbf{Placement:} Soil moisture sensor is inserted into soil near crop roots; rain sensor is placed in open air; flow sensor is installed inline with irrigation pipe.
+\end{itemize}
+
+\textbf{Safety Note:} Electrical wiring for pumps should be performed using proper insulation, fuses, and safe grounding to prevent hazards.
+
+% ----------------------------------------------------------
+% 5.1.3 ESP32 Firmware Deployment
+% ----------------------------------------------------------
+\subsubsection{ESP32 Firmware Deployment}
+\label{subsec:firmware-deployment}
+
+The firmware is uploaded using Arduino IDE (or compatible toolchain) and configured for the target farm environment.
+
+\subsubsection{Firmware Flashing Steps}
+\begin{enumerate}[leftmargin=1.2cm]
+    \item Install Arduino IDE and ESP32 board support packages.
+    \item Connect ESP32 to a computer via USB.
+    \item Select the correct ESP32 board and COM port in Arduino IDE.
+    \item Update configuration parameters in the firmware:
+    \begin{itemize}[leftmargin=1.2cm]
+        \item Wi-Fi SSID and password
+        \item Backend base URL (API endpoint)
+        \item Device ID / Field ID mapping
+        \item Default moisture thresholds (initial values)
+    \end{itemize}
+    \item Upload the firmware to ESP32 and monitor serial logs for confirmation.
+\end{enumerate}
+
+\subsubsection{Post-Flash Verification}
+\begin{itemize}[leftmargin=1.2cm]
+    \item Confirm Wi-Fi connection is established.
+    \item Confirm sensor values are printed in serial logs.
+    \item Confirm telemetry requests are reaching the backend (HTTP 200 OK).
+    \item Confirm relay toggles correctly in manual test mode.
+\end{itemize}
+
+% ----------------------------------------------------------
+% 5.1.4 Backend Deployment (Node.js Server)
+% ----------------------------------------------------------
+\subsection{Backend Deployment (Node.js Server)}
+\label{subsec:backend-deployment}
+
+The backend server hosts REST APIs for device ingestion, user authentication, dashboard data, irrigation control, alerts, and AI recommendation requests.
+
+\subsubsection{Backend Installation Requirements}
+\begin{itemize}[leftmargin=1.2cm]
+    \item Node.js runtime (LTS recommended)
+    \item Package manager (npm)
+    \item Firebase Admin SDK credentials (for Firebase option)
+    \item MySQL credentials (if MySQL option is enabled)
+\end{itemize}
+
+\subsubsection{Backend Deployment Steps}
+\begin{enumerate}[leftmargin=1.2cm]
+    \item Clone/copy backend source code to the target server machine.
+    \item Install dependencies:
+\begin{verbatim}
+npm install
+\end{verbatim}
+    \item Configure environment variables (example):
+\begin{verbatim}
+PORT=8080
+JWT_SECRET=your_secret_key
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_SERVICE_ACCOUNT=path_to_service_account.json
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASSWORD=******
+MYSQL_DB=smart_agri
+AI_SERVICE_URL=http://<ai-host>:5000
+\end{verbatim}
+    \item Start the backend service:
+\begin{verbatim}
+npm start
+\end{verbatim}
+    \item Verify health endpoint and API availability using a browser or API tool (e.g., Postman).
+\end{enumerate}
+
+\subsubsection{Backend Deployment Modes}
+\begin{itemize}[leftmargin=1.2cm]
+    \item \textbf{Local Server Mode:} Suitable for demos and lab testing (same network).
+    \item \textbf{Cloud Server Mode:} Recommended for remote access by farmers outside the local network.
+\end{itemize}
+
+% ----------------------------------------------------------
+% 5.1.4 Database Deployment and Configuration
+% ----------------------------------------------------------
+\subsection{Database Deployment and Configuration}
+\label{subsec:db-deployment}
+
+The system uses MySQL (MariaDB) as the relational database for all data storage, including sensor telemetry, user management, irrigation logs, alerts, and AI-generated crop recommendations. MySQL ensures data integrity through foreign key constraints and supports complex queries for analytics and reporting.
+
+\subsubsection{MySQL Database Setup}
+\begin{enumerate}[leftmargin=1.2cm]
+    \item Install MySQL Server (or MariaDB) and start the service:
+\begin{verbatim}
+sudo systemctl start mysql
+sudo systemctl enable mysql
+\end{verbatim}
+
+    \item Create the database and user:
+\begin{verbatim}
+CREATE DATABASE smart_agriculture;
+CREATE USER 'smart_agri_user'@'localhost' 
+  IDENTIFIED BY 'secure_password';
+GRANT ALL PRIVILEGES ON smart_agriculture.* 
+  TO 'smart_agri_user'@'localhost';
+FLUSH PRIVILEGES;
+\end{verbatim}
+
+    \item Import the database schema (11 tables):
+\begin{verbatim}
+mysql -u smart_agri_user -p smart_agriculture 
+  < schema.sql
+\end{verbatim}
+
+    \item Core tables created:
+    \begin{itemize}
+        \item \textbf{User \& Field Management:} users, fields
+        \item \textbf{Sensor \& Telemetry:} sensors, sensor\_readings
+        \item \textbf{Irrigation:} irrigation\_logs, irrigation\_schedules
+        \item \textbf{Alerts \& AI:} alerts, crop\_recommendations
+        \item \textbf{System:} weather\_data, system\_settings, audit\_logs
+    \end{itemize}
+
+    \item Configure indexes for performance optimization:
+    \begin{itemize}
+        \item Index on (sensor\_id, reading\_time) for sensor\_readings table
+        \item Index on (field\_id) for all related tables
+        \item Index on (user\_id) for authentication queries
+        \item Index on timestamps for time-series queries
+    \end{itemize}
+
+    \item Set up database connection in backend (Node.js):
+\begin{verbatim}
+const mysql = require('mysql2/promise');
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'smart_agri_user',
+  password: process.env.DB_PASSWORD,
+  database: 'smart_agriculture',
+  waitForConnections: true,
+  connectionLimit: 10
+});
+\end{verbatim}
+
+    \item Verify database connectivity:
+\begin{verbatim}
+SELECT COUNT(*) FROM users;
+SELECT * FROM sensors WHERE is_active = 1;
+\end{verbatim}
+\end{enumerate}
+
+% ----------------------------------------------------------
+% 5.1.5 AI Service Deployment (Python)
+% ----------------------------------------------------------
+\subsection{AI Service Deployment (Python)}
+\label{subsec:ai-deployment}
+
+The AI service provides crop recommendations based on extracted features from sensor history and environmental context.
+
+\subsubsection{Deployment Steps}
+\begin{enumerate}[leftmargin=1.2cm]
+    \item Set up Python environment (virtual environment recommended).
+    \item Install required libraries (e.g., TensorFlow/Scikit-learn).
+    \item Place the trained model file in the service directory.
+    \item Run the AI service API (example):
+\begin{verbatim}
+python app.py
+\end{verbatim}
+    \item Configure backend \texttt{AI\_SERVICE\_URL} to connect to the AI endpoint.
+\end{enumerate}
+
+\subsubsection{AI Verification}
+\begin{itemize}[leftmargin=1.2cm]
+    \item Send a test request with sample feature payload.
+    \item Confirm response contains recommended crop(s) and confidence score.
+\end{itemize}
+
+% ----------------------------------------------------------
+% 5.1.6 Mobile Application Deployment
+% ----------------------------------------------------------
+\subsection{Mobile Application Deployment}
+\label{subsec:mobile-deployment}
+
+The mobile application is used by farmers to view live sensor readings, irrigation status, historical analytics, alerts, and AI crop recommendations.
+
+\subsubsection{Installation Steps}
+\begin{enumerate}[leftmargin=1.2cm]
+    \item Build the mobile application APK (or install via test distribution).
+    \item Install on an Android device (enable ``Install from unknown sources'' if needed).
+    \item Configure base URL (backend server address) and sign in/register.
+    \item Add/register field/device mapping (Field ID and Device ID).
+\end{enumerate}
+
+\subsubsection{Mobile Verification Checklist}
+\begin{itemize}[leftmargin=1.2cm]
+    \item Live readings update correctly on dashboard.
+    \item Manual irrigation control toggles pump/valve.
+    \item Alerts appear in the app and push notifications are received.
+    \item Weekly trends / historical charts load from stored data.
+    \item AI recommendation screen returns crop suggestions with confidence.
+\end{itemize}
+
+% ----------------------------------------------------------
+% 5.2 End-to-End System Validation (Recommended for Deployment Chapter)
+% ----------------------------------------------------------
+\subsection{End-to-End System Validation}
+\label{sec:e2e-validation}
+
+After deployment, the complete system is validated using a practical checklist to ensure correct integration:
+
+\begin{enumerate}[leftmargin=1.2cm]
+    \item \textbf{Telemetry Check:} ESP32 sends readings and backend stores them successfully.
+    \item \textbf{Dashboard Check:} Mobile app displays live readings and device status.
+    \item \textbf{Automation Check:} When soil moisture drops below threshold, irrigation triggers automatically (rain condition blocks irrigation).
+    \item \textbf{Logging Check:} Irrigation events and water usage logs are recorded.
+    \item \textbf{Alert Check:} Critical low moisture generates a push notification.
+    \item \textbf{AI Check:} Crop recommendation is produced from recent/historical data with confidence score.
+\end{enumerate}
+
+% ----------------------------------------------------------
+% 5.3 Summary
+% ----------------------------------------------------------
+\subsection{Summary}
+\label{sec:chapter5-summary}
+
+This chapter described the deployment of the Smart AI Powered Agriculture System, including hardware installation, ESP32 firmware flashing, backend and database configuration, AI service deployment, and mobile application setup. A final validation checklist was provided to confirm end-to-end system correctness after installation.
+
+\setcounter{chapter}{5}

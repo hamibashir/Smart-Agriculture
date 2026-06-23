@@ -1,0 +1,276 @@
+% =============================================================================
+%                            Chapter 1: Introduction
+% =============================================================================
+
+\setcounter{chapter}{1}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\chapter*{Chapter 1}
+\markboth{Introduction}{Introduction} 
+\section{Introduction}
+
+Agriculture in Pakistan faces challenges like water shortage, low 
+productivity, and lack of modern tools \cite{shafi2019precision}. 
+To address this, the \textbf{Smart AI Powered Agriculture System} 
+uses Internet of Things (IoT) sensors to monitor soil and weather 
+conditions, automates irrigation to save water, and applies 
+artificial intelligence (AI) to recommend suitable crops 
+\cite{farooq2019survey}. This solution is designed to help farmers 
+improve yield, reduce costs, save water, and adopt smarter farming 
+practices.
+
+\subsection{Project Introduction}
+
+The Smart AI Powered Agriculture System is an IoT-based solution 
+designed to make farming more efficient and sustainable. The system 
+uses sensors to monitor soil moisture, temperature, humidity, light, 
+and rainfall in real time. This data is sent to a mobile application 
+through a backend server, allowing farmers to track field conditions, 
+receive alerts, and view historical records \cite{mohanraj2016field}.
+
+The system also includes automatic irrigation, where water is 
+supplied only when the soil is dry \cite{garcia2020iot}, and an AI 
+module that recommends the most suitable crops for upcoming seasons 
+\cite{musanase2023data}. The goal is to help farmers conserve water, 
+improve crop yield, and make data-driven decisions in agriculture.
+
+The main beneficiaries of this project are small and medium scale 
+farmers in Pakistan, who often face challenges such as water wastage, 
+low crop productivity, and lack of access to modern agricultural 
+tools \cite{zia2021experimental}. By using this system, farmers can 
+monitor their fields easily, save water through automated irrigation, 
+and receive crop recommendations that support better planning.
+
+\subsection{Existing Examples / Solutions}
+
+Several existing systems and solutions in Pakistan and globally work 
+towards precision agriculture, smart irrigation, and farm monitoring. 
+However, most of them are either expensive, focused on large-scale 
+farms, or limited in scope \cite{khanna2019evolution}. 
+Table~\ref{tab:existing_examples} summarizes some examples and the 
+gaps that remain.
+
+\begin{table}[H]
+\centering
+\caption{Existing Examples}
+\label{tab:existing_examples}
+\begin{tabular}{|p{3.2cm}|p{5.2cm}|p{5.2cm}|}
+\hline
+\textbf{Name} & \textbf{What they do (features)} & 
+\textbf{What gap remains} \\ \hline
+
+SAWiE (Sustainable Agriculture Water \& Intelligent Ecosystem) &
+Offers IoT and machine learning based advisory for farmers; soil 
+mapping and alerts for droughts and floods. &
+Does not directly automate irrigation hardware or pump control. 
+\\ \hline
+
+Buraq Integrated Solutions --- Smart Drip Irrigation &
+Implements drip irrigation systems with soil moisture and temperature 
+sensors. &
+Lacks an AI-based crop recommendation module. \\ \hline
+
+VGreen --- CropSight\textsuperscript{\texttrademark} &
+Provides farm mapping, real-time monitoring, and analytics; localized 
+for Pakistani farms. &
+Good dashboards and analytics but lacks full automation (pump control 
+and crop recommendation) and is costly for small farmers. \\ \hline
+
+Field Commander --- Valley Irrigation Pakistan &
+Offers remote monitoring and SMS/Email alerts. &
+Does not offer smart irrigation and is mainly available for large 
+commercial farms. \\ \hline
+
+Smart IoT Farm at PMAS--AAUR, Rawalpindi &
+University research farm with sensors (e.g., soil moisture) and 
+real-time IoT monitoring to demonstrate precision agriculture. &
+No dedicated mobile application for farmers, no AI-based decision 
+support, and no automated irrigation. \\ \hline
+\end{tabular}
+\end{table}
+
+The Smart AI Powered Agriculture System aims to combine IoT-based 
+sensing, automatic irrigation, mobile app support, and AI-driven 
+crop recommendations in a single affordable solution targeted at 
+small and medium farmers.
+
+\subsection{Problem Statement}
+
+Agriculture is the main source of income and food in many countries, 
+especially in developing regions. Many farmers depend on farming for 
+their livelihood, but they face challenges such as water wastage, 
+unpredictable weather, limited access to real-time information, and 
+lack of proper guidance for choosing crops or managing their fields 
+\cite{shafi2019precision}. Traditional farming methods often result 
+in over-watering or under-watering, loss of soil nutrients, and low 
+crop production \cite{garcia2020iot}. Even though modern technology 
+is available, many small and medium farmers cannot afford or access 
+smart farming tools. There is a need for an affordable and 
+easy-to-use smart agriculture system that uses IoT and AI to monitor 
+the environment, save resources such as water and energy, and provide 
+useful recommendations to farmers.
+
+\subsection{Business Scope}
+
+The Smart AI Powered Agriculture System has strong potential in the 
+agriculture sector of Pakistan. Since many farmers face problems like 
+water wastage, low crop yield, and lack of modern tools, this system 
+provides an affordable and simple solution.
+
+By offering IoT-based smart farming kits (sensors, controller, and 
+mobile application), farmers can save water, achieve better crop 
+production, and make smarter decisions. The system can be adopted by 
+small and medium farmers and can also be promoted through government 
+programs, non-governmental organizations (NGOs), and agriculture 
+companies. The idea has strong business value because it directly 
+improves farmers' income and supports food security.
+
+\begingroup
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{longtable}{|p{3.8cm}|p{3.8cm}|p{3.8cm}|}
+\caption{Lean Canvas} \label{tab:lean_canvas} \\
+\hline
+\textbf{Problem} & \textbf{Solution} & 
+\textbf{Unique Value Proposition} \\ \hline
+\endfirsthead
+\hline
+\endhead
+\hline
+\multicolumn{3}{r}{\small\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+1. Water wastage due to over-irrigation. \newline
+2. Low crop yield from poor crop choice. \newline
+3. Lack of affordable smart farming tools. & 
+1. IoT sensors for soil and weather. \newline
+2. Automatic irrigation system. \newline
+3. Mobile app with AI-based crop suggestion. & 
+An affordable smart farming kit that saves water, increases yield, 
+and helps farmers make better crop decisions. \\ \hline
+\textbf{Existing Alternatives} & \textbf{Key Metrics (Approx.)} & 
+\textbf{High-Level Concept} \\ \hline
+1. Manual irrigation. \newline
+2. Expensive imported systems. & 
+1. 100+ farmers use the system. \newline
+2. 45\% water savings (est.). \newline
+3. 35\% increase in yield (est.). & 
+A smart farming assistant for every farmer, like a personal digital 
+guide for crops. \\ \hline
+\textbf{Channels} & \textbf{Cost Structure} & 
+\textbf{Customer Segments} \\ \hline
+1. Direct sales to farmers. \newline
+2. Partnerships with NGOs and government programs. \newline
+3. Agriculture supply companies. & 
+1. IoT hardware (sensors, controllers). \newline
+2. Mobile app and server hosting. \newline
+3. Installation and support. & 
+1. Small and medium farmers. \newline
+2. Agriculture NGOs and government projects. \\ \hline
+\textbf{Early Adopters} & 
+\multicolumn{2}{p{\dimexpr7.6cm+2\tabcolsep+\arrayrulewidth}|}
+{\textbf{Revenue Structure}} \\ \hline
+1. Farmers with 1--4 acres of land. \newline
+2. NGOs running pilot agriculture projects. & 
+\multicolumn{2}{p{\dimexpr7.6cm+2\tabcolsep+\arrayrulewidth}|}{
+1. Selling hardware kits. \newline
+2. Subscription for premium app features. \newline
+3. Installation and training services.
+} \\ \hline
+\end{longtable}
+\endgroup
+
+\subsection{Useful Tools and Technologies}
+The key hardware and software components for the Smart AI Powered 
+Agriculture System are:
+
+\subsubsection{Hardware}
+\begin{itemize}[noitemsep]
+    \item \textbf{ESP32} --- Microcontroller with Wi-Fi support for 
+    sensor data processing and transmission \cite{raj2021survey}.
+    \item \textbf{Soil Moisture Sensor (e.g., YL-69 or capacitive 
+    sensor)} --- Detects soil water level.
+    \item \textbf{DHT22 Sensor} --- Measures temperature and humidity.
+    \item \textbf{Light Sensor (LDR)} --- Monitors sunlight levels 
+    for crop growth.
+    \item \textbf{Rain Sensor (e.g., FC-37 / YL-82)} --- Detects 
+    rainfall to avoid unnecessary irrigation.
+    \item \textbf{Relay Module} --- Controls water pump or valve for 
+    automation.
+    \item \textbf{Water Flow Sensor} --- Measures water usage during 
+    irrigation.
+\end{itemize}
+
+\subsubsection{Software}
+\begin{itemize}[noitemsep]
+    \item \textbf{Arduino IDE (C++)} --- Programming the ESP32.
+    \item \textbf{Backend Server: Node.js} --- Handles data from 
+    sensors and communicates with the mobile app.
+    \item \textbf{Database: MySQL} --- Stores sensor readings and 
+    historical records.
+    \item \textbf{Mobile Application: Android (Java/Kotlin) or 
+    Flutter} --- Displays live data, history, and alerts.
+    \item \textbf{Data Visualization:} Libraries such as 
+    MPAndroidChart, Chart.js, or Recharts for graphs and charts.
+    \item \textbf{Notifications: Firebase Cloud Messaging} --- For 
+    sending push alerts \cite{khawas2018firebase}.
+\end{itemize}
+
+\subsubsection{AI and Machine Learning}
+\begin{itemize}[noitemsep]
+    \item \textbf{Python (TensorFlow / Scikit-learn)} --- For crop 
+    recommendation and predictive analytics \cite{musanase2023data}.
+    \item \textbf{Signal Processing Techniques} --- To filter and 
+    clean noisy sensor data before analysis.
+\end{itemize}
+
+\subsection{Project Work Break Down}
+The project is divided into multiple phases to ensure systematic 
+development, testing, and deployment. Rather than treating the system 
+as a single monolithic build, the Work Breakdown Structure (WBS) 
+decouples the architecture into discrete, parallelizable engineering 
+tracks \cite{sommerville2016software}. 
+
+The core tracks include: (1) Hardware and Firmware, encompassing the 
+ESP32 sensor integration and the 3-tier polling safety logic; (2) 
+Backend Infrastructure, focusing on the Node.js API and MySQL 
+relational database schema; (3) Artificial Intelligence, detailing the 
+synthesis of the Gaussian dataset and the training of the Random Forest 
+classifier; and (4) Frontend Application, covering the Flutter mobile 
+interface for live dashboard monitoring and manual irrigation control.
+
+Figure~\ref{fig:wbs} shows the optimized Work Breakdown Structure 
+reflecting these specific technical phases.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/chapter1/Work 
+    Breakdown.png}
+    \caption{Work Breakdown Structure}
+    \label{fig:wbs}
+\end{figure}
+
+\subsection{Project Time Line}
+The project timeline spans from 29 September 2025 to 10 July 2026. 
+The schedule allocates dedicated time blocks for isolated component 
+development followed by rigorous integration phases. For instance, 
+the AI model training phase occurs concurrently with backend API 
+development, ensuring that the prediction endpoints are immediately 
+consumable once the model achieves its target accuracy metrics. 
+Similarly, firmware development prioritizes local offline safety 
+logic before network connectivity is fully integrated, reducing 
+critical path dependencies.
+
+A Gantt chart representing these overlapping milestones and technical 
+dependencies is shown in Figure~\ref{fig:gantt}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/chapter1/Project 
+    Timeline.png}
+    \caption{Gantt Chart}
+    \label{fig:gantt}
+\end{figure}
+
+\setcounter{chapter}{1}

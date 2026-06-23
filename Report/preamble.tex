@@ -1,0 +1,283 @@
+% ------------------------------
+% Page Layout & Geometry
+% ------------------------------
+\usepackage[
+  a4paper,
+  left=1.25in,
+  right=1in,
+  top=1in,
+  bottom=1in
+]{geometry}
+\raggedbottom
+
+\usepackage{placeins}
+\usepackage{booktabs}
+
+% ==============================
+% Fonts & Math
+% ==============================
+\usepackage[T1]{fontenc}
+\usepackage{newtxtext}
+\usepackage{newtxmath}
+\usepackage{amsmath}
+
+% ==============================
+% Line Spacing & Paragraphs
+% ==============================
+\usepackage{setspace}
+\onehalfspacing
+% Standard paragraph settings from official template
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% ==============================
+% Graphics, Figures & Floats
+% ==============================
+\usepackage[table]{xcolor}
+\definecolor{testgray}{gray}{0.88}
+\usepackage{graphicx}
+\usepackage{caption}
+\definecolor{captionblue}{HTML}{1F4E79} % Dark blue for captions (like MS Word)
+\DeclareCaptionFont{captionblue}{\color{captionblue}}
+\captionsetup{font={it,captionblue}}
+% \captionsetup[table]{position=top, skip=5pt}
+% \captionsetup[figure]{position=bottom, skip=5pt}
+\usepackage{subcaption}
+\usepackage{float}
+% Ensure figures are numbered by section as per template
+\renewcommand{\thefigure}{\thesection.\arabic{figure}}
+
+% ============================== 
+% Tables & Lists
+% ============================== 
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{float}
+% \usepackage[table]{xcolor} % Moved up to Graphics section
+\usepackage{enumitem}
+
+
+
+% Import Custom Table Styles
+\input{tables/table_config.tex}
+
+% ============================== 
+% Code Listings
+% ============================== 
+\usepackage{listings}
+
+\definecolor{codegreen}{HTML}{2E7D32}
+\definecolor{codegray}{HTML}{757575}
+\definecolor{codepurple}{HTML}{6A1B9A}
+\definecolor{codeblue}{HTML}{0D47A1}
+\definecolor{backcolour}{HTML}{F5F5F5}
+
+\lstset{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen}\itshape,
+    keywordstyle=\color{codeblue}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=10pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=single,
+    rulecolor=\color{codegray},
+    xleftmargin=\parindent,
+    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+}
+
+% ------------------------------
+% Custom Code Languages
+% ------------------------------
+
+% JSON
+\lstdefinelanguage{JSON}{
+    stringstyle=\color{codepurple},
+    morestring=[b]",
+    morecomment=[s]{/*}{*/},
+    morecomment=[l]//,
+    keywordstyle=\color{codeblue}\bfseries,
+}
+
+% JavaScript
+\lstdefinelanguage{JavaScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, switch, var, if, in, while, do, else, case, break, const, let},
+  keywordstyle=\color{codeblue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{codegray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{codegreen}\ttfamily,
+  stringstyle=\color{codepurple}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
+% CSS
+\lstdefinelanguage{CSS}{
+  keywords={color,background-image,margin,padding,font,weight,display,position,top,left,right,bottom,list,style,border,size,white,space,min,width, transition, transform, transition-property, transition-duration, transition-timing-function},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  alsoletter={:},
+  alsodigit={-}
+}
+
+% Dart
+\lstdefinelanguage{Dart}{
+  morekeywords={abstract,as,assert,async,await,break,case,catch,class,const,continue,covariant,default,deferred,do,dynamic,else,enum,export,extends,extension,external,factory,false,final,finally,for,Function,get,hide,if,implements,import,in,interface,is,late,library,mixin,new,null,on,operator,part,required,rethrow,return,set,show,static,super,switch,sync,this,throw,true,try,typedef,var,void,while,with,yield},
+  keywordstyle=\color{codeblue}\bfseries,
+  ndkeywords={String,int,double,bool,List,Map,Set,Iterable,Future,Stream,Object,void,dynamic,runApp,Widget,StatelessWidget,StatefulWidget,BuildContext},
+  ndkeywordstyle=\color{codegray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=true,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{codegreen}\ttfamily,
+  stringstyle=\color{codepurple}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
+% ============================== 
+% Bibliography
+% ============================== 
+\usepackage[backend=biber,style=ieee]{biblatex}
+\addbibresource{references.bib}
+
+% ============================== 
+% Hyperlinks
+% ============================== 
+\usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=black]{hyperref}
+\usepackage{bookmark}
+\usepackage{xltabular} % For tables that break across pages and use X columns
+\usepackage[titles]{tocloft} % Fix TOC formatting
+
+% Force minimum space before xltabular so tables don't orphan headers
+\usepackage{etoolbox}
+\usepackage{needspace}
+\BeforeBeginEnvironment{xltabular}{\needspace{8\baselineskip}}
+
+% ============================== 
+% Header/Footer Control
+% ============================== 
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt} % Fix warning: headheight too small
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+
+% Header content
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+
+% Horizontal line in header
+\renewcommand{\headrulewidth}{0.4pt}
+
+% No footer
+\renewcommand{\footrulewidth}{0pt}
+
+% Redefine 'plain' style (used on Chapter pages) to match official template
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[R]{\thepage}
+  \renewcommand{\headrulewidth}{0.4pt}
+}
+
+% ============================== 
+% Heading Formatting
+% ============================== 
+\usepackage{titlesec}
+
+% Chapter (Chapter Heading)
+\titleformat{\chapter}
+  {\normalfont\bfseries\fontsize{16}{18}\selectfont}
+  {\thechapter.}
+  {1em}
+  {}
+
+\titlespacing*{\chapter}
+  {0pt}
+  {0pt}
+  {24pt}
+
+% Section (First-Level Heading)
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{16}{18}\selectfont}
+  {\thesection.}
+  {1em}
+  {}
+
+\titlespacing*{\section}
+  {0pt}
+  {24pt}
+  {12pt}
+
+% Subsection (Second-Level Heading)
+\titleformat{\subsection}
+  {\normalfont\bfseries\fontsize{14}{16}\selectfont}
+  {\thesubsection.}
+  {1em}
+  {}
+
+\titlespacing*{\subsection}
+  {0pt}
+  {24pt}
+  {12pt}
+
+% Subsubsection (Third-Level Heading)
+\titleformat{\subsubsection}
+  {\normalfont\bfseries\fontsize{12}{14}\selectfont}
+  {\thesubsubsection.}
+  {1em}
+  {}
+
+% Custom Item Heading (Fourth-Level Heading)
+\newcounter{itemheading}[subsubsection]
+\renewcommand{\theitemheading}{\thesubsubsection.\alph{itemheading}}
+\newcommand{\itemheading}[1]{%
+  \par\addvspace{12pt}%
+  \refstepcounter{itemheading}%
+  \noindent%
+  {\fontsize{11}{13}\selectfont\bfseries\itshape\underline{\theitemheading. #1}}%
+  \par\nobreak\vspace{6pt}%
+}
+
+% Numbering Depth configuration
+% 0 = Chapter
+% 1 = Section
+% 2 = Subsection
+% 3 = Subsubsection
+\setcounter{secnumdepth}{3}
+
+% Table of Contents Depth
+% Uncomment the line corresponding to the depth you want:
+% \setcounter{tocdepth}{1} % Show only Chapters and Sections
+% \setcounter{tocdepth}{2} % Show Chapters, Sections, and Subsections
+\setcounter{tocdepth}{3}   % Show Chapters, Sections, Subsections, and Subsubsections
+\renewcommand{\contentsname}{Table of Contents}
+
+% Add trailing dots to numbers in the TOC as well
+\renewcommand{\cftchapaftersnum}{.}
+\renewcommand{\cftsecaftersnum}{.}
+\renewcommand{\cftsubsecaftersnum}{.}
+\renewcommand{\cftsubsubsecaftersnum}{.}
+% Match official template section numbering style
+\usepackage{chngcntr}
+\counterwithout{section}{chapter}
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
