@@ -194,7 +194,7 @@ irrigation relay.
 
 Referencing \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 46--52), hardcoded threshold values are defined to classify soil conditions, rainfall 
 status, and light intensity. These limits are utilized by the firmware 
-for local offline automation and zero-latency safety decisions \cite{goap2018iot}.
+for local offline automation and zero-latency safety decisions.
 
 \begin{verbatim}
 // Sensor Thresholds
@@ -494,8 +494,7 @@ and ensures backend commands cannot override local rain safety.
 \label{subsec:snippet11}
 
 Described in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 463--472), the irrigation pump is controlled via an active-low relay module. Setting the 
-relay pin LOW turns the pump ON, while setting it HIGH turns the pump OFF 
-\cite{goap2018iot}.
+relay pin LOW turns the pump ON, while setting it HIGH turns the pump OFF.
 
 \begin{verbatim}
 void turnPumpOn() {
@@ -591,7 +590,7 @@ handling while maintaining system operation in offline mode.
 \label{subsec:snippet14}
 
 Detailed in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 500--506), raw 12-bit analog values (0--4095) are linearly mapped and constrained into 
-percentage values (0--100\%) before transmission to the backend, standardizing the data format \cite{saha2024automated}.
+percentage values (0--100\%) before transmission to the backend, standardizing the data format.
 
 \begin{verbatim}
 float convertSoilMoistureToPercentage(int rawValue) {
