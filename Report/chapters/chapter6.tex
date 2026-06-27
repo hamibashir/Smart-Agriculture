@@ -4,82 +4,6 @@
 
 
 
-% ==========================================================
-% Pending Missing Visual Assets
-% ==========================================================
-\subsection{Pending Missing Visual Assets}
-
-% TODO: Required Asset Name: Hardware Assembled Prototype
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter6/hardware_assembled_prototype.png}
-    \caption{[Placeholder] Hardware Assembled Prototype}
-    \label{fig:placeholder_hardware_assembled_prototype}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
-% TODO: Required Asset Name: Sensor Pump Wiring Setup
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter6/sensor_pump_wiring_setup.png}
-    \caption{[Placeholder] Sensor Pump Wiring Setup}
-    \label{fig:placeholder_sensor_pump_wiring_setup}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
-% TODO: Required Asset Name: Field Test Environment
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter6/field_test_environment.png}
-    \caption{[Placeholder] Field Test Environment}
-    \label{fig:placeholder_field_test_environment}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
-% TODO: Required Asset Name: Serial Monitor Logs
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter6/serial_monitor_logs.png}
-    \caption{[Placeholder] Serial Monitor Logs}
-    \label{fig:placeholder_serial_monitor_logs}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
-% TODO: Required Asset Name: API Output Tests
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter6/api_output_tests.png}
-    \caption{[Placeholder] API Output Tests}
-    \label{fig:placeholder_api_output_tests}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
-% TODO: Required Asset Name: Sensor Reading Validation
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter6/sensor_reading_validation.png}
-    \caption{[Placeholder] Sensor Reading Validation}
-    \label{fig:placeholder_sensor_reading_validation}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
 
 \setcounter{chapter}{6}
 \setcounter{figure}{0}
@@ -374,6 +298,32 @@ within 0.8 seconds. Response format valid and complete.}
 
 \vspace{0.5em}
 \noindent\textbf{Model Evaluation Metrics Validation:} During offline validation against the test dataset partition, the Random Forest model achieved a test accuracy of \textbf{87.86\%} and a 10-fold cross-validation score of \textbf{85.79\%}, verifying its robustness before deployment.
+
+% Figure: AI Training Metrics Part 1
+\enlargethispage{3\baselineskip}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/chapter6/ai_training_metrics_1.png}
+    \caption{Random Forest Dataset Loading and Pre-class Metrics}
+    \label{fig:ai_metrics_1}
+\end{figure}
+
+Figure \ref{fig:ai_metrics_1} illustrates the initialization and training phase of the Random Forest model. The dataset consists of 2800 rows spanning six crucial columns, with an optimal train/test split allocating 2240 rows for training and 560 for testing. The console output confirms an overall test accuracy of \textbf{87.86\%} and a 5-fold cross-validation score of \textbf{85.79\% ($\pm$ 2.15\%)}. The detailed per-class report validates high precision, recall, and F1-scores uniformly across all target crops, proving its readiness.
+
+% Figure: AI Training Metrics Part 2
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/chapter6/ai_training_metrics_2.png}
+    \caption{Feature Importances and Live Prediction Tests}
+    \label{fig:ai_metrics_2}
+\end{figure}
+
+Figure \ref{fig:ai_metrics_2} highlights the internal feature weightings and live prediction behavior. 
+
+\textbf{Feature Importances:} The model inherently determined the relative predictive importance of each input factor during training based on information gain. \textbf{Soil Moisture} emerged as the most dominant predictive feature (0.2941 weight), followed by \textbf{Temperature} (0.1951), \textbf{Soil Type} (0.1908), \textbf{Humidity} (0.1651), and \textbf{Season} (0.1549). This structural hierarchy aligns perfectly with real-world agricultural logic, as soil moisture and climate significantly dictate crop viability more acutely than secondary parameters.
+
+\textbf{Live Prediction Test \& Confidence Scores:} During live inference, the model generates specific confidence percentages. For highly distinct environmental profiles (e.g., Mustard at \textbf{98.11\%} and Cotton at \textbf{94.59\%} confidence), the model exhibits extreme certainty. However, the system sometimes experiences split votes between crops that thrive in similar climates. For instance, the system predicted Chickpea (62.5\%) instead of Wheat, and Sugarcane (61.38\%) instead of Rice. These lower confidence scores occur naturally because both of these pairs share highly overlapping temperature and moisture suitability zones in the synthetic dataset, causing the decision trees' probabilities to be distributed across both valid classes.
 
 % -----------------------------------------------------------
 \subsubsection{TC-UT-10: Firebase Push Notification Dispatch}
@@ -1224,19 +1174,81 @@ System & TC-ST-10 & Wi-Fi Failure Resilience
 
 To validate the physical performance and robustness of the field unit under actual operating conditions, several hardware tests were conducted. The following figures present the physical ESP32 setup and sensor deployment used to achieve the results documented in the preceding test cases.
 
+% TODO: Required Asset Name: Hardware Assembled Prototype
+% Asset Type: Missing Technical Visual Asset
+% Status: Pending Asset Collection
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.8\textwidth]{figures/chapter6/hardware_setup.png}
-    \caption{[PLACEHOLDER] Physical Hardware Setup (ESP32, Relay, and Sensors)}
-    \label{fig:hw_setup}
+    \includegraphics[width=0.8\textwidth]{figures/chapter6/hardware_assembled_prototype.png}
+    \caption{[Placeholder] Hardware Assembled Prototype}
+    \label{fig:placeholder_hardware_assembled_prototype}
 \end{figure}
 
+[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+
+% Figure: Sensor Pump Wiring Setup
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.8\textwidth]{figures/chapter6/sensor_deployment.png}
-    \caption{[PLACEHOLDER] Soil and Environmental Sensor Field Deployment}
-    \label{fig:hw_sensors}
+    \includegraphics[width=0.85\textwidth]{figures/chapter6/sensor_pump_wiring_setup.png}
+    \caption{Actuator and Sensor Wiring Configuration}
+    \label{fig:sensor_pump_wiring}
 \end{figure}
+
+To validate the integration between the sensing layer and the actuation layer, Figure \ref{fig:sensor_pump_wiring} presents a close-up angle of the LDR and relay module configuration. This setup confirms the physical data pathways responsible for triggering the automated irrigation system. By isolating these specific connections, the testing phase verified that the ESP32 correctly translates logical software commands into physical electrical signals capable of safely driving the external water pump. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+
+% TODO: Required Asset Name: Field Test Environment
+% Asset Type: Missing Technical Visual Asset
+% Status: Pending Asset Collection
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/chapter6/field_test_environment.png}
+    \caption{[Placeholder] Field Test Environment}
+    \label{fig:placeholder_field_test_environment}
+\end{figure}
+
+[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+
+
+\subsection{Software \& API Testing Evidence}
+
+To validate the software components, including the Node.js backend API, the ESP32 firmware telemetry, and the AI model outputs, rigorous software testing was conducted. The following figures provide direct visual evidence of the system's operational logs, API responses, and accurate data handling mechanisms.
+
+% TODO: Required Asset Name: Serial Monitor Logs
+% Asset Type: Missing Technical Visual Asset
+% Status: Pending Asset Collection
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/chapter6/serial_monitor_logs.png}
+    \caption{[Placeholder] Serial Monitor Logs}
+    \label{fig:placeholder_serial_monitor_logs}
+\end{figure}
+
+[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+
+% TODO: Required Asset Name: API Output Tests
+% Asset Type: Missing Technical Visual Asset
+% Status: Pending Asset Collection
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/chapter6/api_output_tests.png}
+    \caption{[Placeholder] API Output Tests}
+    \label{fig:placeholder_api_output_tests}
+\end{figure}
+
+[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+
+% TODO: Required Asset Name: Sensor Reading Validation
+% Asset Type: Missing Technical Visual Asset
+% Status: Pending Asset Collection
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/chapter6/sensor_reading_validation.png}
+    \caption{[Placeholder] Sensor Reading Validation}
+    \label{fig:placeholder_sensor_reading_validation}
+\end{figure}
+
+[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+
 \subsection{Summary}
 
 A total of \textbf{31 test cases} were designed and

@@ -12,6 +12,8 @@
 
 \usepackage{placeins}
 \usepackage{booktabs}
+\usepackage{ltablex}
+\keepXColumns
 
 % ==============================
 % Fonts & Math
@@ -45,7 +47,8 @@
 \usepackage{subcaption}
 \usepackage{float}
 % Ensure figures are numbered by section as per template
-\renewcommand{\thefigure}{\thesection.\arabic{figure}}
+\renewcommand{\thefigure}{\arabic{chapter}-\arabic{figure}}
+\renewcommand{\thetable}{\arabic{chapter}-\arabic{table}}
 
 % ============================== 
 % Tables & Lists

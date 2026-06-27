@@ -34,55 +34,23 @@ phases: requirement analysis, system design, software development,
 hardware integration, deployment, and testing. The following 
 objectives were successfully achieved:
 
-\begin{itemize}[leftmargin=1.2cm]
-    \item \textbf{Real-Time Environmental Monitoring:} The ESP32 
-    microcontroller successfully collected soil moisture, 
-    temperature, humidity, light intensity, and rainfall readings 
-    at 30-second intervals and transmitted them to the backend 
-    server over Wi-Fi.
+\textbf{Real-Time Environmental Monitoring:} The ESP32 microcontroller successfully collected soil moisture, temperature, humidity, light intensity, and rainfall readings at 30-second intervals and transmitted them to the backend server over Wi-Fi.
 
-    \item \textbf{Automated Irrigation Control:} A relay-driven 
-    water pump was integrated with threshold-based automation. 
-    The system automatically activates irrigation when soil 
-    moisture drops below the configured threshold and 
-    intelligently blocks irrigation during detected rainfall, 
-    reducing water wastage \cite{garcia2020iot}.
+\textbf{Automated Irrigation Control:} A relay-driven water pump was integrated with threshold-based automation. The system automatically activates irrigation when soil moisture drops below the configured threshold and intelligently blocks irrigation during detected rainfall, reducing water wastage \cite{garcia2020iot}.
 
-    \item \textbf{Offline Resilience:} The embedded firmware 
-    maintained local irrigation control when Wi-Fi connectivity 
-    was unavailable, ensuring uninterrupted field operation 
-    \cite{hassebo2024esp32}.
+\textbf{Offline Resilience:} The embedded firmware maintained local irrigation control when Wi-Fi connectivity was unavailable, ensuring uninterrupted field operation \cite{hassebo2024esp32}.
 
-    \item \textbf{Backend and Data Management:} A Node.js REST 
-    API backend with a relational MySQL database was successfully 
-    deployed. The backend handles sensor ingestion, business rule 
-    evaluation, alert generation, and mobile API serving across 
-    11 database tables \cite{thilakarathne2023fields}.
+\textbf{Backend and Data Management:} A Node.js REST API backend with a relational MySQL database was successfully deployed. The backend handles sensor ingestion, business rule evaluation, alert generation, and mobile API serving across 11 database tables \cite{thilakarathne2023fields}.
 
-    \item \textbf{Mobile Application:} A mobile application was 
-    developed to provide farmers with live field monitoring, 
-    irrigation control, historical analytics, alert management, 
-    and AI crop recommendation access from a single interface 
-    \cite{mobileui2022}.
+\textbf{Mobile Application:} A mobile application was developed to provide farmers with live field monitoring, irrigation control, historical analytics, alert management, and AI crop recommendation access from a single interface \cite{mobileui2022}.
 
-    \item \textbf{Push Notification and Alerting:} Firebase Cloud 
-    Messaging was integrated to deliver real-time push 
-    notifications to farmers whenever critical soil moisture or 
-    sensor failure conditions were detected \cite{khawas2018firebase}.
+\textbf{Push Notification and Alerting:} Firebase Cloud Messaging was integrated to deliver real-time push notifications to farmers whenever critical soil moisture or sensor failure conditions were detected \cite{khawas2018firebase}.
 
-    \item \textbf{AI-Based Crop Recommendations:} A Python-based 
-    machine learning service was trained and deployed to generate 
-    crop recommendations with confidence scores based on soil 
-    conditions, temperature, humidity, and season 
-    \cite{musanase2023data}.
+\textbf{AI-Based Crop Recommendations:} A Python-based machine learning service was trained and deployed to generate crop recommendations with confidence scores based on soil conditions, temperature, humidity, and season \cite{musanase2023data}.
 
-    \item \textbf{Affordability:} The estimated hardware cost of 
-    PKR~6,400 (approximately USD~23) per field unit makes the 
-    system accessible to small and medium farmers in Pakistan, 
-    which is a key differentiator from expensive commercial 
-    solutions already available in the market 
-    \cite{zia2021experimental}.
-\end{itemize}
+\textbf{Affordability:} The estimated hardware cost of PKR~6,400 (approximately USD~23) per field unit makes the system accessible to small and medium farmers in Pakistan, which is a key differentiator from expensive commercial solutions already available in the market \cite{zia2021experimental}.
+
+
 
 All six epics defined in Chapter~2 were implemented and verified 
 through 18 test cases, each of which passed during end-to-end 
@@ -113,35 +81,19 @@ food security and sustainable agriculture.
 While the system meets its defined objectives, several limitations 
 were identified during development and testing:
 
-\begin{itemize}[leftmargin=1.2cm]
-    \item \textbf{Wi-Fi Dependency:} The current implementation 
-    relies on Wi-Fi for cloud connectivity. In rural areas of 
-    Pakistan where Wi-Fi infrastructure is limited, remote field 
-    deployment may be restricted \cite{mansoor2025iot}.
+\textbf{Wi-Fi Dependency:} The current implementation relies on Wi-Fi for cloud connectivity. In rural areas of Pakistan where Wi-Fi infrastructure is limited, remote field deployment may be restricted \cite{mansoor2025iot}.
 
-    \item \textbf{Single Field Unit Prototype:} The hardware 
-    prototype was built and tested for a single field unit. 
-    Multi-node deployment across large farms has not been 
-    validated at scale.
+\textbf{Single Field Unit Prototype:} The hardware prototype was built and tested for a single field unit. Multi-node deployment across large farms has not been validated at scale.
 
-    \item \textbf{AI Model Training Data:} The crop recommendation 
-    model was trained on publicly available datasets. Performance 
-    may vary for highly localized Pakistani soil conditions 
-    without region-specific training data \cite{ali2025soilml}.
+\textbf{AI Model Training Data:} The crop recommendation model was trained on publicly available datasets. Performance may vary for highly localized Pakistani soil conditions without region-specific training data \cite{ali2025soilml}.
 
-    \item \textbf{Power Supply:} The system relies on mains 
-    electricity for the ESP32 and pump. Areas without reliable 
-    power supply require an alternative energy source, which was 
-    not implemented in this prototype \cite{khalifeh2024solar}.
+\textbf{Power Supply:} The system relies on mains electricity for the ESP32 and pump. Areas without reliable power supply require an alternative energy source, which was not implemented in this prototype \cite{khalifeh2024solar}.
 
-    \item \textbf{Weather API Integration:} Weather forecasts 
-    are not yet integrated; decisions are based solely on 
-    real-time sensor readings without future weather context.
+\textbf{Weather API Integration:} Weather forecasts are not yet integrated; decisions are based solely on real-time sensor readings without future weather context.
 
-    \item \textbf{Urdu Language Support:} The mobile application 
-    currently supports English only. Urdu language support would 
-    significantly improve accessibility for farmers in Pakistan.
-\end{itemize}
+\textbf{Urdu Language Support:} The mobile application currently supports English only. Urdu language support would significantly improve accessibility for farmers in Pakistan.
+
+
 
 % ----------------------------------------------------------
 % 6.3 Future Work

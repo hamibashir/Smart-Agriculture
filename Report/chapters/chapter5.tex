@@ -6,35 +6,6 @@
 
 
 
-% ==========================================================
-% Pending Missing Visual Assets
-% ==========================================================
-\subsection{Pending Missing Visual Assets}
-
-% TODO: Required Asset Name: Backend Deployment Logs
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter5/backend_deployment_logs.png}
-    \caption{[Placeholder] Backend Deployment Logs}
-    \label{fig:placeholder_backend_deployment_logs}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
-% TODO: Required Asset Name: AI API Deployment
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter5/ai_api_deployment.png}
-    \caption{[Placeholder] AI API Deployment}
-    \label{fig:placeholder_ai_api_deployment}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
 \setcounter{chapter}{5}
 \setcounter{figure}{0}
 \setcounter{table}{0}
@@ -52,14 +23,8 @@ This chapter describes the installation and deployment process of the Smart AI P
 
 \subsubsection{Deployment Overview}
 The deployment is performed in the following order to ensure correct integration:
-\begin{enumerate}[leftmargin=1.2cm]
-    \item Prepare and connect hardware components (sensors, ESP32, relay, pump/valve).
-    \item Flash ESP32 firmware and configure Wi-Fi/device identifiers.
-    \item Deploy backend services (Node.js) and configure environment variables.
-    \item Configure the database (Firebase Realtime Database and/or MySQL).
-    \item Install and connect the mobile application to the backend.
-    \item Perform end-to-end verification (live readings, control actions, alerts, and AI output).
-\end{enumerate}
+First, prepare and connect hardware components (sensors, ESP32, relay, pump/valve). Next, flash ESP32 firmware and configure Wi-Fi/device identifiers. Then, deploy backend services (Node.js) and configure environment variables. Following that, configure the database (Firebase Realtime Database and/or MySQL). Subsequently, install and connect the mobile application to the backend. Finally, perform end-to-end verification (live readings, control actions, alerts, and AI output).
+
 
 % ----------------------------------------------------------
 % 5.1.2 Hardware Setup and Field Installation
@@ -69,12 +34,8 @@ The deployment is performed in the following order to ensure correct integration
 
 The field unit installation ensures correct sensor placement and safe electrical connections.
 
-\begin{itemize}[leftmargin=1.2cm]
-    \item \textbf{ESP32 and Sensors:} Connect soil moisture sensor to ESP32 ADC pin, DHT22 to digital pin, LDR to ADC pin, rain sensor to digital pin, and flow sensor to interrupt-capable pin.
-    \item \textbf{Relay and Pump/Valve:} Relay input is connected to ESP32 GPIO output. The relay output is wired to the pump/valve power line to allow switching.
-    \item \textbf{Power:} Use regulated supply for ESP32 and sensors. If the pump requires higher voltage/current, use a separate power source with proper isolation.
-    \item \textbf{Placement:} Soil moisture sensor is inserted into soil near crop roots; rain sensor is placed in open air; flow sensor is installed inline with irrigation pipe.
-\end{itemize}
+\textbf{ESP32 and Sensors:} Connect soil moisture sensor to ESP32 ADC pin, DHT22 to digital pin, LDR to ADC pin, rain sensor to digital pin, and flow sensor to interrupt-capable pin. \textbf{Relay and Pump/Valve:} Relay input is connected to ESP32 GPIO output. The relay output is wired to the pump/valve power line to allow switching. \textbf{Power:} Use regulated supply for ESP32 and sensors. If the pump requires higher voltage/current, use a separate power source with proper isolation. \textbf{Placement:} Soil moisture sensor is inserted into soil near crop roots; rain sensor is placed in open air; flow sensor is installed inline with irrigation pipe.
+
 
 \textbf{Safety Note:} Electrical wiring for pumps should be performed using proper insulation, fuses, and safe grounding to prevent hazards.
 
@@ -87,27 +48,12 @@ The field unit installation ensures correct sensor placement and safe electrical
 The firmware is uploaded using Arduino IDE (or compatible toolchain) and configured for the target farm environment.
 
 \subsubsection{Firmware Flashing Steps}
-\begin{enumerate}[leftmargin=1.2cm]
-    \item Install Arduino IDE and ESP32 board support packages.
-    \item Connect ESP32 to a computer via USB.
-    \item Select the correct ESP32 board and COM port in Arduino IDE.
-    \item Update configuration parameters in the firmware:
-    \begin{itemize}[leftmargin=1.2cm]
-        \item Wi-Fi SSID and password
-        \item Backend base URL (API endpoint)
-        \item Device ID / Field ID mapping
-        \item Default moisture thresholds (initial values)
-    \end{itemize}
-    \item Upload the firmware to ESP32 and monitor serial logs for confirmation.
-\end{enumerate}
+First, install Arduino IDE and ESP32 board support packages. Next, connect ESP32 to a computer via USB. Then, select the correct ESP32 board and COM port in Arduino IDE. Following that, update configuration parameters in the firmware: [leftmargin=1.2cm] Subsequently, wi-Fi SSID and password First, backend base URL (API endpoint) Next, device ID / Field ID mapping Then, default moisture thresholds (initial values)  Finally, upload the firmware to ESP32 and monitor serial logs for confirmation.
+
 
 \subsubsection{Post-Flash Verification}
-\begin{itemize}[leftmargin=1.2cm]
-    \item Confirm Wi-Fi connection is established.
-    \item Confirm sensor values are printed in serial logs.
-    \item Confirm telemetry requests are reaching the backend (HTTP 200 OK).
-    \item Confirm relay toggles correctly in manual test mode.
-\end{itemize}
+Confirm Wi-Fi connection is established. Confirm sensor values are printed in serial logs. Confirm telemetry requests are reaching the backend (HTTP 200 OK). Confirm relay toggles correctly in manual test mode.
+
 
 % ----------------------------------------------------------
 % 5.1.4 Backend Deployment (Node.js Server)
@@ -118,12 +64,8 @@ The firmware is uploaded using Arduino IDE (or compatible toolchain) and configu
 The backend server hosts REST APIs for device ingestion, user authentication, dashboard data, irrigation control, alerts, and AI recommendation requests.
 
 \subsubsection{Backend Installation Requirements}
-\begin{itemize}[leftmargin=1.2cm]
-    \item Node.js runtime (LTS recommended)
-    \item Package manager (npm)
-    \item Firebase Admin SDK credentials (for Firebase option)
-    \item MySQL credentials (if MySQL option is enabled)
-\end{itemize}
+Node.js runtime (LTS recommended) Package manager (npm) Firebase Admin SDK credentials (for Firebase option) MySQL credentials (if MySQL option is enabled)
+
 
 \subsubsection{Backend Deployment Steps}
 \begin{enumerate}[leftmargin=1.2cm]
@@ -152,10 +94,30 @@ npm start
 \end{enumerate}
 
 \subsubsection{Backend Deployment Modes}
-\begin{itemize}[leftmargin=1.2cm]
-    \item \textbf{Local Server Mode:} Suitable for demos and lab testing (same network).
-    \item \textbf{Cloud Server Mode:} Recommended for remote access by farmers outside the local network.
-\end{itemize}
+\textbf{Local Server Mode:} Suitable for demos and lab testing (same network). \textbf{Cloud Server Mode:} Recommended for remote access by farmers outside the local network.
+
+
+
+% Figure: DigitalOcean Cloud Deployment Dashboard
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/chapter5/digitalocean_dashboard.png}
+    \caption{DigitalOcean App Platform Deployment Dashboard}
+    \label{fig:do_dashboard}
+\end{figure}
+
+The DigitalOcean App Platform dashboard confirms the successful cloud deployment of the system's core infrastructure. As illustrated in Figure \ref{fig:do_dashboard}, three primary components are actively running in the Singapore (SGP1) region: the Node.js backend API, the Python-based AI recommendation service, and the managed MySQL database cluster. This managed architecture ensures high availability, automated load balancing, and secure communication between the microservices.
+
+% Figure: Backend API Health Check
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/chapter5/backend_health_api.png}
+    \caption{Backend Node.js API Health Check Endpoint}
+    \label{fig:backend_health}
+\end{figure}
+
+To verify the operational status of the backend server, a health check endpoint is exposed. Figure \ref{fig:backend_health} displays the successful JSON response from \texttt{api.hamzabashir.online/health}, confirming that the Node.js API is live in the production environment. This endpoint ensures that mobile applications and IoT field units can reliably communicate with the backend services.
+
 
 % ----------------------------------------------------------
 % 5.1.4 Database Deployment and Configuration
@@ -190,21 +152,12 @@ mysql -u smart_agri_user -p smart_agriculture
 \end{verbatim}
 
     \item Core tables created:
-    \begin{itemize}
-        \item \textbf{User \& Field Management:} users, fields
-        \item \textbf{Sensor \& Telemetry:} sensors, sensor\_readings
-        \item \textbf{Irrigation:} irrigation\_logs, irrigation\_schedules
-        \item \textbf{Alerts \& AI:} alerts, crop\_recommendations
-        \item \textbf{System:} weather\_data, system\_settings, audit\_logs
-    \end{itemize}
+    \textbf{User \& Field Management:} users, fields \textbf{Sensor \& Telemetry:} sensors, sensor\_readings \textbf{Irrigation:} irrigation\_logs, irrigation\_schedules \textbf{Alerts \& AI:} alerts, crop\_recommendations \textbf{System:} weather\_data, system\_settings, audit\_logs
+
 
     \item Configure indexes for performance optimization:
-    \begin{itemize}
-        \item Index on (sensor\_id, reading\_time) for sensor\_readings table
-        \item Index on (field\_id) for all related tables
-        \item Index on (user\_id) for authentication queries
-        \item Index on timestamps for time-series queries
-    \end{itemize}
+    Index on (sensor\_id, reading\_time) for sensor\_readings table Index on (field\_id) for all related tables Index on (user\_id) for authentication queries Index on timestamps for time-series queries
+
 
     \item Set up database connection in backend (Node.js):
 \begin{verbatim}
@@ -247,10 +200,20 @@ python app.py
 \end{enumerate}
 
 \subsubsection{AI Verification}
-\begin{itemize}[leftmargin=1.2cm]
-    \item Send a test request with sample feature payload.
-    \item Confirm response contains recommended crop(s) and confidence score.
-\end{itemize}
+Send a test request with sample feature payload. Confirm response contains recommended crop(s) and confidence score.
+
+
+
+% Figure: AI Service Health Check
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/chapter5/ai_health_api.png}
+    \caption{Python AI Service Health Check Endpoint}
+    \label{fig:ai_health}
+\end{figure}
+
+Following the deployment of the machine learning model, a dedicated health endpoint verifies the AI service's availability and configuration. As shown in Figure \ref{fig:ai_health}, the JSON response from \texttt{ai.hamzabashir.online/health} validates that the Random Forest model is actively serving predictions. The response also confirms the system's evaluation metrics (87.86\% model accuracy and 85.79\% cross-validation accuracy), the supported crop classes, and the required input features (soil moisture, temperature, humidity, soil type, and season), ensuring proper integration with the backend pipeline.
+
 
 % ----------------------------------------------------------
 % 5.1.6 Mobile Application Deployment
@@ -261,21 +224,12 @@ python app.py
 The mobile application is used by farmers to view live sensor readings, irrigation status, historical analytics, alerts, and AI crop recommendations.
 
 \subsubsection{Installation Steps}
-\begin{enumerate}[leftmargin=1.2cm]
-    \item Build the mobile application APK (or install via test distribution).
-    \item Install on an Android device (enable ``Install from unknown sources'' if needed).
-    \item Configure base URL (backend server address) and sign in/register.
-    \item Add/register field/device mapping (Field ID and Device ID).
-\end{enumerate}
+First, build the mobile application APK (or install via test distribution). Next, install on an Android device (enable ``Install from unknown sources'' if needed). Then, configure base URL (backend server address) and sign in/register. Finally, add/register field/device mapping (Field ID and Device ID).
+
 
 \subsubsection{Mobile Verification Checklist}
-\begin{itemize}[leftmargin=1.2cm]
-    \item Live readings update correctly on dashboard.
-    \item Manual irrigation control toggles pump/valve.
-    \item Alerts appear in the app and push notifications are received.
-    \item Weekly trends / historical charts load from stored data.
-    \item AI recommendation screen returns crop suggestions with confidence.
-\end{itemize}
+Live readings update correctly on dashboard. Manual irrigation control toggles pump/valve. Alerts appear in the app and push notifications are received. Weekly trends / historical charts load from stored data. AI recommendation screen returns crop suggestions with confidence.
+
 
 % ----------------------------------------------------------
 % 5.2 End-to-End System Validation (Recommended for Deployment Chapter)
@@ -285,14 +239,8 @@ The mobile application is used by farmers to view live sensor readings, irrigati
 
 After deployment, the complete system is validated using a practical checklist to ensure correct integration:
 
-\begin{enumerate}[leftmargin=1.2cm]
-    \item \textbf{Telemetry Check:} ESP32 sends readings and backend stores them successfully.
-    \item \textbf{Dashboard Check:} Mobile app displays live readings and device status.
-    \item \textbf{Automation Check:} When soil moisture drops below threshold, irrigation triggers automatically (rain condition blocks irrigation).
-    \item \textbf{Logging Check:} Irrigation events and water usage logs are recorded.
-    \item \textbf{Alert Check:} Critical low moisture generates a push notification.
-    \item \textbf{AI Check:} Crop recommendation is produced from recent/historical data with confidence score.
-\end{enumerate}
+First, \textbf{Telemetry Check:} ESP32 sends readings and backend stores them successfully. Next, \textbf{Dashboard Check:} Mobile app displays live readings and device status. Then, \textbf{Automation Check:} When soil moisture drops below threshold, irrigation triggers automatically (rain condition blocks irrigation). Following that, \textbf{Logging Check:} Irrigation events and water usage logs are recorded. Subsequently, \textbf{Alert Check:} Critical low moisture generates a push notification. Finally, \textbf{AI Check:} Crop recommendation is produced from recent/historical data with confidence score.
+
 
 % ----------------------------------------------------------
 % 5.3 Summary

@@ -4,35 +4,6 @@
 
 
 
-% ==========================================================
-% Pending Missing Visual Assets
-% ==========================================================
-\subsection{Pending Missing Visual Assets}
-
-% TODO: Required Asset Name: AI Dataset Sample
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter4/ai_dataset_sample.png}
-    \caption{[Placeholder] AI Dataset Sample}
-    \label{fig:placeholder_ai_dataset_sample}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
-% TODO: Required Asset Name: AI Training Metrics
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter4/ai_training_metrics.png}
-    \caption{[Placeholder] AI Training Metrics}
-    \label{fig:placeholder_ai_training_metrics}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
 \setcounter{chapter}{4}
 \setcounter{figure}{0}
 \setcounter{table}{0}
@@ -46,7 +17,7 @@ development standards, environment, and key software modules across
 the embedded firmware (ESP32), backend services (Node.js), mobile 
 application (Android/Flutter), and the AI/ML recommendation service 
 \cite{thilakarathne2023fields}. The implementation is aligned with 
-the system design described in Chapter~\ref{ch:system-design}.
+the system design described in Chapter 3.
 
 % ----------------------------------------------------------
 % 4.1 Coding Standards
@@ -59,51 +30,20 @@ among team members, the following coding standards were followed
 \cite{sommerville2016software}:
 
 \subsubsection{General Standards}
-\begin{itemize}[leftmargin=1.2cm]
-    \item Consistent naming conventions were used across all modules 
-    (camelCase for variables/functions, PascalCase for classes).
-    \item Functions were kept small and single-purpose to improve 
-    modularity and testability \cite{sommerville2016software}.
-    \item All modules include meaningful comments for complex logic 
-    and configuration parameters.
-    \item Sensitive information (API keys, tokens) was kept out of 
-    source code and stored using environment variables or secure 
-    configuration files \cite{jwtauth2017}.
-    \item Proper error handling and validation were applied at the 
-    boundaries (API inputs, sensor readings, and database writes).
-\end{itemize}
+Consistent naming conventions were used across all modules (camelCase for variables/functions, PascalCase for classes). Functions were kept small and single-purpose to improve modularity and testability \cite{sommerville2016software}. All modules include meaningful comments for complex logic and configuration parameters. Sensitive information (API keys, tokens) was kept out of source code and stored using environment variables or secure configuration files \cite{jwtauth2017}. Proper error handling and validation were applied at the boundaries (API inputs, sensor readings, and database writes).
+
 
 \subsubsection{ESP32 Firmware Standards}
-\begin{itemize}[leftmargin=1.2cm]
-    \item Clear separation of concerns: sensor reading, networking, 
-    and actuation logic implemented as separate functions 
-    \cite{hassebo2024esp32}.
-    \item Debouncing and filtering used for noisy sensors (e.g., 
-    rain sensor) to avoid false triggers \cite{noisyiot2023}.
-    \item Safe defaults: irrigation is turned \textbf{OFF} when 
-    network or sensor failures occur to avoid uncontrolled watering 
-    \cite{hassebo2024esp32}.
-\end{itemize}
+Clear separation of concerns: sensor reading, networking, and actuation logic implemented as separate functions \cite{hassebo2024esp32}. Debouncing and filtering used for noisy sensors (e.g., rain sensor) to avoid false triggers \cite{noisyiot2023}. Safe defaults: irrigation is turned \textbf{OFF} when network or sensor failures occur to avoid uncontrolled watering \cite{hassebo2024esp32}.
+
 
 \subsubsection{Backend Standards (Node.js)}
-\begin{itemize}[leftmargin=1.2cm]
-    \item REST endpoints follow consistent URI patterns and HTTP 
-    status codes \cite{thilakarathne2023fields}.
-    \item Middleware-based validation and authentication (JWT) is 
-    enforced for protected routes \cite{jwtauth2017}.
-    \item Logging includes request IDs and timestamps for debugging 
-    and audit.
-\end{itemize}
+REST endpoints follow consistent URI patterns and HTTP status codes \cite{thilakarathne2023fields}. Middleware-based validation and authentication (JWT) is enforced for protected routes \cite{jwtauth2017}. Logging includes request IDs and timestamps for debugging and audit.
+
 
 \subsubsection{Mobile Application Standards}
-\begin{itemize}[leftmargin=1.2cm]
-    \item UI components follow a consistent design system for 
-    readability and ease of use \cite{mobileui2022}.
-    \item Data is fetched asynchronously and cached for better user 
-    experience.
-    \item Input forms (thresholds, schedules) validate values before 
-    sending to backend.
-\end{itemize}
+UI components follow a consistent design system for readability and ease of use \cite{mobileui2022}. Data is fetched asynchronously and cached for better user experience. Input forms (thresholds, schedules) validate values before sending to backend.
+
 
 % ----------------------------------------------------------
 % 4.2 Development Environment
@@ -115,33 +55,12 @@ This section describes the tools, platforms, and configurations
 used for software development.
 
 \subsubsection{Tools and Platforms}
-\begin{itemize}[leftmargin=1.2cm]
-    \item \textbf{Embedded/Firmware:} Arduino IDE with ESP32 board 
-    support packages \cite{raj2021survey}.
-    \item \textbf{Backend:} Node.js runtime with Express.js 
-    framework \cite{thilakarathne2023fields}.
-    \item \textbf{Database:} MySQL (MariaDB) for all data storage 
-    and retrieval operations \cite{uotila2020db}.
-    \item \textbf{Mobile:} Android Studio (Android) or Flutter SDK 
-    (cross-platform) \cite{khawas2018firebase}.
-    \item \textbf{AI/ML:} Python environment with TensorFlow / 
-    Scikit-learn \cite{ali2025soilml}.
-    \item \textbf{Version Control:} Git for collaborative 
-    development and change tracking \cite{sommerville2016software}.
-\end{itemize}
+\textbf{Embedded/Firmware:} Arduino IDE with ESP32 board support packages \cite{raj2021survey}. \textbf{Backend:} Node.js runtime with Express.js framework \cite{thilakarathne2023fields}. \textbf{Database:} MySQL (MariaDB) for all data storage and retrieval operations \cite{uotila2020db}. \textbf{Mobile:} Android Studio (Android) or Flutter SDK (cross-platform) \cite{khawas2018firebase}. \textbf{AI/ML:} Python environment with TensorFlow / Scikit-learn \cite{ali2025soilml}. \textbf{Version Control:} Git for collaborative development and change tracking \cite{sommerville2016software}.
+
 
 \subsubsection{Testing Setup}
-\begin{itemize}[leftmargin=1.2cm]
-    \item \textbf{Firmware testing:} Serial monitor logging and 
-    controlled sensor value simulation \cite{hassebo2024esp32}.
-    \item \textbf{Backend testing:} API testing using Postman and 
-    unit checks for validation logic.
-    \item \textbf{Mobile testing:} Emulators and physical device 
-    testing for UI and notifications \cite{khawas2018firebase}.
-    \item \textbf{End-to-end testing:} Real sensor readings sent to 
-    backend, verified on app dashboard and alert system 
-    \cite{emon2025iot}.
-\end{itemize}
+\textbf{Firmware testing:} Serial monitor logging and controlled sensor value simulation \cite{hassebo2024esp32}. \textbf{Backend testing:} API testing using Postman and unit checks for validation logic. \textbf{Mobile testing:} Emulators and physical device testing for UI and notifications \cite{khawas2018firebase}. \textbf{End-to-end testing:} Real sensor readings sent to backend, verified on app dashboard and alert system \cite{emon2025iot}.
+
 
 % ----------------------------------------------------------
 % 4.3 Software Description
@@ -170,7 +89,7 @@ rainfall, light intensity, temperature/humidity, and relay-based
 pump control. This explicit pin mapping connects the physical field unit 
 with the software logic \cite{raj2021survey}.
 
-\begin{verbatim}
+\begin{lstlisting}
 // Pin Definitions
 #define SOIL_PIN  34
 #define RAIN_PIN  33
@@ -180,7 +99,7 @@ with the software logic \cite{raj2021survey}.
 
 #define DHT_TYPE DHT22
 DHT dht(DHT_PIN, DHT_TYPE);
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} The hardware components are mapped with ESP32 
 pins, enabling the firmware to collect sensor data and control the 
@@ -196,13 +115,13 @@ Referencing \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 46--52), hardco
 status, and light intensity. These limits are utilized by the firmware 
 for local offline automation and zero-latency safety decisions.
 
-\begin{verbatim}
+\begin{lstlisting}
 // Sensor Thresholds
 #define SOIL_DRY_THRESHOLD   2800
 #define SOIL_WET_THRESHOLD   1200
 #define RAIN_THRESHOLD       2000
 #define LIGHT_DARK_THRESHOLD 3000
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} The system can identify dry soil, wet soil, 
 rainfall, and dark light conditions using predefined sensor 
@@ -216,7 +135,7 @@ thresholds.
 
 As shown in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 73--78), the firmware establishes a strict three-tier timing mechanism. This architecture separates fast local safety checks (1s), backend command polling (5s), and full telemetry data uploads (30s) to optimize network bandwidth \cite{hassebo2024esp32}.
 
-\begin{verbatim}
+\begin{lstlisting}
 // Timing Configuration
 #define SENSOR_READ_INTERVAL   1000
 #define COMMAND_POLL_INTERVAL  5000
@@ -224,7 +143,7 @@ As shown in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 73--78), the fi
 #define BACKEND_RETRY_INTERVAL 5000
 #define WIFI_RETRY_INTERVAL_MS 10000
 #define PUMP_MIN_RUN_TIME      1500
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} Sensors are read every second, backend commands 
 are checked every five seconds, and complete sensor data is 
@@ -240,7 +159,7 @@ Located in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 131--168), the s
 the DHT sensor, configures the relay pin, and explicitly keeps the pump OFF 
 by default. Since the relay operates via an active-low trigger, HIGH safely enforces the OFF state \cite{hassebo2024esp32}.
 
-\begin{verbatim}
+\begin{lstlisting}
 void setup() {
   Serial.begin(115200);
   delay(2000);
@@ -253,7 +172,7 @@ void setup() {
 
   connectToWiFi();
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} The pump remains safely OFF during startup, 
 preventing accidental irrigation when the device powers on.
@@ -268,7 +187,7 @@ The main execution flow, implemented in \texttt{ESP32\_Firmware/final ESP32 code
 Wi-Fi status, reads sensors, evaluates local safety logic, polls 
 backend endpoints for irrigation commands, and handles telemetry uploads \cite{emon2025iot}.
 
-\begin{verbatim}
+\begin{lstlisting}
 void loop() {
   unsigned long now = millis();
 
@@ -307,7 +226,7 @@ void loop() {
     }
   }
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} The firmware performs real-time monitoring, 
 backend synchronization, and sensor data upload in a structured 
@@ -321,7 +240,7 @@ and efficient manner.
 
 To mitigate sensor noise, the firmware applies a smoothing algorithm found in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 346--353). Analog sensor values are averaged across multiple sequential samples to improve reading stability and prevent false condition triggers \cite{noisyiot2023}.
 
-\begin{verbatim}
+\begin{lstlisting}
 int readAnalogSmoothed(uint8_t pin) {
   long sum = 0;
 
@@ -332,7 +251,7 @@ int readAnalogSmoothed(uint8_t pin) {
 
   return (int)(sum / ANALOG_SAMPLES);
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} Sensor readings become more stable and reliable, 
 reducing false triggers caused by noisy analog signals.
@@ -347,7 +266,7 @@ As implemented in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 355--371)
 temperature, and humidity metrics from the connected hardware interfaces 
 \cite{mohanraj2016field}.
 
-\begin{verbatim}
+\begin{lstlisting}
 bool readDht(float& tempC, float& humPct) {
   humPct = dht.readHumidity();
   tempC  = dht.readTemperature();
@@ -368,7 +287,7 @@ void readAllSensors(int& soil, int& rain, int& light,
   light = readAnalogSmoothed(LIGHT_PIN);
   readDht(tempC, humPct);
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} The ESP32 collects all required environmental 
 readings and stores them in cached variables for processing and 
@@ -384,7 +303,7 @@ Detailed in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 238--263), the 
 is detected, the irrigation pump is immediately forced OFF without requiring network 
 communication to the backend API \cite{garcia2020iot}.
 
-\begin{verbatim}
+\begin{lstlisting}
 void applyLocalRainSafety(int rainValue) {
   bool raining = (rainValue < RAIN_THRESHOLD);
 
@@ -404,7 +323,7 @@ void applyLocalRainSafety(int rainValue) {
     syncRelayToCommand(restoreCmd, "rain_cleared_restore");
   }
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} The irrigation pump is protected from running 
 during rainfall, reducing water wastage and improving system safety.
@@ -418,7 +337,7 @@ during rainfall, reducing water wastage and improving system safety.
 As coded in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 270--312), the ESP32 polls the backend via an HTTP GET request to retrieve the latest pump command sent 
 from the mobile application or backend automation logic \cite{yokotani2016mqtt}.
 
-\begin{verbatim}
+\begin{lstlisting}
 bool fetchPumpCommand() {
   if (WiFi.status() != WL_CONNECTED) return false;
 
@@ -448,7 +367,7 @@ bool fetchPumpCommand() {
   http.end();
   return code == 200;
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} The field device stays synchronized with backend 
 pump commands and supports remote irrigation control from the 
@@ -463,7 +382,7 @@ application.
 Located in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 320--341), the relay synchronization function applies backend commands only 
 when the desired pump state differs from the current state. Furthermore, it explicitly blocks remote ON commands if the local rain override is active \cite{hassebo2024esp32}.
 
-\begin{verbatim}
+\begin{lstlisting}
 void syncRelayToCommand(int commanded, const char* reason) {
   if (rainOverrideActive && commanded == 1) {
     Serial.println("Command blocked due to rain override");
@@ -482,7 +401,7 @@ void syncRelayToCommand(int commanded, const char* reason) {
     turnPumpOff();
   }
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} The relay avoids unnecessary repeated switching 
 and ensures backend commands cannot override local rain safety.
@@ -496,7 +415,7 @@ and ensures backend commands cannot override local rain safety.
 Described in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 463--472), the irrigation pump is controlled via an active-low relay module. Setting the 
 relay pin LOW turns the pump ON, while setting it HIGH turns the pump OFF.
 
-\begin{verbatim}
+\begin{lstlisting}
 void turnPumpOn() {
   digitalWrite(RELAY_PIN, LOW);
   pumpRunning = true;
@@ -507,7 +426,7 @@ void turnPumpOff() {
   digitalWrite(RELAY_PIN, HIGH);
   pumpRunning = false;
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} The system can physically control the irrigation 
 pump through the ESP32 and relay module.
@@ -522,7 +441,7 @@ Defined in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 412--458), an of
 locally using its direct soil moisture and rainfall sensor inputs 
 \cite{emon2025iot}.
 
-\begin{verbatim}
+\begin{lstlisting}
 void runOfflinePumpLogic(int soilValue, int rainValue) {
   bool raining = (rainValue < RAIN_THRESHOLD);
   bool soilWet = (soilValue < SOIL_WET_THRESHOLD);
@@ -547,7 +466,7 @@ void runOfflinePumpLogic(int soilValue, int rainValue) {
     turnPumpOn();
   }
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} The irrigation system remains functional even 
 when internet connectivity is unavailable.
@@ -560,7 +479,7 @@ when internet connectivity is unavailable.
 
 As seen in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 477--495), the ESP32 connects to Wi-Fi in station mode and updates its global connection state flag. If the connection drops or fails, the firmware bypasses network uploads and routes execution to the offline safety logic \cite{farhan2019iotplatform}.
 
-\begin{verbatim}
+\begin{lstlisting}
 void connectToWiFi() {
   if (WiFi.status() == WL_CONNECTED) {
     wifiConnected = true;
@@ -578,7 +497,7 @@ void connectToWiFi() {
 
   wifiConnected = (WiFi.status() == WL_CONNECTED);
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} The firmware supports automatic Wi-Fi connection 
 handling while maintaining system operation in offline mode.
@@ -592,7 +511,7 @@ handling while maintaining system operation in offline mode.
 Detailed in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 500--506), raw 12-bit analog values (0--4095) are linearly mapped and constrained into 
 percentage values (0--100\%) before transmission to the backend, standardizing the data format.
 
-\begin{verbatim}
+\begin{lstlisting}
 float convertSoilMoistureToPercentage(int rawValue) {
   return constrain((float)map(rawValue, 0, 4095, 100, 0),
                    0.0f, 100.0f);
@@ -602,7 +521,7 @@ float convertLightToPercentage(int rawValue) {
   return constrain((float)map(rawValue, 0, 4095, 100, 0),
                    0.0f, 100.0f);
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} Raw ADC readings are normalized into 
 user-friendly percentage values for dashboard visualization and 
@@ -618,7 +537,7 @@ Finally, in \texttt{ESP32\_Firmware/final ESP32 code.txt} (Lines 530--605), the 
 values, rainfall status, and current pump state. This telemetry data is uploaded to 
 the Node.js backend API using an HTTP POST request \cite{yokotani2016mqtt}.
 
-\begin{verbatim}
+\begin{lstlisting}
 bool sendSensorDataToBackend(int soilRaw, int rainRaw,
                              int lightRaw, float temp, 
                              float hum) {
@@ -658,7 +577,7 @@ bool sendSensorDataToBackend(int soilRaw, int rainRaw,
 
   return (code == 200 || code == 201);
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Outcome:} Sensor readings are successfully transmitted to 
 the backend for database storage, alerts, analytics, and 
@@ -672,20 +591,8 @@ application display.
 
 During implementation, several challenges were encountered and 
 resolved \cite{noisyiot2023}:
-\begin{itemize}[leftmargin=1.2cm]
-    \item \textbf{Noisy Sensor Readings:} Soil moisture and rain 
-    sensors produced unstable values in early tests. This was 
-    resolved by applying filtering, threshold smoothing, and 
-    debouncing logic \cite{noisyiot2023}.
-    \item \textbf{Intermittent Wi-Fi Connectivity:} Network 
-    dropouts caused missed telemetry uploads. Automatic reconnect 
-    and retry mechanisms were introduced in firmware 
-    \cite{farhan2019iotplatform}.
-    \item \textbf{Consistent Data Synchronization:} Ensuring the 
-    dashboard always reflects the latest reading required consistent 
-    timestamp handling and backend validation 
-    \cite{thilakarathne2023fields}.
-\end{itemize}
+\textbf{Noisy Sensor Readings:} Soil moisture and rain sensors produced unstable values in early tests. This was resolved by applying filtering, threshold smoothing, and debouncing logic \cite{noisyiot2023}. \textbf{Intermittent Wi-Fi Connectivity:} Network dropouts caused missed telemetry uploads. Automatic reconnect and retry mechanisms were introduced in firmware \cite{farhan2019iotplatform}. \textbf{Consistent Data Synchronization:} Ensuring the dashboard always reflects the latest reading required consistent timestamp handling and backend validation \cite{thilakarathne2023fields}.
+
 
 % ----------------------------------------------------------
 % 4.5 Summary

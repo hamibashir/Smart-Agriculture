@@ -4,71 +4,6 @@
 
 
 
-% ==========================================================
-% Pending Missing Visual Assets
-% ==========================================================
-\subsection{Pending Missing Visual Assets}
-
-% TODO: Required Asset Name: ESP32 Circuit Schematic
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter3/esp32_circuit_schematic.png}
-    \caption{[Placeholder] ESP32 Circuit Schematic}
-    \label{fig:placeholder_esp32_circuit_schematic}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
-% TODO: Required Asset Name: Hardware Wiring Layout
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter3/hardware_wiring_layout.png}
-    \caption{[Placeholder] Hardware Wiring Layout}
-    \label{fig:placeholder_hardware_wiring_layout}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
-% TODO: Required Asset Name: System Component Diagram
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter3/system_component_diagram.png}
-    \caption{[Placeholder] System Component Diagram}
-    \label{fig:placeholder_system_component_diagram}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
-% TODO: Required Asset Name: System Activity Diagram
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter3/system_activity_diagram.png}
-    \caption{[Placeholder] System Activity Diagram}
-    \label{fig:placeholder_system_activity_diagram}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
-% TODO: Required Asset Name: Communication Protocol Diagram
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter3/communication_protocol_diagram.png}
-    \caption{[Placeholder] Communication Protocol Diagram}
-    \label{fig:placeholder_communication_protocol_diagram}
-\end{figure}
-
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
 \setcounter{chapter}{3}
 \setcounter{figure}{0}
 \setcounter{table}{0}
@@ -92,7 +27,7 @@ The architecture is organized into four distinct layers \cite{Tzounis2017}. At t
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{figures/chapter3/System_Architecture.png}
+    \includegraphics[width=1\textwidth, height=6cm]{figures/chapter3/System_Architecture.png}
     \caption{System Architecture Diagram}
     \label{fig:system-architecture}
 \end{figure}
@@ -120,79 +55,124 @@ Data flows seamlessly between components through specific hardware and software 
 
 \subsection{Hardware Specifications}
 
-This section details the hardware components required for the field 
-unit deployment, including technical specifications, operating 
-parameters, and integration requirements. Table 
-\ref{tab:hardware-specs} provides an overview of all components, 
-while Table \ref{tab:hardware-technical-specs} presents detailed 
+% Figure: ESP32 Circuit Schematic
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/chapter3/esp32_circuit_schematic.png}
+    \caption{ESP32 Component Wiring Schematic (Fritzing)}
+    \label{fig:esp32_circuit_schematic}
+\end{figure}
+
+The detailed wiring diagram presented in Figure \ref{fig:esp32_circuit_schematic} was developed using Fritzing to map out the precise electrical connections between the ESP32 microcontroller and the peripheral sensors. It illustrates the digital and analog pin assignments for the DHT11 sensor, soil moisture probe, rain sensor, LDR, and the relay module connected to the water pump.
+
+% Figure: Hardware Layout
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/chapter3/hardware_wiring_layout1.jpg}
+    \caption{Hardware Components and Sensor Modules Overview}
+    \label{fig:hardware_components}
+\end{figure}
+
+Figure \ref{fig:hardware_components} presents a high-level visual overview of the individual hardware components utilized in the system before their final enclosure. The image highlights the core ESP32 microcontroller, the FC-28 soil moisture sensor, and the active relay module during the initial lab testing phase. This component-level view confirms the physical procurement and basic operational status of the essential IoT nodes required for the smart agriculture system.
+
+
+This section details the hardware components required for the field
+unit deployment, including technical specifications, operating
+parameters, and integration requirements. Table
+\ref{tab:hardware-specs} provides an overview of all components,
+while Table \ref{tab:hardware-technical-specs} presents detailed
 technical specifications.
 
 \renewcommand{\arraystretch}{1.2}
 \setlength{\tabcolsep}{6pt}
 
-\newpage
-
 \subsubsection{Component Overview}
 
-\begin{table}[!htbp]
-\centering
-\caption{Hardware Components and Primary Functions}
-\label{tab:hardware-specs}
+\begingroup
+\footnotesize
+
 \begin{tabularx}{\textwidth}{|p{0.32\textwidth}|X|}
+\caption{Hardware Components and Primary Functions}
+\label{tab:hardware-specs}\\
+
 \hline
 \textbf{Component} & \textbf{Specification / Purpose} \\
 \hline
+\endfirsthead
+
+\hline
+\textbf{Component} & \textbf{Specification / Purpose} \\
+\hline
+\endhead
+
+\hline
+\multicolumn{2}{r}{\small\textit{Continued on next page}}\\
+\endfoot
+
+\hline
+\endlastfoot
+
 \textbf{ESP32 Microcontroller} &
-Dual-core 32-bit microcontroller with integrated Wi-Fi 
-(802.11 b/g/n) and Bluetooth. Controls sensor data acquisition, 
-local threshold logic, irrigation actuation, and backend 
+Dual-core 32-bit microcontroller with integrated Wi-Fi
+(802.11 b/g/n) and Bluetooth. Controls sensor data acquisition,
+local threshold logic, irrigation actuation, and backend
 communication via HTTP/REST protocol \cite{raj2021survey}. \\
 \hline
+
 \textbf{Soil Moisture Sensor} &
-Capacitive or resistive sensor (YL-69 / HL-69) that measures 
-volumetric water content in soil. Provides analog output (0--1023) 
-proportional to moisture level, enabling precise irrigation 
+Capacitive or resistive sensor (YL-69 / HL-69) that measures
+volumetric water content in soil. Provides analog output (0--1023)
+proportional to moisture level, enabling precise irrigation
 decision-making. \\
 \hline
+
 \textbf{DHT22 Sensor} &
-Digital temperature and humidity sensor with calibrated output. 
-Measures ambient temperature (–40°C to +80°C) and relative humidity 
-(0--100\%) for crop environment monitoring and weather correlation 
+Digital temperature and humidity sensor with calibrated output.
+Measures ambient temperature (–40°C to +80°C) and relative humidity
+(0--100\%) for crop environment monitoring and weather correlation
 \cite{mohanraj2016field}. \\
 \hline
+
 \textbf{LDR Light Sensor} &
-Light Dependent Resistor that measures ambient light intensity 
-(0--1023 lux equivalent). Supports day/night detection, optimal 
+Light Dependent Resistor that measures ambient light intensity
+(0--1023 lux equivalent). Supports day/night detection, optimal
 irrigation timing, and crop photosynthesis analysis. \\
 \hline
+
 \textbf{Rain Sensor} &
-Digital rain detection module (FC-37 / YL-82) with adjustable 
-sensitivity. Detects rainfall conditions to prevent irrigation 
-during rain events and conserve water resources 
+Digital rain detection module (FC-37 / YL-82) with adjustable
+sensitivity. Detects rainfall conditions to prevent irrigation
+during rain events and conserve water resources
 \cite{garcia2020iot}. \\
 \hline
+
 \textbf{Water Flow Sensor} &
-Hall effect-based flow meter (YF-S201) that measures water flow 
-rate (1--30 L/min) using pulse frequency output. Enables accurate 
+Hall effect-based flow meter (YF-S201) that measures water flow
+rate (1--30 L/min) using pulse frequency output. Enables accurate
 water consumption tracking and irrigation efficiency analysis. \\
 \hline
+
 \textbf{Relay Module} &
-Single-channel 5V relay with optocoupler isolation. Switches 
-high-power pump/valve circuits (up to 10A at 250V AC or 30V DC) 
+Single-channel 5V relay with optocoupler isolation. Switches
+high-power pump/valve circuits (up to 10A at 250V AC or 30V DC)
 based on ESP32 digital output or manual mobile app commands. \\
 \hline
+
 \textbf{Water Pump / Solenoid Valve} &
-12V DC submersible pump or AC-powered solenoid valve for irrigation 
-actuation. Flow rate: 500--2000 L/hour depending on field size and 
+12V DC submersible pump or AC-powered solenoid valve for irrigation
+actuation. Flow rate: 500--2000 L/hour depending on field size and
 crop requirements \cite{zia2021experimental}. \\
 \hline
+
 \textbf{Power Supply} &
-5V/2A regulated adapter for ESP32 and sensors (via ESP32's 3.3V 
-regulator). Separate 12V/220V supply for pump/valve with protection 
+5V/2A regulated adapter for ESP32 and sensors (via ESP32's 3.3V
+regulator). Separate 12V/220V supply for pump/valve with protection
 circuitry (fuse, surge protection). \\
 \hline
+
 \end{tabularx}
-\end{table}
+
+\endgroup
 
 \FloatBarrier
 \Needspace{8\baselineskip}
@@ -714,7 +694,19 @@ and transaction support.
 \subsection{AI Data Modeling and Architecture}
 \label{sec:ai-architecture}
 
-To generate intelligent crop recommendations, the system utilizes a Machine Learning pipeline driven by a \textbf{Random Forest Classifier}. The model maps real-time environmental context to optimal crop varieties.
+To generate intelligent crop recommendations, the system utilizes a Machine Learning pipeline driven by a \textbf{Random Forest Classifier}.
+
+
+% Figure: AI Dataset Sample
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/chapter4/ai_dataset_sample.png}
+    \caption{Training Dataset Sample for Crop Recommendation}
+    \label{fig:ai_dataset}
+\end{figure}
+
+Figure \ref{fig:ai_dataset} presents a representative sample of the localized agricultural dataset used to train the Random Forest classification model. The tabular structure clearly illustrates the multi-dimensional input feature space, comprising continuous environmental variables (soil moisture, temperature, humidity) and categorical agronomical constraints (soil type and season). Each structured record directly maps these five independent variables to an optimal target variable (\texttt{recommended\_crop}), providing the foundational ground truth necessary for the machine learning algorithm to learn complex, non-linear environmental relationships.
+ The model maps real-time environmental context to optimal crop varieties.
 
 \subsubsection{Dataset Acquisition and Synthesis}
 Due to the scarcity of high-resolution localized agricultural datasets, the training dataset was synthetically generated using a Gaussian distribution algorithm. To ensure the model robustly handles real-world constraints and sensor variability, stochastic noise was deliberately injected into the dataset generation process. The resulting dataset contains inputs spanning five core features: \texttt{soil\_moisture}, \texttt{temperature}, \texttt{humidity}, \texttt{soil\_type\_enc}, and \texttt{season\_enc}.
@@ -729,11 +721,15 @@ The system employs a Random Forest algorithm, selected for its resilience to ove
 Prior to training, categorical features (soil type, season, and crop labels) are vectorized using scikit-learn's \texttt{LabelEncoder}. The dataset is partitioned using a strict 80/20 train-test split, validated through a 5-fold cross-validation technique to confirm generalizability across diverse field conditions.
 
 \subsubsection{Confidence Score Calculation}
-The Random Forest model outputs a confidence score alongside its primary crop recommendation. This score is derived statistically using the ensemble nature of the algorithm. Specifically, the model consists of 150 individual decision trees ($N_{trees} = 150$). When an input vector is presented, each tree in the forest casts a ``vote'' for a specific crop class. The confidence score ($C$) is computed as the ratio of trees voting for the majority class ($V_{max}$) to the total number of trees:
+The Random Forest model outputs a confidence score alongside its primary crop recommendation. This score is mathematically derived using the algorithm's ensemble soft-voting probability mechanism, directly mirroring the \texttt{predict\_proba} function implemented in the AI backend. Specifically, for an input vector $x$, each of the 150 decision trees ($N_{trees} = 150$) calculates a class probability $p_t(c|x)$, representing the fraction of samples of class $c$ in the resulting leaf node. The final class probability $P(c|x)$ is the mean of these probabilities across the entire forest:
 \begin{equation}
-C = \left( \frac{V_{max}}{N_{trees}} \right) \times 100\%
+P(c|x) = \frac{1}{N_{trees}} \sum_{t=1}^{N_{trees}} p_t(c|x)
 \end{equation}
-For example, if 135 out of 150 trees vote for Wheat, the confidence score is calculated as $135/150 \times 100\% = 90\%$. A higher percentage indicates strong consensus among the decision paths, reflecting higher statistical certainty that the recommended crop matches the environmental parameters.
+The confidence score ($C$) is then extracted as the maximum mean probability among all supported crop classes, converted to a percentage:
+\begin{equation}
+C = \max_c P(c|x) \times 100\%
+\end{equation}
+By computing the average of individual tree probabilities rather than relying on a simplistic majority vote count, the model produces a highly calibrated confidence score. This rigorous statistical method ensures that the final recommendation accurately reflects the variance and certainty of the training data, ultimately providing farmers with a highly reliable indicator of crop viability under the specified environmental conditions.
 
 % ----------------------------------------------------------
 % 3.7 Workflow Diagram

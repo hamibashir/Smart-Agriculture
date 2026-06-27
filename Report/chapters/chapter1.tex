@@ -125,105 +125,20 @@ programs, non-governmental organizations (NGOs), and agriculture
 companies. The idea has strong business value because it directly 
 improves farmers' income and supports food security.
 
-\begingroup
-\footnotesize
-\renewcommand{\arraystretch}{1.15}
-\begin{longtable}{|p{3.8cm}|p{3.8cm}|p{3.8cm}|}
-\caption{Lean Canvas} \label{tab:lean_canvas} \\
-\hline
-\textbf{Problem} & \textbf{Solution} & 
-\textbf{Unique Value Proposition} \\ \hline
-\endfirsthead
-\hline
-\endhead
-\hline
-\multicolumn{3}{r}{\small\textit{Continued on next page}} \\
-\endfoot
-\hline
-\endlastfoot
-1. Water wastage due to over-irrigation. \newline
-2. Low crop yield from poor crop choice. \newline
-3. Lack of affordable smart farming tools. & 
-1. IoT sensors for soil and weather. \newline
-2. Automatic irrigation system. \newline
-3. Mobile app with AI-based crop suggestion. & 
-An affordable smart farming kit that saves water, increases yield, 
-and helps farmers make better crop decisions. \\ \hline
-\textbf{Existing Alternatives} & \textbf{Key Metrics (Approx.)} & 
-\textbf{High-Level Concept} \\ \hline
-1. Manual irrigation. \newline
-2. Expensive imported systems. & 
-1. 100+ farmers use the system. \newline
-2. 45\% water savings (est.). \newline
-3. 35\% increase in yield (est.). & 
-A smart farming assistant for every farmer, like a personal digital 
-guide for crops. \\ \hline
-\textbf{Channels} & \textbf{Cost Structure} & 
-\textbf{Customer Segments} \\ \hline
-1. Direct sales to farmers. \newline
-2. Partnerships with NGOs and government programs. \newline
-3. Agriculture supply companies. & 
-1. IoT hardware (sensors, controllers). \newline
-2. Mobile app and server hosting. \newline
-3. Installation and support. & 
-1. Small and medium farmers. \newline
-2. Agriculture NGOs and government projects. \\ \hline
-\textbf{Early Adopters} & 
-\multicolumn{2}{p{\dimexpr7.6cm+2\tabcolsep+\arrayrulewidth}|}
-{\textbf{Revenue Structure}} \\ \hline
-1. Farmers with 1--4 acres of land. \newline
-2. NGOs running pilot agriculture projects. & 
-\multicolumn{2}{p{\dimexpr7.6cm+2\tabcolsep+\arrayrulewidth}|}{
-1. Selling hardware kits. \newline
-2. Subscription for premium app features. \newline
-3. Installation and training services.
-} \\ \hline
-\end{longtable}
-\endgroup
+\begingroup \footnotesize \renewcommand{\arraystretch}{1.15} \begin{longtable}{|p{3.8cm}|p{3.8cm}|p{3.8cm}|} \caption{Lean Canvas} \label{tab:lean_canvas} \\ \hline \textbf{Problem} & \textbf{Solution} & \textbf{Unique Value Proposition} \\ \hline \endfirsthead \hline \endhead \hline \multicolumn{3}{r}{\small\textit{Continued on next page}} \\ \endfoot \hline \endlastfoot 1. Water wastage due to over-irrigation. \newline 2. Low crop yield from poor crop choice. \newline 3. Lack of affordable smart farming tools. & 1. IoT sensors for soil and weather. \newline 2. Automatic irrigation system. \newline 3. Mobile app with AI-based crop suggestion. & An affordable smart farming kit that saves water, increases yield, and helps farmers make better crop decisions. \\ \hline \textbf{Existing Alternatives} & \textbf{Key Metrics (Approx.)} & \textbf{High-Level Concept} \\ \hline 1. Manual irrigation. \newline 2. Expensive imported systems. & 1. 100+ farmers use the system. \newline 2. 45\% water savings (est.). \newline 3. 35\% increase in yield (est.). & A smart farming assistant for every farmer, like a personal digital guide for crops. \\ \hline \textbf{Channels} & \textbf{Cost Structure} & \textbf{Customer Segments} \\ \hline 1. Direct sales to farmers. \newline 2. Partnerships with NGOs and government programs. \newline 3. Agriculture supply companies. & 1. IoT hardware (sensors, controllers). \newline 2. Mobile app and server hosting. \newline 3. Installation and support. & 1. Small and medium farmers. \newline 2. Agriculture NGOs and government projects. \\ \hline \textbf{Early Adopters} & \multicolumn{2}{p{\dimexpr7.6cm+2\tabcolsep+\arrayrulewidth}|} {\textbf{Revenue Structure}} \\ \hline 1. Farmers with 1--4 acres of land. \newline 2. NGOs running pilot agriculture projects. & \multicolumn{2}{p{\dimexpr7.6cm+2\tabcolsep+\arrayrulewidth}|}{ 1. Selling hardware kits. \newline 2. Subscription for premium app features. \newline 3. Installation and training services. } \\ \hline \end{longtable} \endgroup
 
 \subsection{Useful Tools and Technologies}
 The key hardware and software components for the Smart AI Powered 
 Agriculture System are:
 
 \subsubsection{Hardware}
-\begin{itemize}[noitemsep]
-    \item \textbf{ESP32} --- Microcontroller with Wi-Fi support for 
-    sensor data processing and transmission \cite{raj2021survey}.
-    \item \textbf{Soil Moisture Sensor (e.g., YL-69 or capacitive 
-    sensor)} --- Detects soil water level.
-    \item \textbf{DHT22 Sensor} --- Measures temperature and humidity.
-    \item \textbf{Light Sensor (LDR)} --- Monitors sunlight levels 
-    for crop growth.
-    \item \textbf{Rain Sensor (e.g., FC-37 / YL-82)} --- Detects 
-    rainfall to avoid unnecessary irrigation.
-    \item \textbf{Relay Module} --- Controls water pump or valve for 
-    automation.
-    \item \textbf{Water Flow Sensor} --- Measures water usage during 
-    irrigation.
-\end{itemize}
+The hardware architecture is anchored by the ESP32 microcontroller, which serves as the central processing unit equipped with built-in Wi-Fi capabilities to facilitate seamless sensor data processing and transmission \cite{raj2021survey}. To accurately monitor the environmental conditions, a capacitive soil moisture sensor (such as the YL-69) is deployed to detect the volumetric water content in the soil. Additionally, a DHT22 sensor provides high-precision measurements of ambient temperature and humidity, while a Light Dependent Resistor (LDR) continuously monitors the sunlight intensity essential for optimal crop growth. To prevent over-watering during natural precipitation, a rain sensor (such as the FC-37 or YL-82) is integrated into the system. Actuation is managed by a dedicated relay module that safely controls the higher-voltage water pump or irrigation valve based on the microcontroller's logic. Finally, a water flow sensor is incorporated into the pipeline to precisely measure the volume of water consumed during each automated irrigation cycle.
 
 \subsubsection{Software}
-\begin{itemize}[noitemsep]
-    \item \textbf{Arduino IDE (C++)} --- Programming the ESP32.
-    \item \textbf{Backend Server: Node.js} --- Handles data from 
-    sensors and communicates with the mobile app.
-    \item \textbf{Database: MySQL} --- Stores sensor readings and 
-    historical records.
-    \item \textbf{Mobile Application: Android (Java/Kotlin) or 
-    Flutter} --- Displays live data, history, and alerts.
-    \item \textbf{Data Visualization:} Libraries such as 
-    MPAndroidChart, Chart.js, or Recharts for graphs and charts.
-    \item \textbf{Notifications: Firebase Cloud Messaging} --- For 
-    sending push alerts \cite{khawas2018firebase}.
-\end{itemize}
+The software ecosystem spans multiple layers, beginning with the firmware developed using C++ in the Arduino IDE to program the ESP32 microcontroller. At the backend, a robust Node.js server is deployed to efficiently handle incoming telemetry data from the field sensors and manage bi-directional communication with the mobile application. All sensor readings, historical records, and user configurations are persistently stored in a normalized MySQL relational database. For the frontend user experience, a cross-platform mobile application is developed using the Flutter framework (or native Android Java/Kotlin), which presents live data, historical trends, and system alerts through an intuitive interface. To enhance the analytical value of the data, visualization libraries such as MPAndroidChart, Chart.js, or Recharts are utilized to render dynamic graphs and charts. Furthermore, real-time push notifications regarding critical field conditions are delivered to the farmers via Firebase Cloud Messaging \cite{khawas2018firebase}.
 
 \subsubsection{AI and Machine Learning}
-\begin{itemize}[noitemsep]
-    \item \textbf{Python (TensorFlow / Scikit-learn)} --- For crop 
-    recommendation and predictive analytics \cite{musanase2023data}.
-    \item \textbf{Signal Processing Techniques} --- To filter and 
-    clean noisy sensor data before analysis.
-\end{itemize}
+The predictive intelligence of the system is driven by a machine learning module developed in Python, leveraging powerful libraries such as TensorFlow and Scikit-learn to generate accurate crop recommendations and conduct predictive analytics based on historical environmental data \cite{musanase2023data}. To ensure the high fidelity of the inputs fed into the models, advanced signal processing techniques are applied to filter out noise and clean the raw sensor data prior to analysis.
 
 \subsection{Project Work Break Down}
 The project is divided into multiple phases to ensure systematic 
@@ -240,52 +155,70 @@ synthesis of the Gaussian dataset and the training of the Random Forest
 classifier; and (4) Frontend Application, covering the Flutter mobile 
 interface for live dashboard monitoring and manual irrigation control.
 
-Figure~\ref{fig:wbs} shows the optimized Work Breakdown Structure 
-reflecting these specific technical phases.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{figures/chapter1/Work 
-    Breakdown.png}
-    \caption{Work Breakdown Structure}
-    \label{fig:wbs}
-\end{figure}
 
 To address the detailed task distribution, Table~\ref{tab:wbs_detailed} outlines the formal Work Breakdown Structure with specific task ownership across the team members (Muhammad Awais, Hamza Bashir, Junaid Amin), explicit phase durations, and deliverables.
 
-\begin{table}[H]
-    \centering
-    \renewcommand{\arraystretch}{1.4}
-    \begin{tabular}{|p{0.8cm}|p{3.5cm}|p{2cm}|p{3.5cm}|p{4.5cm}|}
-        \hline
-        \rowcolor{black}
-        \color{white}\textbf{ID} & \color{white}\textbf{Task / Phase} & \color{white}\textbf{Duration} & \color{white}\textbf{Ownership} & \color{white}\textbf{Deliverable} \\ \hline
-        \textbf{1} & \textbf{Hardware \& Firmware} & \textbf{4 Weeks} & \textbf{Hamza Bashir} & \textbf{Physical prototype \& ESP32 Code} \\ \hline
-        1.1 & Sensor Calibration & 1 Week & Hamza Bashir & Calibrated DHT22 and Moisture inputs \\ \hline
-        1.2 & Actuator Integration & 1 Week & Hamza Bashir & Functional relay control for pump \\ \hline
-        1.3 & ESP32 Firmware & 2 Weeks & Hamza Bashir & Stable Wi-Fi telemetry and control loop \\ \hline
-        
-        \textbf{2} & \textbf{Backend \& Database} & \textbf{4 Weeks} & \textbf{Junaid Amin} & \textbf{Deployed API \& MySQL Schema} \\ \hline
-        2.1 & Database Design & 1 Week & Junaid Amin & Normalized schema deployed to server \\ \hline
-        2.2 & REST API Dev & 2 Weeks & Junaid Amin & Endpoints for telemetry and control \\ \hline
-        2.3 & Authentication & 1 Week & Junaid Amin & Secure JWT login and field mapping \\ \hline
-        
-        \textbf{3} & \textbf{AI \& Machine Learning} & \textbf{3 Weeks} & \textbf{Muhammad Awais} & \textbf{Trained Scikit-Learn Model} \\ \hline
-        3.1 & Dataset Preparation & 1 Week & Muhammad Awais & Dataset generation and cleaning \\ \hline
-        3.2 & Model Training & 1 Week & Muhammad Awais & Tuned Random Forest (n\_estimators=150) \\ \hline
-        3.3 & API Integration & 1 Week & Muhammad Awais & Wrapper returning confidence score \\ \hline
-        
-        \textbf{4} & \textbf{Frontend Application} & \textbf{4 Weeks} & \textbf{Team} & \textbf{Compiled Flutter APK} \\ \hline
-        4.1 & UI Mockups \& Flow & 1 Week & Junaid Amin & Figma designs for all screens \\ \hline
-        4.2 & Core Development & 2 Weeks & Team & Flutter UI and backend API binding \\ \hline
-        4.3 & System Testing & 1 Week & Hamza Bashir & Passed test cases across devices \\ \hline
-    \end{tabular}
-    \caption{Detailed Work Breakdown Structure with Ownership}
-    \label{tab:wbs_detailed}
-\end{table}
+\renewcommand{\arraystretch}{1.4}
+
+\begin{longtable}{|p{0.8cm}|p{3.5cm}|p{2cm}|p{3.5cm}|p{4.5cm}|}
+\caption{Detailed Work Breakdown Structure with Ownership}
+\label{tab:wbs_detailed}\\
+
+\hline
+\rowcolor{black}
+\color{white}\textbf{ID} &
+\color{white}\textbf{Task / Phase} &
+\color{white}\textbf{Duration} &
+\color{white}\textbf{Ownership} &
+\color{white}\textbf{Deliverable} \\
+\hline
+\endfirsthead
+
+\multicolumn{5}{c}%
+{\tablename\ \thetable\ -- Continued from previous page} \\
+
+\hline
+\rowcolor{black}
+\color{white}\textbf{ID} &
+\color{white}\textbf{Task / Phase} &
+\color{white}\textbf{Duration} &
+\color{white}\textbf{Ownership} &
+\color{white}\textbf{Deliverable} \\
+\hline
+\endhead
+
+\hline
+\multicolumn{5}{r}{Continued on next page} \\
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+\textbf{1} & \textbf{Hardware \& Firmware} & \textbf{4 Weeks} & \textbf{Hamza Bashir} & \textbf{Physical prototype \& ESP32 Code} \\ \hline
+1.1 & Sensor Calibration & 1 Week & Hamza Bashir & Calibrated DHT22 and Moisture inputs \\ \hline
+1.2 & Actuator Integration & 1 Week & Hamza Bashir & Functional relay control for pump \\ \hline
+1.3 & ESP32 Firmware & 2 Weeks & Hamza Bashir & Stable Wi-Fi telemetry and control loop \\ \hline
+
+\textbf{2} & \textbf{Backend \& Database} & \textbf{4 Weeks} & \textbf{Junaid Amin} & \textbf{Deployed API \& MySQL Schema} \\ \hline
+2.1 & Database Design & 1 Week & Junaid Amin & Normalized schema deployed to server \\ \hline
+2.2 & REST API Dev & 2 Weeks & Junaid Amin & Endpoints for telemetry and control \\ \hline
+2.3 & Authentication & 1 Week & Junaid Amin & Secure JWT login and field mapping \\ \hline
+
+\textbf{3} & \textbf{AI \& Machine Learning} & \textbf{3 Weeks} & \textbf{Muhammad Awais} & \textbf{Trained Scikit-Learn Model} \\ \hline
+3.1 & Dataset Preparation & 1 Week & Muhammad Awais & Dataset generation and cleaning \\ \hline
+3.2 & Model Training & 1 Week & Muhammad Awais & Tuned Random Forest (n\_estimators=150) \\ \hline
+3.3 & API Integration & 1 Week & Muhammad Awais & Wrapper returning confidence score \\ \hline
+
+\textbf{4} & \textbf{Frontend Application} & \textbf{4 Weeks} & \textbf{Team} & \textbf{Compiled Flutter APK} \\ \hline
+4.1 & UI Mockups \& Flow & 1 Week & Junaid Amin & Figma designs for all screens \\ \hline
+4.2 & Core Development & 2 Weeks & Team & Flutter UI and backend API binding \\ \hline
+4.3 & System Testing & 1 Week & Hamza Bashir & Passed test cases across devices \\ \hline
+
+\end{longtable}
 
 \subsection{Project Time Line}
-The project timeline spans from 29 September 2025 to 10 July 2026. 
+The project timeline spans from 29 September 2025 to 17 July 2026. 
 The schedule allocates dedicated time blocks for isolated component 
 development followed by rigorous integration phases. For instance, 
 the AI model training phase occurs concurrently with backend API 
@@ -295,15 +228,31 @@ Similarly, firmware development prioritizes local offline safety
 logic before network connectivity is fully integrated, reducing 
 critical path dependencies.
 
-A Gantt chart representing these overlapping milestones and technical 
-dependencies is shown in Figure~\ref{fig:gantt}.
+To provide a precise technical schedule, Table~\ref{tab:project_schedule} breaks down the project timeline into formal milestones, mapping durations to exact dates, defining cross-component dependencies, and establishing strict team ownership.
 
-\begin{figure}[H]
+\enlargethispage{5cm}
+\begin{table}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{figures/chapter1/Project 
-    Timeline.png}
-    \caption{Gantt Chart}
-    \label{fig:gantt}
-\end{figure}
+    \caption{Formal Project Schedule}
+    \label{tab:project_schedule}
+    \vspace{0.2cm}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabularx}{\textwidth}{|c|X|c|c|c|c|}
+        \hline
+        \rowcolor{black}
+        \color{white}\textbf{ID} & \color{white}\textbf{Milestone} & \color{white}\textbf{Start} & \color{white}\textbf{End} & \color{white}\textbf{Depends On} & \color{white}\textbf{Owner} \\ \hline
+        \textbf{M1}  & Requirement Specifications & 29 Sep 25 & 12 Oct 25 & -- & Team \\ \hline
+        \textbf{M2}  & Hardware Design & 13 Oct 25 & 02 Nov 25 & M1 & Hamza \\ \hline
+        \textbf{M3}  & Backend \& Database & 03 Nov 25 & 30 Nov 25 & M1 & Junaid \\ \hline
+        \textbf{M4}  & AI Dataset Preparation & 13 Oct 25 & 26 Oct 25 & M1 & Awais \\ \hline
+        \textbf{M5}  & ESP32 Firmware & 03 Nov 25 & 23 Nov 25 & M2 & Hamza \\ \hline
+        \textbf{M6}  & AI Model Training & 27 Oct 25 & 16 Nov 25 & M4 & Awais \\ \hline
+        \textbf{M7}  & API Integration & 01 Dec 25 & 21 Dec 25 & M3, M5, M6 & Team \\ \hline
+        \textbf{M8}  & Mobile App UI & 22 Dec 25 & 18 Jan 26 & M1 & Junaid \\ \hline
+        \textbf{M9}  & System Integration & 19 Jan 26 & 15 Mar 26 & M7, M8 & Team \\ \hline
+        \textbf{M10} & Testing \& Fixing & 16 Mar 26 & 10 May 26 & M9 & Hamza \\ \hline
+        \textbf{M11} & Final Deployment & 11 May 26 & 10 Jul 26 & M10 & Team \\ \hline
+    \end{tabularx}
+\end{table}
 
 \setcounter{chapter}{1}
