@@ -9,6 +9,7 @@
 \setcounter{figure}{0}
 \setcounter{table}{0}
 \chapter*{Chapter 6}
+\fancyhead[L]{System Testing}
 \markboth{System Testing}{System Testing}
 
 % ----------------------------------------------------------
@@ -67,6 +68,7 @@
 
 % ----------------------------------------------------------
 \section{System Testing}
+\markboth{System Testing}{System Testing}
 % ----------------------------------------------------------
 
 This chapter presents the formal testing of the Smart AI 
@@ -1174,80 +1176,72 @@ System & TC-ST-10 & Wi-Fi Failure Resilience
 
 To validate the physical performance and robustness of the field unit under actual operating conditions, several hardware tests were conducted. The following figures present the physical ESP32 setup and sensor deployment used to achieve the results documented in the preceding test cases.
 
-% TODO: Required Asset Name: Hardware Assembled Prototype
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter6/hardware_assembled_prototype.png}
-    \caption{[Placeholder] Hardware Assembled Prototype}
-    \label{fig:placeholder_hardware_assembled_prototype}
+    \includegraphics[width=0.9\textwidth]{figures/chapter5/testing1.png}
+    \caption{Hardware Assembled Prototype}
+    \label{fig:hardware_assembled_prototype}
 \end{figure}
 
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+Figure \ref{fig:hardware_assembled_prototype} provides concrete evidence of the rigorous hardware testing phase. This image showcases the fully assembled prototype during active testing, confirming that all components---including the ESP32 microcontroller, sensors, and power modules---were properly integrated and verified for operational stability. By evaluating the hardware in its assembled state, the team ensured that real-world sensor data acquisition and component interactions functioned flawlessly before the final field deployment.
 
 % Figure: Sensor Pump Wiring Setup
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{figures/chapter6/sensor_pump_wiring_setup.png}
+    \includegraphics[width=1\textwidth]{figures/chapter6/sensor_pump_wiring_setup.png}
     \caption{Actuator and Sensor Wiring Configuration}
     \label{fig:sensor_pump_wiring}
 \end{figure}
 
-To validate the integration between the sensing layer and the actuation layer, Figure \ref{fig:sensor_pump_wiring} presents a close-up angle of the LDR and relay module configuration. This setup confirms the physical data pathways responsible for triggering the automated irrigation system. By isolating these specific connections, the testing phase verified that the ESP32 correctly translates logical software commands into physical electrical signals capable of safely driving the external water pump. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+To validate the integration between the sensing layer and the actuation layer, Figure \ref{fig:sensor_pump_wiring} presents a close-up angle of the LDR and relay module configuration. This setup confirms the physical data pathways responsible for triggering the automated irrigation system. By isolating these specific connections, the testing phase verified that the ESP32 correctly translates logical software commands into physical electrical signals capable of safely driving the external water pump.
 
-% TODO: Required Asset Name: Field Test Environment
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter6/field_test_environment.png}
-    \caption{[Placeholder] Field Test Environment}
-    \label{fig:placeholder_field_test_environment}
+    \includegraphics[width=1\textwidth]{figures/chapter6/field_testing.png}
+    \caption{Field Test Environment at Fateh Jhang}
+    \label{fig:field_test_environment}
 \end{figure}
 
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+To validate the system's performance in a real-world scenario, the team conducted comprehensive field testing at an agricultural site located in Fateh Jhang. As depicted in Figure \ref{fig:field_test_environment}, a group member is holding the final waterproofed hardware unit against the backdrop of actual crop fields. This on-site testing was crucial to ensure the sensors, hardware casing, and wireless communication remained completely stable under true environmental conditions, thereby confirming the system's readiness for practical deployment.
 
 
 \subsection{Software \& API Testing Evidence}
 
 To validate the software components, including the Node.js backend API, the ESP32 firmware telemetry, and the AI model outputs, rigorous software testing was conducted. The following figures provide direct visual evidence of the system's operational logs, API responses, and accurate data handling mechanisms.
 
-% TODO: Required Asset Name: Serial Monitor Logs
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter6/serial_monitor_logs.png}
-    \caption{[Placeholder] Serial Monitor Logs}
-    \label{fig:placeholder_serial_monitor_logs}
+    \includegraphics[width=1\textwidth]{figures/chapter6/serial_monitor_logs.png}
+    \caption{ESP32 Serial Monitor Logs}
+    \label{fig:serial_monitor_logs}
 \end{figure}
 
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+Figure \ref{fig:serial_monitor_logs} displays the active serial monitor output directly from the ESP32 microcontroller during the testing phase. The logs confirm successful network connectivity, including Wi-Fi attachment and MQTT broker connection. Furthermore, the monitor actively prints real-time sensor readings (such as temperature, humidity, and soil moisture levels) along with physical actuator triggers. This validates that the local hardware firmware is successfully reading environmental data and dispatching telemetry payloads to the backend server.
 
-% TODO: Required Asset Name: API Output Tests
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter6/api_output_tests.png}
-    \caption{[Placeholder] API Output Tests}
-    \label{fig:placeholder_api_output_tests}
+    \includegraphics[width=1\textwidth]{figures/chapter6/api_output_backend.png}
+    \caption{Backend API Health Endpoint Response}
+    \label{fig:api_output_backend}
 \end{figure}
 
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
-
-% TODO: Required Asset Name: Sensor Reading Validation
-% Asset Type: Missing Technical Visual Asset
-% Status: Pending Asset Collection
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/chapter6/sensor_reading_validation.png}
-    \caption{[Placeholder] Sensor Reading Validation}
-    \label{fig:placeholder_sensor_reading_validation}
+    \includegraphics[width=1\textwidth]{figures/chapter6/api_output_ai.png}
+    \caption{AI Service API Health Endpoint Response}
+    \label{fig:api_output_ai}
 \end{figure}
 
-[PLACEHOLDER EXPLANATION]: This section serves as a 4-to-5 line explanatory paragraph that will describe the visual asset presented above. It will comprehensively detail the purpose, underlying structure, and operational significance of the diagram, chart, or screenshot. By providing this extensive textual context, the report will ensure that readers fully understand the specific components, workflows, and technical details illustrated in the figure. (This text will be manually updated by the user once the final image is inserted).
+To ensure seamless communication between the client applications and the server, API output tests were conducted against the live production endpoints. As shown in Figure \ref{fig:api_output_backend}, the backend API (\texttt{https://api.hamzabashir.online/health}) correctly processed the request and returned a JSON response confirming its active status and production environment. Similarly, as depicted in Figure \ref{fig:api_output_ai}, the AI service endpoint was successfully queried. It returned a structured JSON payload detailing its supported crops (e.g., chickpea, cotton, wheat), the required input features, and a verified model accuracy of $87.86\%$. These successful interactions verify the robustness of the RESTful architecture, confirming that routing and AI model inference are functioning securely and efficiently.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/chapter6/sensor_reading_validation.png}
+    \caption{MySQL Database Sensor Reading Validation}
+    \label{fig:sensor_reading_validation}
+\end{figure}
+
+Figure \ref{fig:sensor_reading_validation} provides a direct view into the connected MySQL database structure. While the database houses several management tables, this specific screenshot validates the telemetry data pipeline by showcasing the live sensor readings table. It confirms that the environmental data transmitted by the ESP32 field unit over the internet is successfully received, processed, and permanently stored in the backend database. This persistent data storage acts as the critical foundation for historical analytics and the AI crop recommendation engine.
 
 \subsection{Summary}
 

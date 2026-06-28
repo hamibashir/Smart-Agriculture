@@ -73,18 +73,19 @@
   \renewcommand{\tabularxcolumn}[1]{>{\centering\arraybackslash}m{#1}}
   \begin{tabularx}{\linewidth}{|>{\columncolor{black}\color{white}\centering\arraybackslash}m{4cm}|X|}
     \hline
-    VERSION & V 1.0 \\
+    VERSION & V 2.0 (Final) \\
     \hline
   \end{tabularx}
-\end{minipage}
+\end{minipage}%
 \hfill
 \begin{minipage}{0.43\textwidth}
   \raggedleft
-  \begin{tabular}{|>{\columncolor{black}\color{white}\centering\arraybackslash}m{4.6cm}|>{\centering\arraybackslash}m{1cm}|}
+  \renewcommand{\tabularxcolumn}[1]{>{\centering\arraybackslash}m{#1}}
+  \begin{tabularx}{\linewidth}{|>{\columncolor{black}\color{white}\centering\arraybackslash}m{4.6cm}|X|}
     \hline
     NUMBER OF MEMBERS & 3 \\
     \hline
-  \end{tabular}
+  \end{tabularx}
 \end{minipage}
 
 \vspace{0.8cm}

@@ -23,7 +23,7 @@ This chapter describes the installation and deployment process of the Smart AI P
 
 \subsubsection{Deployment Overview}
 The deployment is performed in the following order to ensure correct integration:
-First, prepare and connect hardware components (sensors, ESP32, relay, pump/valve). Next, flash ESP32 firmware and configure Wi-Fi/device identifiers. Then, deploy backend services (Node.js) and configure environment variables. Following that, configure the database (Firebase Realtime Database and/or MySQL). Subsequently, install and connect the mobile application to the backend. Finally, perform end-to-end verification (live readings, control actions, alerts, and AI output).
+First, prepare and connect hardware components (sensors, ESP32, relay, pump). Next, flash ESP32 firmware and configure Wi-Fi/device identifiers. Then, deploy backend services (Node.js) and configure environment variables. Following that, configure the database (MySQL). Subsequently, install and connect the mobile application to the backend. Finally, perform end-to-end verification (live readings, control actions, alerts, and AI output).
 
 
 % ----------------------------------------------------------
@@ -39,13 +39,31 @@ The field unit installation ensures correct sensor placement and safe electrical
 
 \textbf{Safety Note:} Electrical wiring for pumps should be performed using proper insulation, fuses, and safe grounding to prevent hazards.
 
+\subsubsection{Hardware Prototype Evolution and Waterproofing}
+During the initial development and testing phase, the hardware components were mounted on a basic cardboard prototype to verify electrical connections and system logic. However, since the system is designed for field deployment where it will be exposed to water and harsh environmental conditions, strict waterproofing was mandatory. 
+
+To achieve this, the entire ESP32 circuitry and power modules were enclosed in a durable plastic casing. Precise holes were drilled only for the essential sensor wires, and high-grade silicon sealant was generously applied around these openings to ensure no water could enter or damage the internal electronics. This resulted in a robust, waterproof, and ready-to-use final hardware prototype suitable for actual agricultural environments.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/chapter5/testing2.jpg}
+    \caption{Initial Hardware Prototype and Lab Testing Setup}
+    \label{fig:prototype-initial}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/chapter5/testing1.png}
+    \caption{Final Waterproofed Ready-to-Use Hardware Prototype}
+    \label{fig:prototype-final}
+\end{figure}
 % ----------------------------------------------------------
 % 5.1.3 ESP32 Firmware Deployment
 % ----------------------------------------------------------
 \subsubsection{ESP32 Firmware Deployment}
 \label{subsec:firmware-deployment}
 
-The firmware is uploaded using Arduino IDE (or compatible toolchain) and configured for the target farm environment.
+The firmware is uploaded using Arduino IDE and configured for the target farm environment.
 
 \subsubsection{Firmware Flashing Steps}
 First, install Arduino IDE and ESP32 board support packages. Next, connect ESP32 to a computer via USB. Then, select the correct ESP32 board and COM port in Arduino IDE. Following that, update configuration parameters in the firmware: [leftmargin=1.2cm] Subsequently, wi-Fi SSID and password First, backend base URL (API endpoint) Next, device ID / Field ID mapping Then, default moisture thresholds (initial values)  Finally, upload the firmware to ESP32 and monitor serial logs for confirmation.
@@ -111,7 +129,7 @@ The DigitalOcean App Platform dashboard confirms the successful cloud deployment
 % Figure: Backend API Health Check
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{figures/chapter5/backend_health_api.png}
+    \includegraphics[width=1\textwidth]{figures/chapter5/backend_health_api.png}
     \caption{Backend Node.js API Health Check Endpoint}
     \label{fig:backend_health}
 \end{figure}
@@ -190,7 +208,7 @@ The AI service provides crop recommendations based on extracted features from se
 \subsubsection{Deployment Steps}
 \begin{enumerate}[leftmargin=1.2cm]
     \item Set up Python environment (virtual environment recommended).
-    \item Install required libraries (e.g., TensorFlow/Scikit-learn).
+    \item Install required libraries.
     \item Place the trained model file in the service directory.
     \item Run the AI service API (example):
 \begin{verbatim}
@@ -207,7 +225,7 @@ Send a test request with sample feature payload. Confirm response contains recom
 % Figure: AI Service Health Check
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{figures/chapter5/ai_health_api.png}
+    \includegraphics[width=1\textwidth]{figures/chapter5/ai_health_api.png}
     \caption{Python AI Service Health Check Endpoint}
     \label{fig:ai_health}
 \end{figure}
@@ -223,12 +241,13 @@ Following the deployment of the machine learning model, a dedicated health endpo
 
 The mobile application is used by farmers to view live sensor readings, irrigation status, historical analytics, alerts, and AI crop recommendations.
 
-\subsubsection{Installation Steps}
-First, build the mobile application APK (or install via test distribution). Next, install on an Android device (enable ``Install from unknown sources'' if needed). Then, configure base URL (backend server address) and sign in/register. Finally, add/register field/device mapping (Field ID and Device ID).
+\subsubsection{Deployment and Installation}
+To simplify the deployment process for end-users, the complete source code and the latest pre-built APK for the mobile application have been published on our official GitHub repository \cite{smart_agri_github}. 
 
+Users are not required to manually compile the application. They can simply navigate to the repository, download the latest compiled APK file, and install it directly on their Android smartphones (ensuring that ``Install from unknown sources'' is enabled in their device settings). Once installed, the user can immediately register, sign in, and connect to the live backend to start utilizing the Smart Agriculture system without any complex setup procedures.
 
 \subsubsection{Mobile Verification Checklist}
-Live readings update correctly on dashboard. Manual irrigation control toggles pump/valve. Alerts appear in the app and push notifications are received. Weekly trends / historical charts load from stored data. AI recommendation screen returns crop suggestions with confidence.
+Live readings update correctly on dashboard. Manual irrigation control toggles pump. Alerts appear in the app and push notifications are received. Weekly trends / historical charts load from stored data. AI recommendation screen returns crop suggestions with confidence.
 
 
 % ----------------------------------------------------------

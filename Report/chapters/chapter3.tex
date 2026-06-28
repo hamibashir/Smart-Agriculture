@@ -47,7 +47,7 @@ transmission, processing, and user interaction.
 
 \subsubsection{Core Components}
 
-The physical layer is driven by the \textbf{Sensing Unit}, which incorporates a soil moisture sensor, a DHT22 module for temperature and humidity, an LDR for light intensity, a rain sensor, and a water flow sensor to accurately capture field conditions \cite{mohanraj2016field}. This data is processed by the \textbf{Control Unit}, an ESP32 microcontroller that actively reads sensor values and enforces local irrigation logic \cite{raj2021survey}. When irrigation is required, the \textbf{Actuation Unit} utilizes a relay-driven pump or solenoid valve to manage water flow either manually or automatically \cite{garcia2020iot}. On the server side, the \textbf{Backend Services} rely on a Node.js server to handle device ingestion, evaluate business rules, trigger alerts, and serve mobile APIs \cite{thilakarathne2023fields}. Persistent \textbf{Data Storage} is managed through a MySQL relational database, which securely archives sensor logs, irrigation events, and user configurations \cite{uotila2020db}. To provide intelligent insights, a Python-based \textbf{AI/ML Service} analyzes historical and environmental patterns to generate crop recommendations \cite{ali2025soilml}. Lastly, the \textbf{Mobile Application} serves as the primary user interface, offering an Android/Flutter environment for monitoring, control, analytics, and receiving push notifications \cite{khawas2018firebase}.
+The physical layer is driven by the \textbf{Sensing Unit}, which incorporates a soil moisture sensor, a DHT22 module for temperature and humidity, an LDR for light intensity, a rain sensor, and a water flow sensor to accurately capture field conditions \cite{mohanraj2016field}. This data is processed by the \textbf{Control Unit}, an ESP32 microcontroller that actively reads sensor values and enforces local irrigation logic \cite{raj2021survey}. When irrigation is required, the \textbf{Actuation Unit} utilizes a relay-driven pump to manage water flow either manually or automatically \cite{garcia2020iot}. On the server side, the \textbf{Backend Services} rely on a Node.js server to handle device ingestion, evaluate business rules, trigger alerts, and serve mobile APIs \cite{thilakarathne2023fields}. Persistent \textbf{Data Storage} is managed through a MySQL relational database, which securely archives sensor logs, irrigation events, and user configurations \cite{uotila2020db}. To provide intelligent insights, a Python-based \textbf{AI/ML Service} analyzes historical and environmental patterns to generate crop recommendations \cite{ali2025soilml}. Lastly, the \textbf{Mobile Application} serves as the primary user interface, offering an Android/Flutter environment for monitoring, control, analytics, and receiving push notifications \cite{khawas2018firebase}.
 
 \subsubsection{Connectors (Interfaces)}
 
@@ -120,8 +120,8 @@ communication via HTTP/REST protocol \cite{raj2021survey}. \\
 \hline
 
 \textbf{Soil Moisture Sensor} &
-Capacitive or resistive sensor (YL-69 / HL-69) that measures
-volumetric water content in soil. Provides analog output (0--1023)
+Capacitive sensor (YL-69) that measures
+volumetric water content in soil. Provides analog output (0--2560)
 proportional to moisture level, enabling precise irrigation
 decision-making. \\
 \hline
@@ -140,16 +140,10 @@ irrigation timing, and crop photosynthesis analysis. \\
 \hline
 
 \textbf{Rain Sensor} &
-Digital rain detection module (FC-37 / YL-82) with adjustable
+Digital rain detection module (FC-37) with adjustable
 sensitivity. Detects rainfall conditions to prevent irrigation
 during rain events and conserve water resources
 \cite{garcia2020iot}. \\
-\hline
-
-\textbf{Water Flow Sensor} &
-Hall effect-based flow meter (YF-S201) that measures water flow
-rate (1--30 L/min) using pulse frequency output. Enables accurate
-water consumption tracking and irrigation efficiency analysis. \\
 \hline
 
 \textbf{Relay Module} &
@@ -158,15 +152,15 @@ high-power pump/valve circuits (up to 10A at 250V AC or 30V DC)
 based on ESP32 digital output or manual mobile app commands. \\
 \hline
 
-\textbf{Water Pump / Solenoid Valve} &
-12V DC submersible pump or AC-powered solenoid valve for irrigation
+\textbf{Water Pump} &
+12V DC submersible pump for irrigation
 actuation. Flow rate: 500--2000 L/hour depending on field size and
 crop requirements \cite{zia2021experimental}. \\
 \hline
 
 \textbf{Power Supply} &
 5V/2A regulated adapter for ESP32 and sensors (via ESP32's 3.3V
-regulator). Separate 12V/220V supply for pump/valve with protection
+regulator). Separate 12V supply for pump with protection
 circuitry (fuse, surge protection). \\
 \hline
 
@@ -195,7 +189,7 @@ CPU: Dual-core Xtensa LX6 @ 240MHz; RAM: 520KB; Flash: 4MB;
 Wi-Fi: 2.4GHz 802.11n; GPIO: 34 pins &
 Power: 5V (VIN) \\
 \hline
-Soil Moisture & YL-69 / Capacitive &
+Soil Moisture & YL-69 &
 Operating Voltage: 3.3V--5V; Output: Analog (0--1023); Response 
 Time: \textless 1s; Probe Length: 60mm &
 Analog (A0) \\
@@ -210,15 +204,10 @@ Resistance Range: 1k$\Omega$--10M$\Omega$; Spectral Peak: 540nm;
 Voltage: 3.3V--5V &
 Analog (A1) \\
 \hline
-Rain Sensor & FC-37 / YL-82 &
+Rain Sensor & FC-37 &
 Operating Voltage: 3.3V--5V; Detection Area: 5cm $\times$ 4cm; 
 Output: Digital (HIGH/LOW) &
 Digital (GPIO) \\
-\hline
-Water Flow & YF-S201 &
-Flow Range: 1--30 L/min; Pressure: $\le$ 1.75MPa; Output: Pulse 
-(F = 7.5Q Hz); Voltage: 5V DC &
-Interrupt (GPIO 2) \\
 \hline
 Relay Module & 5V Single Channel &
 Coil Voltage: 5V DC; Contact Rating: 10A @ 250V AC / 30V DC; 
@@ -268,9 +257,6 @@ DHT22 Sensor & GPIO 4 (D4) & Digital I/O & Data Protocol \\
 \hline
 Rain Sensor & GPIO 5 (D5) & Digital Input & HIGH / LOW \\
 \hline
-Water Flow Sensor & GPIO 2 (D2) & Interrupt Input & 
-Pulse Frequency \\
-\hline
 Relay Module & GPIO 14 (D7) & Digital Output & 
 HIGH (ON) / LOW (OFF) \\
 \hline
@@ -295,7 +281,6 @@ follows \cite{raj2021survey}:
     \item \textbf{DHT22 Sensor:} 1--1.5mA @ 3.3V $\approx$ 0.005W
     \item \textbf{Soil Moisture + LDR + Rain Sensors:} 
     10--20mA @ 3.3V $\approx$ 0.03--0.07W
-    \item \textbf{Water Flow Sensor:} 15mA @ 5V $\approx$ 0.075W
     \item \textbf{Relay Module (coil):} 70mA @ 5V $\approx$ 0.35W
     \item \textbf{Total (sensors \& control):} $\approx$ 1--1.5W
     \item \textbf{Water Pump (12V):} 0.5--1A @ 12V = 6--12W 
@@ -330,8 +315,6 @@ DHT22 Sensor & 1 & 400 \\
 LDR Sensor & 1 & 50 \\
 \hline
 Rain Sensor Module & 1 & 200 \\
-\hline
-Water Flow Sensor (YF-S201) & 1 & 600 \\
 \hline
 5V Relay Module & 1 & 150 \\
 \hline
@@ -766,6 +749,37 @@ decision-making, actuation, alerting, and AI-based recommendations
 \end{figure}
 
 % ----------------------------------------------------------
+% 3.8 UML Component Diagram
+% ----------------------------------------------------------
+\subsection{UML Component Diagram}
+\label{sec:uml-component}
+
+As illustrated in Figure \ref{fig:component-diagram}, the UML Component Diagram formally defines the structural relationships between the system's core modules. It highlights the Application, Backend, AI, and Device layers, explicitly showing how the Node.js API acts as the central hub. The defined interfaces, such as the REST API (HTTPS) for the mobile app and MQTT/Wi-Fi for telemetry, ensure that each component remains modular, scalable, and loosely coupled.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/chapter3/component diagram.png}
+    \caption{UML Component Diagram of the System}
+    \label{fig:component-diagram}
+\end{figure}
+
+% ----------------------------------------------------------
+% 3.9 UML Activity Diagram
+% ----------------------------------------------------------
+\subsection{UML Activity Diagram}
+\label{sec:uml-activity}
+
+Figure \ref{fig:activity-diagram} presents the comprehensive UML Activity Diagram, mapping out the dynamic execution flow of the system. It demonstrates the initial authentication, branching into parallel tracks for background system operations (sensor reading, AI analysis) and active user interactions (monitoring, manual control). The synchronization of these parallel tracks ensures that the mobile dashboard reflects real-time telemetry while simultaneously triggering appropriate Firebase push notifications for critical alerts.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/chapter3/activity diagram.png}
+    \caption{UML Activity Diagram of the System Workflow}
+    \label{fig:activity-diagram}
+\end{figure}
+
+
+% ----------------------------------------------------------
 % 3.8 Third-Parties Dependencies
 % ----------------------------------------------------------
 \subsection{Third-Parties Dependencies}
@@ -775,7 +789,7 @@ The proposed system integrates third-party libraries, frameworks,
 and services to reduce development time and improve reliability 
 \cite{sommerville2016software}:
 \begin{itemize}[leftmargin=1.2cm]
-    \item \textbf{Arduino IDE / ESP32 SDK:} Embedded development 
+    \item \textbf{Arduino IDE:} Embedded development 
     environment for ESP32 firmware \cite{raj2021survey}.
     \item \textbf{Node.js + Express.js:} Backend development 
     framework for APIs and device ingestion 
@@ -785,11 +799,11 @@ and services to reduce development time and improve reliability
     \cite{uotila2020db}.
     \item \textbf{Firebase Cloud Messaging (FCM):} Push 
     notifications for alerts and updates \cite{khawas2018firebase}.
-    \item \textbf{Android (Java/Kotlin) / Flutter:} Mobile 
+    \item \textbf{Flutter:} Mobile 
     application development platform \cite{mobileui2022}.
     \item \textbf{Visualization Library:} Graphs and charts (e.g., 
     MPAndroidChart or equivalent).
-    \item \textbf{Python ML Libraries:} TensorFlow / Scikit-learn 
+    \item \textbf{Python ML Model:} Random Forest 
     for crop recommendation modeling \cite{ali2025soilml}.
 \end{itemize}
 

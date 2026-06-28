@@ -15,7 +15,7 @@ This chapter describes the implementation of the Smart AI Powered
 Agriculture System at a finer level of detail. It explains the 
 development standards, environment, and key software modules across 
 the embedded firmware (ESP32), backend services (Node.js), mobile 
-application (Android/Flutter), and the AI/ML recommendation service 
+application (Flutter), and the AI/ML recommendation service 
 \cite{thilakarathne2023fields}. The implementation is aligned with 
 the system design described in Chapter 3.
 
@@ -55,7 +55,7 @@ This section describes the tools, platforms, and configurations
 used for software development.
 
 \subsubsection{Tools and Platforms}
-\textbf{Embedded/Firmware:} Arduino IDE with ESP32 board support packages \cite{raj2021survey}. \textbf{Backend:} Node.js runtime with Express.js framework \cite{thilakarathne2023fields}. \textbf{Database:} MySQL (MariaDB) for all data storage and retrieval operations \cite{uotila2020db}. \textbf{Mobile:} Android Studio (Android) or Flutter SDK (cross-platform) \cite{khawas2018firebase}. \textbf{AI/ML:} Python environment with TensorFlow / Scikit-learn \cite{ali2025soilml}. \textbf{Version Control:} Git for collaborative development and change tracking \cite{sommerville2016software}.
+\textbf{Embedded/Firmware:} Arduino IDE with ESP32 board support packages \cite{raj2021survey}. \textbf{Backend:} Node.js runtime with Express.js framework \cite{thilakarathne2023fields}. \textbf{Database:} MySQL (MariaDB) for all data storage and retrieval operations \cite{uotila2020db}. \textbf{Mobile:} Flutter SDK (cross-platform) \cite{khawas2018firebase}. \textbf{AI/ML:} Python environment Random Forest \cite{ali2025soilml}. \textbf{Version Control:} Git for collaborative development and change tracking \cite{sommerville2016software}.
 
 
 \subsubsection{Testing Setup}
@@ -77,6 +77,9 @@ environmental data, applying local decision logic, receiving pump
 commands from the backend, and uploading sensor readings for 
 storage, alerts, analytics, and AI-based processing 
 \cite{thilakarathne2023fields}.
+
+\vspace{0.5em}
+\noindent\textbf{Note on Code Snippets:} The following code snippets are presented to highlight the core functional logic (e.g., sensor integration, decision-making, and communication protocols). For the purpose of brevity and readability, standard imports, module definitions, and boilerplate file structures have been intentionally omitted. For access to the complete, fully functional source code across all system layers, please refer to the project's official GitHub repository \cite{smart_agri_github}.
 
 % ==========================================================
 % 4.3.1 Snippet 1 — Hardware Pin Configuration
