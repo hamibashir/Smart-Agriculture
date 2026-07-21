@@ -11,7 +11,7 @@ export function Hero() {
         animate={{ scale: 1.02, opacity: 1 }}
         transition={{ duration: 1.5, ease: "easeOut" }}
         className="absolute -inset-4 z-0 bg-cover bg-center bg-no-repeat opacity-80"
-        style={{ backgroundImage: "url('/hero-bg.png')" }}
+        style={{ backgroundImage: `url('${import.meta.env.BASE_URL}hero-bg.png')` }}
       />
       
       {/* Premium Dark Gradient Overlay */}
@@ -58,7 +58,7 @@ export function Hero() {
           className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto"
         >
           <a 
-            href="/SmartAgri.apk" 
+            href={`${import.meta.env.BASE_URL}SmartAgri.apk`} 
             download
             className={buttonVariants({ 
               size: "lg", 
