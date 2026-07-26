@@ -137,7 +137,7 @@ CREATE TABLE `fields` (
   `location_latitude` decimal(10,8) DEFAULT NULL,
   `location_longitude` decimal(11,8) DEFAULT NULL,
   `area_size` decimal(10,2) NOT NULL COMMENT 'Area in acres or hectares',
-  `area_unit` enum('acres','hectares','square_meters') DEFAULT 'acres',
+  `area_unit` enum('acres','hectares','square_meters','marla','square_feet') DEFAULT 'acres',
   `soil_type` varchar(50) DEFAULT NULL COMMENT 'e.g., Clay, Sandy, Loamy',
   `current_crop` varchar(100) DEFAULT NULL,
   `planting_date` date DEFAULT NULL,
