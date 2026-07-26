@@ -1,0 +1,559 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Final Exam - Smart AI Powered Agriculture System</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --ink: #102118;
+      --muted: #4a5c52;
+      --line: #d8e7dd;
+      --brand: #1f9d55;
+      --brand-2: #0d7c66;
+      --blue: #2563eb;
+      --dark: #07140f;
+      --panel: #ffffff;
+    }
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ecfdf3, #eff6ff);
+      color: var(--ink);
+      overflow: hidden;
+    }
+    .slides-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .55s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slide.active { opacity: 1; z-index: 10; pointer-events: auto; }
+    
+    .slide-content {
+      width: 100%;
+      height: 100vh;
+      padding: 48px 7vw 96px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      background:
+        linear-gradient(90deg, rgba(31,157,85,.055) 1px, transparent 1px),
+        linear-gradient(rgba(31,157,85,.045) 1px, transparent 1px),
+        #ffffff;
+      background-size: 48px 48px;
+    }
+    .title-slide {
+      justify-content: center;
+      background:
+        radial-gradient(circle at 74% 22%, rgba(134,239,172,.25), transparent 28%),
+        radial-gradient(circle at 14% 76%, rgba(59,130,246,.22), transparent 24%),
+        linear-gradient(135deg, #06120d 0%, #123d2a 56%, #0f172a 100%);
+      color: white;
+    }
+    .title-slide p { color: #d9fbe3; }
+    .eyebrow {
+      color: #bbf7d0;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 900;
+      margin-bottom: 14px;
+    }
+    h1 {
+      font-size: clamp(2rem, 3.7vw, 4.5rem);
+      line-height: 1.06;
+      letter-spacing: 0;
+      margin-bottom: 18px;
+    }
+    .slide-content > h1 {
+      font-size: clamp(1.8rem, 2.8vw, 3rem);
+      color: var(--dark);
+      padding-bottom: 14px;
+      border-bottom: 4px solid var(--brand);
+      margin-bottom: 30px;
+    }
+    h2 {
+      color: var(--brand-2);
+      font-size: clamp(1.15rem, 1.4vw, 1.3rem);
+      margin: 10px 0 10px;
+    }
+    p, li {
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    
+    .hero-grid, .grid {
+      display: grid;
+      gap: 20px;
+      margin-top: 16px;
+    }
+    .hero-grid { grid-template-columns: 1.1fr .9fr; align-items: center; gap: 34px; }
+    .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 28px rgba(16, 33, 24, .08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(16, 33, 24, .12);
+    }
+    .card.dark {
+      background: var(--dark);
+      border-color: rgba(255,255,255,.18);
+      color: white;
+    }
+    .card.dark h2 { color: #86efac; }
+    .card.dark p { color: #d1fae5; }
+    
+    .metric { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .metric:last-child { border-bottom: none; }
+    .metric strong { font-size: 1.4rem; color: #fff; }
+
+    td { border-bottom: 1px solid #eee; padding: 10px; font-size: 1.05rem; }
+
+    .nav-buttons {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 100;
+    }
+    .nav-btn {
+      background: white;
+      border: 2px solid var(--brand);
+      color: var(--brand);
+      padding: 11px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 900;
+      transition: all .25s;
+    }
+    .nav-btn:hover { background: var(--brand); color: white; transform: translateY(-2px); }
+    .slide-counter {
+      position: fixed;
+      right: 28px; bottom: 28px;
+      z-index: 101;
+      background: rgba(255,255,255,.94);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-weight: 900;
+      color: var(--brand-2);
+    }
+    .section-label {
+      position: fixed;
+      right: 28px; top: 20px;
+      z-index: 101;
+      background: rgba(255,255,255,.94);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-weight: 900;
+      color: var(--brand-2);
+    }
+    .progress {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: rgba(31,157,85,.16);
+      z-index: 102;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--brand), var(--blue));
+      transition: width .3s ease;
+    }
+    
+    .reveal-block {
+      opacity: 0;
+      transform: translateY(20px) scale(.992);
+      pointer-events: none;
+      transition: opacity .52s ease, transform .52s cubic-bezier(.22, 1, .36, 1);
+      will-change: opacity, transform;
+    }
+    .reveal-block.revealed {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    
+    @media (max-width: 900px) {
+      .hero-grid, .cols-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="slides-container" id="slidesContainer">
+    <div class="slide active" data-section="Welcome">
+      <div class="slide-content title-slide">
+        <div class="hero-grid">
+          <div class="reveal-block revealed">
+            <div class="eyebrow">Final Defense Presentation</div>
+            <h1>Smart AI Powered Agriculture System</h1>
+            <p style="font-size:1.3rem;max-width:780px;margin-bottom:20px;">A comprehensive, in-depth review of System Implementation, Testing, Deployment, and Team Collaboration directly from the Project Report.</p>
+            <p style="font-size: 1.2rem; font-weight: 800; color: #ffffff;">Muhammad Awais (BSE223112)<br>Hamza Bashir (BSE223108)<br>Junaid Amin (BSE223107)</p>
+            <p style="font-size: 1.1rem; margin-top: 14px;">Supervisor: Adnan Karamat</p>
+          </div>
+          <div class="card dark reveal-block revealed">
+            <h2>Detailed Agenda</h2>
+            <div class="metric"><p>Chapter 4</p><strong>15+ Implementation Snippets</strong></div>
+            <div class="metric"><p>Chapter 5</p><strong>Full System Deployment</strong></div>
+            <div class="metric"><p>Chapter 6</p><strong>18+ Formal Test Cases</strong></div>
+            <div class="metric"><p>Section 1.6</p><strong>Team Work Breakdown</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="slide" data-section="Implementation">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Implementation </h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>Snippet 1: Hardware Pin Configuration</h2><p>As implemented in `ESP32_Firmware/final ESP32 code.txt` (Lines 34–44), the ESP32 firmware defines dedicated GPIO pins for soil moisture, rainfall, light intensity, temperature/humidity, and relay-based pump control. This explicit pin mapping connects the physical field unit with the software logic [...</p></div><div class="card reveal-block"><h2>Snippet 2: Sensor Threshold Configuration</h2><p>Referencing `ESP32_Firmware/final ESP32 code.txt` (Lines46–52), hardcodedthreshold values are defined to classify soil conditions, rainfall status, and light intensity. These limits are utilized by the firmware for local offline automation and zero-latency safety decisions. 1 `// Senso` `r Threshold...</p></div><div class="card reveal-block"><h2>Snippet 3: Three-Tier Timing System</h2><p>As shown in `ESP32_Firmware/final ESP32 code.txt` (Lines 73–78), the firmware establishes a strict three-tier timing mechanism. This architecture separates fast local safety checks (1s), backend command polling (5s), and full telemetry data uploads (30s) to optimize network bandwidth [26]. 1 `// Tim...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Implementation">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Implementation (Part 2)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>Snippet 4: Safe System Initialization</h2><p>Locatedin `ESP32_Firmware/final ESP32 code.txt` (Lines131–168), thesystemstartup sequence initializes serial communication, starts the DHT sensor, configures the relay pin, and explicitly keeps the pump OFF by default. Since the relay operates via an active-low trigger, HIGH safely enforces the OFF ...</p></div><div class="card reveal-block"><h2>Snippet 5: Main Execution Loop</h2><p>The main execution flow, implemented in `ESP32_Firmware/final ESP32 code.txt` (Lines 173–230), drives the continuous monitoring loop. It dynamically checks Wi-Fi status, reads sensors, evaluates local safety logic, polls backend endpoints for irrigation commands, and handles telemetry uploads [28]. ...</p></div><div class="card reveal-block"><h2>Snippet 6: Smoothed Sensor Reading</h2><p>To mitigatesensornoise, thefirmwareappliesasmoothingalgorithmfoundin `ESP32_Firmware/final ESP32 code.txt` (Lines 346–353). Analog sensor values are averaged across multiple sequential samples to improve reading stability and prevent false condition triggers [27]. 1 `int readAnalogSmoothed(uint8_t p...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Implementation">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Implementation (Part 3)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>Snippet 7: Sensor Data Acquisition</h2><p>As implemented in `ESP32_Firmware/final ESP32 code.txt` (Lines 355–371), the firmware acquires soil moisture, rainfall, light intensity, temperature, and humidity metrics from the connected hardware interfaces [3]. 1 `bool readDht(float& tempC, float& humPct) {` 2 `humPct = dht.readHumidity();` 3 `t...</p></div><div class="card reveal-block"><h2>Snippet 8: Local Rain Safety Mechanism</h2><p>Detailed in `ESP32_Firmware/final ESP32 code.txt` (Lines 238–263), the system incorporates a zero-latency local rain override. If rainfall is detected, the irrigation pump is immediately forced OFF without requiring network communication to the backend API [4]. 1 `void applyLocalRainSafety(int rainV...</p></div><div class="card reveal-block"><h2>Snippet 9: Backend Command Polling</h2><p>As coded in `ESP32_Firmware/final ESP32 code.txt` (Lines 270–312), the ESP32 polls the backend via an HTTP GET request to retrieve the latest pump command sent from the mobile application or backend automation logic [21]. 1 `bool fetchPumpCommand() {` 2 `if (WiFi.status() != WL_CONNECTED) return fal...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Implementation">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Implementation (Part 4)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>Snippet 10: Relay Synchronization Logic</h2><p>Located in `ESP32_Firmware/final ESP32 code.txt` (Lines 320–341), the relay synchronization function applies backend commands only when the desired pump state differs from the current state. Furthermore, it explicitly blocks remote ON commands if the local rain override is active [26]. 1 `void syncR...</p></div><div class="card reveal-block"><h2>Snippet 11: Relay-Based Pump Control</h2><p>Described in `ESP32_Firmware/final ESP32 code.txt` (Lines 463–472), the irrigation pump is controlled via an active-low relay module. Setting the relay pin LOW turns the pump ON, while setting it HIGH turns the pump OFF. 1 `void turnPumpOn() {` 2 `digitalWrite(RELAY_PIN , LOW);` 3 `pumpRunning = tru...</p></div><div class="card reveal-block"><h2>Snippet 12: Offline Irrigation Logic</h2><p>Defined in `ESP32_Firmware/final ESP32 code.txt` (Lines 412–458), an offline fallback mechanism ensures that if Wi-Fi is disconnected, the ESP32 autonomously continues irrigation control locally using its direct soil moisture and rainfall sensor inputs [28]. 1 `void runOfflinePumpLogic(int soilValue...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Implementation">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Implementation (Part 5)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>Snippet 13: Wi-Fi Connectivity and Reconnection</h2><p>As seen in `ESP32_Firmware/final ESP32 code.txt` (Lines 477–495), the ESP32 connects to Wi-Fi in station mode and updates its global connection state flag. If the connection drops or fails, the firmware bypasses network uploads and routes execution to the offline safety logic [20]. 1 `void connectTo...</p></div><div class="card reveal-block"><h2>Snippet 14: Sensor Value Conversion</h2><p>Detailed in `ESP32_Firmware/final ESP32 code.txt` (Lines 500–506), raw 12-bit analog values (0–4095) are linearly mapped and constrained into percentage values (0–100%) before transmission to the backend, standardizing the data format. 1 `float convertSoilMoistureToPercentage(int rawValue) {` 2 `ret...</p></div><div class="card reveal-block"><h2>Snippet 15: Sensor Data Upload to Backend</h2><p>Finally, in `ESP32_Firmware/final ESP32 code.txt` (Lines 530–605), the firmware constructs a JSON payload containing the device ID, normalized sensor values, rainfall status, and current pump state. This telemetry data is uploaded to the Node.js backend API using an HTTP POST request [21]. 1 `bool s...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Testing">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Testing </h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>TC-UT-01: User Registration with Valid Data</h2><p style="font-size:0.9rem;">**Date:** 10th January 2026 --- --- **System:** Node.js Backend — User Aut hentication Module **Objective:** Verify that a new user account is created successfully in the `users`table when valid registration data is submitted to the registration API endpoint. **Test ID:**TC-UT-01 **Version:** 1 **Test Type:** Unit Testing **Input:** Full Name: Ali ...</p></div><div class="card reveal-block"><h2>TC-UT-02: User Login with Valid Credentials</h2><p style="font-size:0.9rem;">**Date:** 10th January 2026 **System:** Node.js Backend — JWT Authentication Module **Objective:** Verify that a registered **Test ID:** TC-UT-02 user can authenticate and receive a valid JWT token upon providing correct login credentials. **Version:** 1 **Test Type:** Unit Testing **Input:** Email: ali.khan@test.com Password: Pass@1234 **<br><stro...</p></div><div class="card reveal-block"><h2>TC-UT-03: User Login with Invalid Password</h2><p style="font-size:0.9rem;">**Date:** 10th January 2026 **System:** Node.js Backend — JWT Authentication Module System Testing 92 **Objective:** Verify that the system correctly rejects login attempts when an incorrect password is provided, without leaking account existence information. **Test ID:**TC-UT-03 --- --- **Version:** 1 **Test Type:** Unit Testing **Input:** Email: ...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Testing">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Testing (Part 2)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>TC-UT-04: Soil Moisture Sensor Smoothed Reading</h2><p style="font-size:0.9rem;">**Date:** 12th January 2026 --- --- **System:** ESP32 Firmware — Sensor D ata Acquisition Module **Objective:** Verify that the smoothed analog reading function correctly averages multiple ADC samples from the soil moisture sensor to produce a stable, noise-reduced output value. **Test ID:**TC-UT-04 **Version:** 1 **Test Type:** Unit Testing **Inpu...</p></div><div class="card reveal-block"><h2>TC-UT-05: Soil Moisture Percentage Conversion</h2><p style="font-size:0.9rem;">**Date:** 12th January 2026 **System:** ESP32 Firmware — Sensor Value Conversion Module **Objective:** Verify that raw ADC soil **Test ID:** TC-UT-05 moisture values are correctly converted to percentage values constrained between 0% and 100%. **Version:** 1 **Test Type:** Unit Testing **Input:** Raw ADC Input Value: 2048 ADC Resolution: 12-bit (Ra...</p></div><div class="card reveal-block"><h2>TC-UT-06: DHT22 Temperature and Humidity Reading</h2><p style="font-size:0.9rem;">**Date:** 12th January 2026 **System:** ESP32 Firmware — DHT22 Sensor Module System Testing 94 **Objective:** Verify that the DHT22 reading function returns valid temperature and humidity values and **Test ID:**TC-UT-06 --- --- handles NaN sensor errors gracefully by returning a sentinel error value. **Version:** 1 **Test Type:** Unit Testing **Inp...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Testing">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Testing (Part 3)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>TC-UT-07: Dry Soil Threshold Evaluation</h2><p style="font-size:0.9rem;">**Date:** 13th January 2026 --- --- **System:** ESP32 Firmware — Local T hreshold Logic Module **Objective:** Verify that the ofine pump logic correctly identifes a dry soil condition and sets the irrigation request fag when the raw moisture reading exceeds the dry threshold. **Test ID:**TC-UT-07 **Version:** 1 **Test Type:** Unit Testing **Input:*...</p></div><div class="card reveal-block"><h2>TC-UT-08: Rain Detection Logic</h2><p style="font-size:0.9rem;">**Date:** 13th January 2026 --- --- **System:** ESP32 Firmware — Rain Saf ety Module **Objective:** Verify that the rain detection logic correctly identifes a rainfall condition when the rain sensor analog value falls below the confgured rain threshold. **Test ID:**TC-UT-08 **Version:** 1 **Test Type:** Unit Testing **Input:** Raw Rain Sensor Value...</p></div><div class="card reveal-block"><h2>TC-UT-09: AI Crop Recommendation Model Output</h2><p style="font-size:0.9rem;">**Date:** 15th January 2026 **System:** Python AI Service — Crop Recommendation ML Model oO Explorer : : Jutput 1g Con: Terminal ort Smart-Agriculture . . . ideajes PSPS C:\Users\Admin\Documents\Github\smart-Agriculture>C:\Users\Admin\Documents\Github\smart-Agriculture\AIl_Model>cd AI_Modelpython train_model.py xn v Al Modelpycache eeeSmart Agricul...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Testing">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Testing (Part 4)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>TC-UT-10: Firebase Push Notification Dispatch</h2><p style="font-size:0.9rem;">**Date:** 15th January 2026 **System:** Node.js Backend — Firebase Cloud Messaging (FCM) Module **Objective:** Verify that the FCM **Test ID:** TC-UT-10 notification function successfully delivers a push notification to a registered device token when invoked with a valid critical alert payload. **Version:** 1 **Test Type:** Unit Testing **Input:** ...</p></div><div class="card reveal-block"><h2>TC-CT-01: Automatic Irrigation Trigger Component</h2><p style="font-size:0.9rem;">System Testing 99 **Date:** 18th January 2026 --- --- **System:** ESP32 Firmware + Relay Mo dule — Automated Irrigation Component **Objective:** Verify that the automatic irrigation component correctly activates the relay-driven water pump when soil moisture drops below the confgured threshold, without any manual user intervention. **Test ID:**TC-C...</p></div><div class="card reveal-block"><h2>TC-CT-02: Rain Safety Override Component</h2><p style="font-size:0.9rem;">**Date:** 18th January 2026 --- --- **System:** ESP32 Firmware — Rain Ov erride Safety Component **Objective:** Verify that the local rain safety override component immediately stops the active irrigation pump when rainfall is detected, regardless of the current backend pump command state. **Test ID:**TC-CT-02 **Version:** 1 **Test Type:** Componen...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Testing">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Testing (Part 5)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>TC-CT-03: Offline Irrigation Control Component</h2><p style="font-size:0.9rem;">**Date:** 19th January 2026 **System:** ESP32 Firmware — Offline Pump Logic Component **Objective:** Verify that the ESP32 **Test ID:** TC-CT-03 maintains correct local irrigation control when Wi-Fi is disconnected, using only onboard sensor readings for all irrigation decisions. **Version:** 1 **Test Type:** Component Testing **Input:** Wi-Fi Stat...</p></div><div class="card reveal-block"><h2>TC-CT-04: Critical Alert Generation Component</h2><p style="font-size:0.9rem;">**Date:** 20th January 2026 **System:** Node.js Backend — Alert Ge neration and Storage Component --- --- **Objective:** Verify that the backend alert component creates a critical alert record in the database and dispatches a push notifcation when a critical soil moisture reading is received from the ESP32. **Test ID:**TC-CT-04 **Version:** 1 **Tes...</p></div><div class="card reveal-block"><h2>TC-CT-05: Historical Data Retrieval Component</h2><p style="font-size:0.9rem;">**Date:** 20th January 2026 --- --- **System:** Node.js Backend — Historica l Analytics API Component **Objective:** Verify that the historical data retrieval component correctly queries and returns fltered sensor readings for a given feld and date range, using the composite database index for performance. **Test ID:**TC-CT-05 **Version:** 1 **Test...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Testing">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Testing (Part 6)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>TC-CT-06: Manual Irrigation Control Component</h2><p style="font-size:0.9rem;">**Date:** 21st January 2026 **System:** Mobile App + Node.js Backend — Manual Irrigation Control Component **Objective:** Verify that a manual **Test ID:** TC-CT-06 pump ON command issued from the mobile application is received and stored by the backend, then fetched and executed correctly by the ESP32 within its polling interval. **Version:** 1 **...</p></div><div class="card reveal-block"><h2>TC-CT-07: Crop Recommendation API Component</h2><p style="font-size:0.9rem;">**Date:** 22nd January 2026 **System:** Node.js Backend + Python AI Service — Crop Recommendation API Component **Objective:** Verify that the backend **Test ID:** TC-CT-07 recommendation component correctly aggregates sensor data, forwards it to the AI service, receives a crop recommendation, and stores the result in the `crop_recommendations` tab...</p></div><div class="card reveal-block"><h2>TC-IT-01: ESP32 to Backend Sensor Telemetry</h2><p style="font-size:0.9rem;">**Date:** 25th January 2026 System Testing 104 **System:** ESP32 Firmware + Node.js Backend — Sensor Telemetry Integration **Objective:** Verify that the ESP32 **Test ID:** TC-IT-01 correctly packages sensor readings into a JSON payload and transmits them to the backend REST API, which validates the device, stores the reading, and returns a success...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Testing">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Testing (Part 7)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>TC-IT-02: Backend to MySQL Data Persistence</h2><p style="font-size:0.9rem;">**Date:** 25th January 2026 **System:** Node.js Backend + MySQL Database — Data Persistence Integration **Objective:** Verify that sensor **Test ID:** TC-IT-02 readings received at the backend API are correctly and completely persisted in the MySQL `sensor_readings` table with accurate values and timestamps. **Version:** 1 **Test Type:** Integratio...</p></div><div class="card reveal-block"><h2>TC-IT-03: Backend to Firebase FCM Integration</h2><p style="font-size:0.9rem;">**Date:** 26th January 2026 **System:** Node.js Backend + Firebase Cloud Messaging — Push Notification Integration **Objective:** Verify that the backend **Test ID:** TC-IT-03 alert module successfully integrates with FCM to deliver push notifications to the farmer’s registered mobile device when a critical threshold condition is detected. **Versio...</p></div><div class="card reveal-block"><h2>TC-IT-04: Mobile App to Backend Authentication</h2><p style="font-size:0.9rem;">**Date:** 26th January 2026 --- --- **System:** Android Mobile App + Node .js Backend — Authentication Integration **Objective:** Verify that the mobile application correctly sends login credentials to the backend, stores the returned JWT token securely, and uses it as a Bearer token for all subsequent protected API calls. **Test ID:**TC-IT-04 **Ve...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Testing">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Testing (Part 8)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>TC-IT-05: Backend to AI Service Integration</h2><p style="font-size:0.9rem;">**Date:** 27th January 2026 **System:** Node.js Backend + Python AI Service — Crop Recommendation Integration System Testing 107 **Objective:** Verify that the backend correctly forwards aggregated soil feature data to the deployed Python AI service REST endpoint and receives a valid crop recommendation response. **Test ID:**TC-IT-05 --- --- **Vers...</p></div><div class="card reveal-block"><h2>TC-IT-06: ESP32 Irrigation Command Polling</h2><p style="font-size:0.9rem;">**Date:** 27th January 2026 --- --- **System:** Mobile App + Node.js Backen d + ESP32 — Irrigation Command Integration **Objective:** Verify the complete command propagation fow: user triggers manual irrigation on the mobile app, backend stores the command, and ESP32 polls, receives, and executes the command within its defned polling interval. **Te...</p></div><div class="card reveal-block"><h2>TC-IT-07: Sensor Data to Mobile Dashboard</h2><p style="font-size:0.9rem;">**Date:** 28th January 2026 --- --- **System:** ESP32 + Node.js Backend + Mobile App — Live Dashboard Data Integration **Objective:** Verify that sensor readings uploaded by the ESP32 are stored in the backend database and correctly displayed on the farmer’s mobile application dashboard within the expected refresh interval. **Test ID:**TC-IT-07 **V...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Testing">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Testing (Part 9)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>TC-ST-01: Complete Sensor-to-Dashboard End-to-End Flow</h2><p style="font-size:0.9rem;">**Date:** 1st February 2026 --- --- **System:** Complete System — Sensor t o Dashboard End-to-End Test **Objective:** Verify the complete data pipeline from physical sensor reading on the ESP32 feld unit through backend storage to live display on the farmer’s mobile application dashboard. **Test ID:**TC-ST-01 **Version:** 1 **Test Type:** System Te...</p></div><div class="card reveal-block"><h2>TC-ST-02: Automated Irrigation with Rain Safety End-to-End</h2><p style="font-size:0.9rem;">**Date:** 2nd February 2026 **System:** Complete System — Automated Irrigation with Rain Override End-to-End Test **Objective:** Verify that the system **Test ID:** TC-ST-02 autonomously detects dry soil, triggers irrigation, and then correctly stops irrigation when rainfall is detected, all without any manual user intervention. **Version:** 1 **Te...</p></div><div class="card reveal-block"><h2>TC-ST-03: Manual Irrigation Remote Control End-to-End</h2><p style="font-size:0.9rem;">**Date:** 2nd February 2026 **System:** Complete System — Mobile App to Field Pump Control End-to-End Test System Testing 111 **Objective:** Verify the complete fow of a farmer remotely starting and stopping irrigation from the mobile application, with correct real-time status updates refected on the dashboard and irrigation logs. **Test ID:**TC-ST...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Testing">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Testing (Part 10)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>TC-ST-04: AI Crop Recommendation End-to-End Flow</h2><p style="font-size:0.9rem;">**Date:** 3rd February 2026 --- --- **System:** Complete System — AI Crop Recommendation End-to-End Test **Objective:** Verify the complete AI recommendation fow from farmer input on the mobile app, through the backend, AI service, database storage, and result display with confdence score and accept/reject functionality. **Test ID:**TC-ST-04 **Vers...</p></div><div class="card reveal-block"><h2>TC-ST-05: Critical Alert with Push Notification End-to-End</h2><p style="font-size:0.9rem;">**Date:** 3rd February 2026 **System:** Complete System — Critical Alert and Push Notification End-to-End Test **Objective:** Verify that a critical soil **Test ID:** TC-ST-05 moisture condition detected by the ESP32 results in a database alert record, a push notification delivered to the farmer’s device, and a visible alert in the mobile applicati...</p></div><div class="card reveal-block"><h2>TC-ST-06: Weekly Historical Analytics End-to-End</h2><p style="font-size:0.9rem;">**Date:** 4th February 2026 --- --- **System:** Complete System — Historic al Analytics End-to-End Test **Objective:** Verify that the analytics module correctly retrieves and renders a 7-day soil moisture trend line chart on the mobile application with accurate data points and interactive tooltips. **Test ID:**TC-ST-06 **Version:** 1 **Test Type:*...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Testing">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Testing (Part 11)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>TC-ST-07: Data Export End-to-End</h2><p style="font-size:0.9rem;">**Date:** 4th February 2026 **System:** Complete System — Data Export End-to-End Test System Testing 114 **Objective:** Verify that a farmer can successfully confgure and export historical farm data as a downloadable report from the mobile application containing all selected sensor readings and irrigation events. **Test ID:**TC-ST-07 --- --- **Vers...</p></div><div class="card reveal-block"><h2>TC-ST-08: Sensor Offline Detection End-to-End</h2><p style="font-size:0.9rem;">**Date:** 5th February 2026 --- --- **System:** Complete System — Sensor Ofine Detection End-to-End Test **Objective:** Verify that the system correctly detects when an ESP32 sensor node stops transmitting telemetry and marks its status as “Ofine” on the mobile application dashboard after the confgured timeout period. **Test ID:**TC-ST-08 **Version...</p></div><div class="card reveal-block"><h2>TC-ST-09: Field Comparison End-to-End</h2><p style="font-size:0.9rem;">**Date:** 5th February 2026 **System:** Complete System — Field Comparison End-to-End Test **Objective:** Verify that the system **Test ID:** TC-ST-09 correctly retrieves and displays side-by-side statistics for two different fields, enabling the farmer to compare soil moisture trends and water usage across multiple farm plots. **Version:** 1 **Tes...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Testing">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Testing (Part 12)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>TC-ST-10: Complete System Resilience Under Wi-Fi Failure</h2><p style="font-size:0.9rem;">**Date:** 6th February 2026 --- --- **System:** Complete System — Networ k Failure Resilience Test **Objective:** Verify that the complete system maintains correct local irrigation control during a Wi-Fi outage and automatically recovers full backend synchronisation when connectivity is restored. **Test ID:**TC-ST-10 **Version:** 1 **Test Type:** S...</p></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Deployment">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Deployment </h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>Deployment Overview</h2><p>The deployment is performed in the following order to ensure correct integration: First, prepare and connect hardware components (sensors, ESP32, relay, pump). Next, flash ESP32 firmware and configure Wi-Fi/device identifiers. Then, deploy backend services (Node.js) and configure environment variabl...</p></div><div class="card reveal-block"><h2>Hardware Setup and Field Installation</h2><p>The field unit installation ensures correct sensor placement and safe electrical connections. **ESP32 and Sensors:** Connect soil moisture sensor to ESP32 ADC pin, DHT22 to digital pin, LDR to ADC pin, rain sensor to digital pin, and flow sensor to interrupt-capable pin. **Relay and Pump/Valve:** Re...</p></div><div class="card reveal-block"><h2>ESP32 Firmware Deployment</h2><p>The firmware is uploaded using Arduino IDE and configured for the target farm environment....</p></div>
+        </div>
+        <div class="card dark reveal-block" style="margin-top:20px;">
+            <p><strong>Note for Images:</strong> Include deployment architecture diagrams in the <code>images/</code> folder (e.g., <code>images/deployment.png</code>) to display them here.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Deployment">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Deployment (Part 2)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>Firmware Flashing Steps</h2><p>First, install Arduino IDE and ESP32 board support packages. Next, connect ESP32 to a computer via USB. Then, select the correct ESP32 board and COM port in Arduino IDE. Following that, update configuration parameters in the firmware: [leftmargin=1.2cm] Subsequently, wi-Fi SSID and password First, b...</p></div><div class="card reveal-block"><h2>Post-Flash Verification</h2><p>Confirm Wi-Fi connection is established. Confirm sensor values are printed in serial logs. Confirm telemetry requests are reaching the backend (HTTP 200 OK). Confirm relay toggles correctly in manual test mode. Software Deployment 84...</p></div><div class="card reveal-block"><h2>Backend Deployment (Node.js Server)</h2><p>The backend server hosts REST APIs for device ingestion, user authentication, dashboard data, irrigation control, alerts, and AI recommendation requests....</p></div>
+        </div>
+        <div class="card dark reveal-block" style="margin-top:20px;">
+            <p><strong>Note for Images:</strong> Include deployment architecture diagrams in the <code>images/</code> folder (e.g., <code>images/deployment.png</code>) to display them here.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Deployment">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Deployment (Part 3)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>Backend Installation Requirements</h2><p>Node.js runtime (LTS recommended) Package manager (npm) Firebase Admin SDK credentials (for Firebase option) MySQL credentials (if MySQL option is enabled)...</p></div><div class="card reveal-block"><h2>Backend Deployment Steps</h2><p>1. Clone/copy backend source code to the target server machine. 2. Install dependencies: ``` npminstall ``` 3. Configure environment variables (example): ``` PORT=8080 ``` ``` JWT_SECRET=your_secret_key FIREBASE_PROJECT_ID=your_project_id FIREBASE_SERVICE_ACCOUNT=path_to_service_account.json MYSQL_H...</p></div><div class="card reveal-block"><h2>Backend Deployment Modes</h2><p>**Local Server Mode:** Suitable for demos and lab testing (same network). **Cloud Server Mode:** Recommended for remote access by farmers outside the local network. € G &_ douddigitalocean.com/apps/dch9? eff-OBth-4774-8799-4ec36d02 dt 5e7400 ® o + @: Cy J Home Launchpad (29) © BacktoA ' (=) backend ...</p></div>
+        </div>
+        <div class="card dark reveal-block" style="margin-top:20px;">
+            <p><strong>Note for Images:</strong> Include deployment architecture diagrams in the <code>images/</code> folder (e.g., <code>images/deployment.png</code>) to display them here.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Deployment">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Deployment (Part 4)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>MySQL Database Setup</h2><p>1. Install MySQL Server (or MariaDB) and start the service: ``` sudosystemctlstartmysql ``` ``` sudosystemctlenablemysql ``` 2. Create the database and user: ``` CREATEDATABASEsmart_agriculture; ``` ``` CREATEUSER’smart_agri_user’@’localhost’ ``` ``` IDENTIFIEDBY’secure_password’; ``` ``` GRANTALLPR...</p></div><div class="card reveal-block"><h2>AI Service Deployment (Python)</h2><p>The AI service provides crop recommendations based on extracted features from sensor history and environmental context....</p></div><div class="card reveal-block"><h2>Deployment Steps</h2><p>1. Set up Python environment (virtual environment recommended). 2. Install required libraries. 3. Place the trained model file in the service directory. 4. Run the AI service API (example): ``` pythonapp.py ``` 5. Configure backend `AI_SERVICE_URL` to connect to the AI endpoint....</p></div>
+        </div>
+        <div class="card dark reveal-block" style="margin-top:20px;">
+            <p><strong>Note for Images:</strong> Include deployment architecture diagrams in the <code>images/</code> folder (e.g., <code>images/deployment.png</code>) to display them here.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Deployment">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Deployment (Part 5)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>AI Verification</h2><p>Send a test request with sample feature payload. Confirm response contains recommended crop(s) and confidence score. backend - DigitalOcean App x @ aihamzabashir.online/heatth x = + € Cc %3 aihamzabashir.online/health Pretty-print { “crops_supported": [ “chickpea”, “cotton", “maize”, “mustard”, "ric...</p></div><div class="card reveal-block"><h2>Mobile Verification Checklist</h2><p>Live readings update correctly on dashboard. Manual irrigation control toggles pump. Alerts appear in the app and push notifications are received. Weekly trends / historical charts load from stored data. AI recommendation screen returns crop suggestions with confidence....</p></div><div class="card reveal-block"><h2>End-to-End System Validation</h2><p>After deployment, the complete system is validated using a practical checklist to ensure correct integration: First, **Telemetry Check:** ESP32 sends readings and backend stores them successfully. Next, **Dashboard Check:** Mobile app displays live readings and device status. Then, **Automation Chec...</p></div>
+        </div>
+        <div class="card dark reveal-block" style="margin-top:20px;">
+            <p><strong>Note for Images:</strong> Include deployment architecture diagrams in the <code>images/</code> folder (e.g., <code>images/deployment.png</code>) to display them here.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-section="Deployment">
+      <div class="slide-content">
+        <h1 class="reveal-block">System Deployment (Part 6)</h1>
+        <div class="grid cols-3" style="margin-top: 30px;">
+          <div class="card reveal-block"><h2>Summary</h2><p>This chapter described the deployment of the Smart AI Powered Agriculture System, including hardware installation, ESP32 firmware flashing, backend and database configuration, AI service deployment, and mobile application setup. A final validation checklist was provided to confirm end-to-end system ...</p></div>
+        </div>
+        <div class="card dark reveal-block" style="margin-top:20px;">
+            <p><strong>Note for Images:</strong> Include deployment architecture diagrams in the <code>images/</code> folder (e.g., <code>images/deployment.png</code>) to display them here.</p>
+        </div>
+      </div>
+    </div>
+    
+<div class="slide" data-section="Team Work">
+  <div class="slide-content">
+    <h1 class="reveal-block">Team Work & Breakdown Structure</h1>
+    <div class="reveal-block" style="max-height: 70vh; overflow-y: auto;">
+      
+<table style="width:100%; border-collapse: collapse; margin-top:20px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+  <tr style="background: var(--brand); color: white;">
+    <th style="padding: 12px; text-align: left;">Role/Module</th>
+    <th style="padding: 12px; text-align: left;">Task Description</th>
+  </tr>
+  <tr><td>1-4</td><td>Formal Project Schedule<br>. . . . . . . . . . . . . . . . . . . . . . . . . . .<br>7</td></tr><tr><td>2-1</td><td>Verify User Registration with Valid Data . . . . . . . . . . . . . . . . . . .<br>13</td></tr><tr><td>2-2</td><td>Verify Login with Valid Credentials<br>. . . . . . . . . . . . . . . . . . . . .<br>14</td></tr><tr><td>2-3</td><td>Verify Profle Management . . . . . . . . . . . . . . . . . . . . . . . . . .<br>14</td></tr><tr><td>2-4</td><td>Verify Field Overview Display . . . . . . . . . . . . . . . . . . . . . . . .<br>15</td></tr><tr><td>2-5</td><td>Verify Real-Time Data Display . . . . . . . . . . . . . . . . . . . . . . . .<br>16</td></tr><tr><td>2-6</td><td>Verify Sensor Status Monitoring . . . . . . . . . . . . . . . . . . . . . . .<br>16</td></tr><tr><td>2-7</td><td>Verify Manual Pump Start<br>. . . . . . . . . . . . . . . . . . . . . . . . . .<br>17</td></tr><tr><td>2-8</td><td>Verify Automatic Trigger on Low Moisture<br>. . . . . . . . . . . . . . . . .<br>18</td></tr><tr><td>2-9</td><td>Verify Irrigation Logging . . . . . . . . . . . . . . . . . . . . . . . . . . .<br>18</td></tr><tr><td>2-10</td><td>Verify Crop Recommendation Generation . . . . . . . . . . . . . . . . . .<br>19</td></tr><tr><td>2-11</td><td>Verify Recommendation Confdence Score . . . . . . . . . . . . . . . . . .<br>20</td></tr><tr><td>2-12</td><td>Verify Accept Recommendation<br>. . . . . . . . . . . . . . . . . . . . . . .<br>21</td></tr><tr><td>2-13</td><td>Verify Critical Alert Delivery . . . . . . . . . . . . . . . . . . . . . . . . .<br>21</td></tr><tr><td>2-14</td><td>Verify Unread Alert Count . . . . . . . . . . . . . . . . . . . . . . . . . .<br>22</td></tr><tr><td>2-15</td><td>Verify Resolve Alert Functionality . . . . . . . . . . . . . . . . . . . . . .<br>22</td></tr><tr><td>2-16</td><td>Verify Weekly Trend Graph . . . . . . . . . . . . . . . . . . . . . . . . . .<br>23</td></tr><tr><td>2-17</td><td>Verify Data Export<br>. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .<br>24</td></tr><tr><td>2-18</td><td>Verify Field Comparison . . . . . . . . . . . . . . . . . . . . . . . . . . .<br>24</td></tr><tr><td>2-19</td><td>Traceability Matrix . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .<br>44</td></tr><tr><td>3-1</td><td>Hardware Components and Primary Functions . . . . . . . . . . . . . . . .<br>50</td></tr><tr><td>3-2</td><td>Hardware Technical Specifcations and Interface Details . . . . . . . . . . .<br>51</td></tr><tr><td>3-4</td><td>ESP32 Pin Confguration . . . . . . . . . . . . . . . . . . . . . . . . . . .<br>52</td></tr><tr><td>3-6</td><td>Estimated Hardware Costs<br>. . . . . . . . . . . . . . . . . . . . . . . . . .<br>53</td></tr><tr><td>6-35</td><td>System Testing Summary . . . . . . . . . . . . . . . . . . . . . . . . . . . 116</td></tr><tr><td>**Name**</td><td>**What they do (features)** **What gap remains**</td></tr><tr><td>SAWiE<br>(Sustain-<br>able<br>Agriculture<br>Water & Intelligent<br>Ecosystem)</td><td>Ofers IoT and machine learn-<br>ing based advisory for farm-<br>ers; soil mapping and alerts for<br>droughts and foods. Does not directly automate irri-<br>gation hardware or pump con-<br>trol.</td></tr><tr><td>Buraq<br>Integrated<br>Solutions — Smart<br>Drip Irrigation</td><td>Implements drip irrigation sys-<br>tems with soil moisture and<br>temperature sensors. Lacks an AI-based crop recom-<br>mendation module.</td></tr><tr><td>VGreen<br>—<br>CropSight<sup>™</sup></td><td>Provides farm mapping, real-<br>time monitoring, and analytics;<br>localized for Pakistani farms. Good dashboards and analyt-<br>ics but lacks full automation<br>(pump control and crop rec-<br>ommendation) and is costly for<br>small farmers.</td></tr><tr><td>Field Commander<br>— Valley Irriga-<br>tion Pakistan</td><td>Ofers remote monitoring and<br>SMS/Email alerts. Does not ofer smart irrigation<br>and is mainly available for large<br>commercial farms.</td></tr><tr><td>Smart<br>IoT<br>Farm<br>at PMAS–AAUR,<br>Rawalpindi</td><td>University research farm with<br>sensors (e.g., soil moisture)<br>and real-time IoT monitoring to<br>demonstrate precision agricul-<br>ture. No dedicated mobile applica-<br>tion for farmers, no AI-based<br>decision support, and no auto-<br>mated irrigation.</td></tr><tr><td>**Problem**</td><td>**Solution** **Unique Value Proposition**</td></tr><tr><td>1.<br>Water wastage due to<br>over-irrigation.</td><td>1. IoT sensors for soil and<br>weather. An afordable smart farm-<br>ing kit that saves water,</td></tr><tr><td>2.<br>Low crop yield from</td><td>2.<br>Automatic irrigation increases yield, and helps</td></tr><tr><td>poor crop choice.</td><td>system. farmers make better crop</td></tr><tr><td>3. Lack of afordable smart<br>farming tools.</td><td>3.<br>Mobile app with AI-<br>based crop suggestion. decisions.</td></tr><tr><td>**Existing Alternatives**</td><td>**Key Metrics (Approx.)** **High-Level Concept**</td></tr><tr><td>1. Manual irrigation.<br>2. Expensive imported sys-<br>tems.</td><td>1.<br>100+ farmers use the<br>system.<br>2. 45% water savings (est.).<br>3.<br>35% increase in yield<br>(est.). A smart farming assistant<br>for every farmer, like a<br>personal digital guide for<br>crops.</td></tr><tr><td>**Channels**</td><td>**Cost Structure** **Customer Segments**</td></tr><tr><td>1. Direct sales to farmers.<br>2. Partnerships with NGOs<br>and government programs.</td><td>1. IoT hardware (sensors,<br>controllers).<br>2. Mobile app and server 1. Small and medium farm-<br>ers.<br>2. Agriculture NGOs and</td></tr><tr><td>3. Agriculture supply com-</td><td>hosting. government projects.</td></tr><tr><td>panies.</td><td>3. Installation and support.</td></tr><tr><td>**Early Adopters**</td><td>**Revenue Structure**</td></tr><tr><td>**ID**</td><td>**Task / Phase** **Duration** **Ownership** **Deliverable**</td></tr><tr><td>**1**</td><td>**Hardware**<br>**&**<br>**Firmware** **4 Weeks** **Hamza Bashir** **Physical**<br>**prototype**<br>**&**<br>**ESP32 Code**</td></tr><tr><td>1.1</td><td>Sensor Calibration 1 Week Hamza Bashir Calibrated<br>DHT22<br>and<br>Moisture inputs</td></tr><tr><td>1.2</td><td>Actuator Integration 1 Week Hamza Bashir Functional relay control for<br>pump<br>Continued on next page</td></tr><tr><td>**ID**</td><td>**Task / Phase** **Duration** **Ownership** **Deliverable**</td></tr><tr><td>1.3</td><td>ESP32 Firmware 2 Weeks Hamza Bashir Stable Wi-Fi telemetry and<br>control loop</td></tr><tr><td>**2**</td><td>**Backend**<br>**&**<br>**Database** **4 Weeks** **Junaid Amin** **Deployed API & MySQL**<br>**Schema**</td></tr><tr><td>2.1</td><td>Database Design 1 Week Junaid Amin Normalized<br>schema<br>de-<br>ployed to server</td></tr><tr><td>2.2</td><td>REST API Dev 2 Weeks Junaid Amin Endpoints<br>for<br>telemetry<br>and control</td></tr><tr><td>2.3</td><td>Authentication 1 Week Junaid Amin Secure JWT login and feld<br>mapping</td></tr><tr><td>**3**</td><td>**AI**<br>**&**<br>**Machine**<br>**Learning** **3 Weeks** **Muhammad Awais** **Trained**<br>**Scikit-Learn**<br>**Model**</td></tr><tr><td>3.1</td><td>Dataset Preparation 1 Week Muhammad Awais Dataset<br>generation<br>and<br>cleaning</td></tr><tr><td>3.2</td><td>Model Training 1 Week Muhammad Awais Tuned<br>Random<br>Forest<br>(n_estimators=150)</td></tr><tr><td>3.3</td><td>API Integration 1 Week Muhammad Awais Wrapper returning conf-<br>dence score</td></tr><tr><td>**4**</td><td>**Frontend Applica-**<br>**tion** **4 Weeks** **Team** **Compiled Flutter APK**</td></tr><tr><td>4.1</td><td>UI Mockups & Flow 1 Week Junaid Amin Figma<br>designs<br>for<br>all<br>screens</td></tr><tr><td>4.2</td><td>Core Development 2 Weeks Team FlutterUIand backendAPI<br>binding</td></tr><tr><td>4.3</td><td>System Testing 1 Week Hamza Bashir Passed test cases across de-<br>vices</td></tr><tr><td>**ID**</td><td>**Milestone** **Start** **End** **Depends On** **Owner**</td></tr><tr><td>**M1**</td><td>Requirement Specifcations 29 Sep 25 12 Oct 25 – Team</td></tr><tr><td>**M2**</td><td>Hardware Design 13 Oct 25 02 Nov 25 M1 Hamza</td></tr><tr><td>**M3**</td><td>Backend & Database 03 Nov 25 30 Nov 25 M1 Junaid</td></tr><tr><td>**M4**</td><td>AI Dataset Preparation 13 Oct 25 26 Oct 25 M1 Awais</td></tr><tr><td>**M5**</td><td>ESP32 Firmware 03 Nov 25 23 Nov 25 M2 Hamza</td></tr><tr><td>**M6**</td><td>AI Model Training 27 Oct 25 16 Nov 25 M4 Awais</td></tr><tr><td>**M7**</td><td>API Integration 01 Dec 25 21 Dec 25 M3, M5, M6 Team</td></tr><tr><td>**M8**</td><td>Mobile App UI 22 Dec 25 18 Jan 26 M1 Junaid</td></tr><tr><td>**M9**</td><td>System Integration 19 Jan 26 15 Mar 26 M7, M8 Team</td></tr><tr><td>**M10**</td><td>Testing & Fixing 16 Mar 26 10 May 26 M9 Hamza</td></tr><tr><td>**M11**</td><td>Final Deployment 11 May 26 10 Jul 26 M10 Team</td></tr><tr><td>**Test ID**</td><td>TC-E1-US1-01</td></tr><tr><td>**User Story ID**</td><td>E1-US1</td></tr><tr><td>**Module**</td><td>User Authentication and Registration</td></tr><tr><td>**Test Case Description**</td><td>Verify that a new user can successfully register<br>using valid credentials and personal informa-<br>tion.</td></tr><tr><td>**Preconditions**</td><td>User is on the registration screen and backend<br>server is operational.</td></tr><tr><td>**Test Inputs**</td><td>Name = “Ali Khan”<br>Email = “ali@test.com”<br>Phone = “+923001234567”<br>Password = “Pass123”</td></tr><tr><td>**Expected Result**</td><td>A new user account should be created success-<br>fully in the`users`table and the user should be<br>redirected to the login page.</td></tr><tr><td>**Actual Result**</td><td>User account was created successfully and redi-<br>rected to the login page correctly.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E1-US2-01</td></tr><tr><td>**User Story ID**</td><td>E1-US2</td></tr><tr><td>**Module**</td><td>User Authentication</td></tr><tr><td>**Test Case Description**</td><td>Verify that a registered user can log into the<br>system successfully using valid credentials.</td></tr><tr><td>**Preconditions**</td><td>User account already exists in the system<br>database.</td></tr><tr><td>**Test Inputs**</td><td>Email = “ali@test.com”<br>Password = “Pass123”</td></tr><tr><td>**Expected Result**</td><td>System authenticates the user, generates JWT<br>token, and redirects to dashboard with HTTP<br>200 OK response.</td></tr><tr><td>**Actual Result**</td><td>User was authenticated successfully and dash-<br>board loaded correctly with valid JWT token.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E1-US3-01</td></tr><tr><td>**User Story ID**</td><td>E1-US3</td></tr><tr><td>**Module**</td><td>Profle Management</td></tr><tr><td>**Test Case Description**</td><td>Verify that the user can update personal profle<br>information successfully.</td></tr><tr><td>**Preconditions**</td><td>User is logged in and profle screen is accessible.</td></tr><tr><td>**Test Inputs**</td><td>Updated Phone = “+923009876543”</td></tr><tr><td>**Expected Result**</td><td>Updated profle information should be saved in<br>the`users`table and success message should be<br>displayed.</td></tr><tr><td>**Actual Result**</td><td>Profle information was updated successfully</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E2-US1-01</td></tr><tr><td>**User Story ID**</td><td>E2-US1</td></tr><tr><td>**Module**</td><td>Real-Time Sensor Data Monitoring</td></tr><tr><td>**Test Case Description**</td><td>Verify that all registered felds are displayed on<br>the dashboard with their current status.</td></tr><tr><td>**Preconditions**</td><td>User is logged in and felds are registered in the<br>system.</td></tr><tr><td>**Test Inputs**</td><td>User opens the dashboard screen.</td></tr><tr><td>**Expected Result**</td><td>Dashboard should display all registered felds<br>with status indicators such as “Healthy” or<br>“Needs Water”.</td></tr><tr><td>**Actual Result**</td><td>Registered felds were displayed successfully<br>with correct status indicators.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E2-US2-01</td></tr><tr><td>**User Story ID**</td><td>E2-US2</td></tr><tr><td>**Module**</td><td>Real-Time Monitoring</td></tr><tr><td>**Test Case Description**</td><td>Verify that the latest sensor readings are cor-<br>rectly displayed on the user interface.</td></tr><tr><td>**Preconditions**</td><td>ESP32 device is connected and sending teleme-<br>try to backend server.</td></tr><tr><td>**Test Inputs**</td><td>Sensor ID = 14<br>Moisture = 45%<br>Temperature = 30<sup>◦</sup>C</td></tr><tr><td>**Expected Result**</td><td>Dashboard should display updated moisture and<br>temperature values matching the sensor readings<br>stored in the database.</td></tr><tr><td>**Actual Result**</td><td>Dashboard displayed “Moisture:<br>45%” and<br>“Temperature: 30<sup>◦</sup>C” correctly.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E2-US3-01</td></tr><tr><td>**User Story ID**</td><td>E2-US3</td></tr><tr><td>**Module**</td><td>Sensor Status Monitoring</td></tr><tr><td>**Test Case Description**</td><td>Verify that the system displays ofine status<br>when a sensor stops sending data.</td></tr><tr><td>**Preconditions**</td><td>Sensor is registered in the system and dashboard<br>is accessible.</td></tr><tr><td>**Test Inputs**</td><td>Sensor ID = 14 stops sending telemetry data.</td></tr><tr><td>**Expected Result**</td><td>System should mark the sensor status as “Of-<br>fine” on the dashboard or sensor detail page.</td></tr><tr><td>**Actual Result**</td><td>Sensor status changed to “Ofine” successfully<br>when telemetry was not received.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E3-US1-01</td></tr><tr><td>**User Story ID**</td><td>E3-US1</td></tr><tr><td>**Module**</td><td>Irrigation Control System</td></tr><tr><td>**Test Case Description**</td><td>Verify that the irrigation pump starts success-<br>fully when triggered manually by the user.</td></tr><tr><td>**Preconditions**</td><td>ESP32 device and relay module are connected<br>and operational.</td></tr><tr><td>**Test Inputs**</td><td>User clicks “Start Irrigation” button for Field ID<br>= 6.</td></tr><tr><td>**Expected Result**</td><td>System should activate the relay, update pump<br>status to “ON”, and create a new irrigation log<br>entry.</td></tr><tr><td>**Actual Result**</td><td>Pump activated successfully and irrigation sta-<br>tus updated correctly in the application.</td></tr><tr><td>**Test ID**</td><td>TC-E3-US2-01</td></tr><tr><td>**User Story ID**</td><td>E3-US2</td></tr><tr><td>**Module**</td><td>Automated Irrigation Control</td></tr><tr><td>**Test Case Description**</td><td>Verify that the system automatically starts irri-<br>gation when soil moisture falls below the con-<br>fgured threshold.</td></tr><tr><td>**Preconditions**</td><td>Auto-irrigation mode is enabled and threshold<br>is confgured.</td></tr><tr><td>**Test Inputs**</td><td>Threshold = 30%<br>Simulated Moisture Reading = 25%</td></tr><tr><td>**Expected Result**</td><td>System should automatically activate irrigation<br>pump and generate a low moisture alert notif-<br>cation.</td></tr><tr><td>**Actual Result**</td><td>Irrigation triggered automatically and alert no-<br>tifcation generated successfully.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E3-US3-01</td></tr><tr><td>**User Story ID**</td><td>E3-US3</td></tr><tr><td>**Module**</td><td>Irrigation Logs</td></tr><tr><td>**Test Case Description**</td><td>Verify that completed irrigation cycles are<br>stored in irrigation history.</td></tr><tr><td>**Preconditions**</td><td>Irrigation cycle has been started and completed<br>successfully.</td></tr><tr><td>**Test Inputs**</td><td>User opens irrigation history/logs for Field ID =<br>6.</td></tr><tr><td>**Expected Result**</td><td>System should display irrigation start time,<br>end<br>time,<br>duration,<br>and<br>pump<br>status<br>in<br>`irrigation_logs`.</td></tr><tr><td>**Actual Result**</td><td>Irrigation log was created and displayed suc-<br>cessfully with correct event details.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E4-US1-01</td></tr><tr><td>**User Story ID**</td><td>E4-US1</td></tr><tr><td>**Module**</td><td>AI Crop Recommendation System</td></tr><tr><td>**Test Case Description**</td><td>Verify that the AI model generates a suitable<br>crop recommendation based on feld conditions.</td></tr><tr><td>**Preconditions**</td><td>AI recommendation service is active and histor-<br>ical feld data is available.</td></tr><tr><td>**Test Inputs**</td><td>Field ID = 6<br>Soil Type = Loamy<br>Season = Rabi</td></tr><tr><td>**Expected Result**</td><td>System should generate crop recommendation</td></tr><tr><td>**Actual Result**</td><td>System recommended “Wheat” with confdence</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E4-US2-01</td></tr><tr><td>**User Story ID**</td><td>E4-US2</td></tr><tr><td>**Module**</td><td>AI Crop Recommendation System</td></tr><tr><td>**Test Case Description**</td><td>Verify that the system displays a confdence per-<br>centage with the recommended crop.</td></tr><tr><td>**Preconditions**</td><td>Crop recommendation has been generated suc-<br>cessfully.</td></tr><tr><td>**Test Inputs**</td><td>User views generated recommendation result for<br>Field ID = 6.</td></tr><tr><td>**Expected Result**</td><td>System should display recommended crop with<br>confdence score, for example “Wheat – 85%<br>Confdence”.</td></tr><tr><td>**Actual Result**</td><td>Recommended crop and confdence score were<br>displayed successfully.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E4-US3-01</td></tr><tr><td>**User Story ID**</td><td>E4-US3</td></tr><tr><td>**Module**</td><td>AI Crop Recommendation System</td></tr><tr><td>**Test Case Description**</td><td>Verify that accepting a crop recommendation<br>updates the feld crop status.</td></tr><tr><td>**Preconditions**</td><td>A crop recommendation is already displayed on<br>the recommendation screen.</td></tr><tr><td>**Test Inputs**</td><td>User clicks “Accept” on the recommendation<br>result “Wheat”.</td></tr><tr><td>**Expected Result**</td><td>Field crop status should be updated to the ac-<br>cepted crop and recommendation should be<br>marked as accepted in the database.</td></tr><tr><td>**Actual Result**</td><td>Recommendation was accepted successfullyand<br>feld crop status was updated.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E5-US1-01</td></tr><tr><td>**User Story ID**</td><td>E5-US1</td></tr><tr><td>**Module**</td><td>Alerts and Notifcations</td></tr><tr><td>**Test Case Description**</td><td>Verify that the system generates and displays<br>alerts for critical moisture conditions.</td></tr><tr><td>**Preconditions**</td><td>Notifcation service and backend alert system<br>are operational.</td></tr><tr><td>**Test Inputs**</td><td>Moisture Reading = 10% (Critical threshold <<br>15%)</td></tr><tr><td>**Expected Result**</td><td>System should create a critical alert record and</td></tr><tr><td>**Actual Result**</td><td>Critical alert generated successfully and notif-</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E5-US2-01</td></tr><tr><td>**User Story ID**</td><td>E5-US2</td></tr><tr><td>**Module**</td><td>Alerts and Notifcations</td></tr><tr><td>**Test Case Description**</td><td>Verify that the notifcation icon displays the cor-<br>rect unread alert count.</td></tr><tr><td>**Preconditions**</td><td>At least one unread alert exists in the system.</td></tr><tr><td>**Test Inputs**</td><td>User opens the application dashboard.</td></tr><tr><td>**Expected Result**</td><td>Notifcation icon should display badge count ac-<br>cording to the number of unread alerts.</td></tr><tr><td>**Actual Result**</td><td>Notifcation badge displayed the correct unread<br>alert count successfully.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E5-US3-01</td></tr><tr><td>**User Story ID**</td><td>E5-US3</td></tr><tr><td>**Module**</td><td>Alerts and Notifcations</td></tr><tr><td>**Test Case Description**</td><td>Verify that an active alert can be marked as re-<br>solved by the user.</td></tr><tr><td>**Preconditions**</td><td>An active unresolved alert exists in the alerts list.</td></tr><tr><td>**Test Inputs**</td><td>User clicks “Mark as Resolved” on a low mois-<br>ture alert.</td></tr><tr><td>**Expected Result**</td><td>Alert status should be updated as resolved and<br>moved to alert history.</td></tr><tr><td>**Actual Result**</td><td>Alert was marked as resolved successfully and<br>removed from active alerts list.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E6-US1-01</td></tr><tr><td>**User Story ID**</td><td>E6-US1</td></tr><tr><td>**Module**</td><td>Historical Analytics and Visualization</td></tr><tr><td>**Test Case Description**</td><td>Verify that the weekly moisture trend graph dis-<br>plays accurate historical data points.</td></tr><tr><td>**Preconditions**</td><td>Historical sensor data for the previous 7 days<br>exists in the database.</td></tr><tr><td>**Test Inputs**</td><td>User selects “Last 7 Days” flter from analytics<br>dashboard.</td></tr><tr><td>**Expected Result**</td><td>System should render line chart with correct<br>moisture readings and date labels for the pre-<br>vious week.</td></tr><tr><td>**Actual Result**</td><td>Weekly trend graph displayed correctly with ac-<br>curate data points and timestamps.</td></tr><tr><td>**Test ID**</td><td>TC-E6-US2-01</td></tr><tr><td>**User Story ID**</td><td>E6-US2</td></tr><tr><td>**Module**</td><td>Historical Analytics and Reporting</td></tr><tr><td>**Test Case Description**</td><td>Verify that the user can export historical farm<br>data successfully.</td></tr><tr><td>**Preconditions**</td><td>Historical sensor readings are available in the<br>database.</td></tr><tr><td>**Test Inputs**</td><td>User clicks “Export” button on analytics screen.</td></tr><tr><td>**Expected Result**</td><td>System should generate downloadable report fle<br>in CSV or PDF format.</td></tr><tr><td>**Actual Result**</td><td>Farm data report was generated and downloaded<br>successfully.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Test ID**</td><td>TC-E6-US3-01</td></tr><tr><td>**User Story ID**</td><td>E6-US3</td></tr><tr><td>**Module**</td><td>Historical Analytics and Visualization</td></tr><tr><td>**Test Case Description**</td><td>Verify that the system compares water usage and<br>sensor statistics of two diferent felds.</td></tr><tr><td>**Preconditions**</td><td>At least two felds with historical sensor and<br>irrigation data exist in the system.</td></tr><tr><td>**Test Inputs**</td><td>Field A = Field ID 6<br>Field B = Field ID 7</td></tr><tr><td>**Expected Result**</td><td>System should display side-by-side comparison<br>of moisture trends, water usage, and feld statis-<br>tics.</td></tr><tr><td>**Actual Result**</td><td>Field comparison was displayed successfully<br>with correct side-by-side statistics.</td></tr><tr><td>**Status**</td><td>Pass</td></tr><tr><td>**Epic**</td><td>**User Story** **Test Case** **UI Screen**</td></tr><tr><td>E1 (Auth)</td><td>E1-US1 (Register) TC-E1-US1-01 Login Scre<br>ister) en (Reg-</td></tr><tr><td>E1 (Auth)</td><td>E1-US2 (Login) TC-E1-US2-01 Login Scre en</td></tr><tr><td>E1 (Auth)</td><td>E1-US3 (Profle) N/A (Standard Up-<br>date) Settings<br>/<br>Page Profle</td></tr><tr><td>E2 (Monitor-<br>ing)</td><td>E2-US1 (Field Overview) N/A<br>(Visual<br>Check) Dashboard</td></tr><tr><td>E2 (Monitor-<br>ing)</td><td>E2-US2 (Sensor Detail) TC-E2-US2-01 Detailed<br>Data Page Sensor</td></tr><tr><td>E2 (Monitor-<br>ing)</td><td>E2-US3 (Status) N/A (Status Check) Dashboard<br>Page / Sensor</td></tr><tr><td>E3<br>(Irriga-<br>tion)</td><td>E3-US1 (Manual) TC-E3-US1-01 Irrigation<br>Panel Control</td></tr><tr><td>E3<br>(Irriga-<br>tion)</td><td>E3-US2 (Auto) TC-E3-US2-01 Irrigation<br>Panel Control</td></tr><tr><td>E3<br>(Irriga-<br>tion)</td><td>E3-US3 (Logs) N/A (Log Check) Detailed<br>Data Page <br>Tab) Sensor<br> (History</td></tr><tr><td>E4 (AI)</td><td>E4-US1 (Request Rec) TC-E4-US1-01 AI Crop <br>mendation Recom-<br>Screen</td></tr><tr><td>E4 (AI)</td><td>E4-US2 (Confdence) N/A<br>(Visual<br>Check) AI Crop <br>mendation Recom-<br>Screen</td></tr><tr><td>Cont</td><td>inued on ne xt page...</td></tr><tr><td>**Epic**</td><td>**User Story** **Test Case** **UI Screen**</td></tr><tr><td>E4 (AI)</td><td>E4-US3 (Accept) N/A (State Change) AI Crop Recom-<br>mendation Screen</td></tr><tr><td>E5 (Alerts)</td><td>E5-US1 (Critical) TC-E5-US1-01 Alerts & Notifca-<br>tions Screen</td></tr><tr><td>E5 (Alerts)</td><td>E5-US2 (Unread) N/A (Badge Check) Dashboard<br>(Alert<br>Icon)</td></tr><tr><td>E5 (Alerts)</td><td>E5-US3 (Resolve) N/A<br>(Action<br>Check) Alerts & Notifca-<br>tions Screen</td></tr><tr><td>E6 (Analyt-<br>ics)</td><td>E6-US1 (Trends) TC-E6-US1-01 Detailed<br>Sensor<br>Data Page (History)</td></tr><tr><td>E6 (Analyt-<br>ics)</td><td>E6-US2 (Export) N/A (Download) Settings<br>/<br>Profle<br>Page</td></tr><tr><td>E6 (Analyt-<br>ics)</td><td>E6-US3 (Compare) N/A (Multi-view) Dashboard<br>(Com-<br>parison View)</td></tr><tr><td>**Component**</td><td>**Specifcation / Purpose**</td></tr><tr><td>**ESP32 Microcontroller**</td><td>Dual-core 32-bit microcontroller with integrated Wi-Fi (802.11<br>b/g/n) and Bluetooth. Controls sensor data acquisition, local<br>threshold logic, irrigation actuation, and backend communication<br>via HTTP/REST protocol [8].</td></tr><tr><td>**Soil Moisture Sensor**</td><td>Capacitive sensor (YL-69) that measures volumetric water content<br>in soil. Provides analog output (0–2560) proportional to moisture<br>level, enabling precise irrigation decision-making.</td></tr><tr><td>**DHT22 Sensor**</td><td>Digital temperature and humidity sensor with calibrated output.<br>Measures ambient temperature (–40°C to +80°C) and relative<br>humidity (0–100%) for crop environment monitoring and weather<br>correlation [3].</td></tr><tr><td>**LDR Light Sensor**</td><td>Light Dependent Resistor that measures ambient light intensity<br>(0–1023 lux equivalent). Supports day/night detection, optimal<br>irrigation timing, and crop photosynthesis analysis.</td></tr><tr><td>**Rain Sensor**</td><td>Digital rain detection module (FC-37) with adjustable sensitivity.<br>Detects rainfall conditions to prevent irrigation during rain events<br>and conserve water resources [4].</td></tr><tr><td>**Relay Module**</td><td>Single-channel 5V relay with optocoupler isolation. Switches<br>high-power pump/valve circuits (up to 10A at 250V AC or 30V DC)<br>based on ESP32 digital output or manual mobile app commands.</td></tr><tr><td>**Water Pump**</td><td>12V DC submersible pump for irrigation actuation. Flow rate:<br>500–2000 L/hour depending on feld size and crop requirements [6].</td></tr><tr><td>**Power Supply**</td><td>regulator). Separate 12V supply for pump with protection circuitry<br>(fuse, surge protection).</td></tr><tr><td>**Component**</td><td>**Model** **Technical Specs** **Interface**</td></tr><tr><td>ESP32</td><td>ESP-WROOM-<br>32 CPU: Dual-core Xtensa LX6 @<br>240MHz; RAM: 520KB; Flash: 4MB;<br>Wi-Fi: 2.4GHz 802.11n; GPIO: 34pins Power:<br>5V<br>(VIN)</td></tr><tr><td>Soil Moisture</td><td>YL-69 Operating Voltage: 3.3V–5V; Output:<br>Analog (0–1023); Response Time: <1s;<br>Probe Length: 60mm Analog (A0)</td></tr><tr><td>Temperature &<br>Humidity</td><td>DHT22<br>(AM2302) (±0.5°C); Humidity: 0–100% RH<br>(±2–5%); Sampling: 0.5Hz Digital (GPIO)</td></tr><tr><td>Light Sensor</td><td>LDR (5mm) Resistance Range: 1kΩ–10MΩ;<br>Spectral Peak: 540nm; Voltage:<br>3.3V–5V Analog (A1)</td></tr><tr><td>Rain Sensor</td><td>FC-37 Operating Voltage: 3.3V–5V; Detection<br>Area: 5cm×4cm; Output: Digital<br>(HIGH/LOW) Digital (GPIO)</td></tr><tr><td>Relay Module</td><td>5V Single Chan-<br>nel Coil Voltage: 5V DC; Contact Rating:<br>10A @ 250V AC / 30V DC; Isolation:<br>Optocoupler Digital (GPIO)</td></tr><tr><td>Pump</td><td>12V<br>DC<br>Sub-<br>mersible Voltage: 12V DC; Current: 0.5–1A;<br>Flow Rate: 500–1200 L/h; Head:<br>1.5–3m Relay<br>NO/-<br>COM</td></tr><tr><td>Power Supply</td><td>AC/DC Adapter (ESP32/Sensors), 12V/1A (Pump -<br>separate) DC Jack / Ter-<br>minal</td></tr><tr><td>**Component**</td><td>**ESP32 Pin** **Pin Type** **Signal**</td></tr><tr><td>Soil Moisture Sensor</td><td>GPIO 36 (A0) Analog Input 0–1023 (Moisture<br>%)</td></tr><tr><td>LDR Light Sensor</td><td>GPIO 39 (A1) AnalogInput 0–1023 (Lux)</td></tr><tr><td>DHT22 Sensor</td><td>GPIO 4 (D4) Digital I/O Data Protocol</td></tr><tr><td>Rain Sensor</td><td>GPIO 5 (D5) Digital Input HIGH / LOW</td></tr><tr><td>Relay Module</td><td>GPIO 14 (D7) Digital Output HIGH (ON) / LOW<br>(OFF)</td></tr><tr><td>Power (VIN)</td><td>5V Pin Power Input 5V DC</td></tr><tr><td>Ground (GND)</td><td>GND Pin Ground Common Ground</td></tr><tr><td>**Component**</td><td>**Qty** **Estimated Cost (PKR)**</td></tr><tr><td>ESP32 Development Board</td><td>1 1,200</td></tr><tr><td>Soil Moisture Sensor</td><td>1 300</td></tr><tr><td>DHT22 Sensor</td><td>1 400</td></tr><tr><td>LDR Sensor</td><td>1 50</td></tr><tr><td>Rain Sensor Module</td><td>1 200</td></tr><tr><td>5V RelayModule</td><td>1 150</td></tr><tr><td>12V DC Water Pump</td><td>1 1,500</td></tr><tr><td>5V/2A Power Supply</td><td>1 300</td></tr><tr><td>12V/1A Power Supply</td><td>1 400</td></tr><tr><td>ConnectingWires & Miscellaneous</td><td>— 500</td></tr><tr><td>Enclosure (Weatherproof)</td><td>1 800</td></tr><tr><td>**Totalper Field Unit**</td><td>**6,400 PKR**</td></tr><tr><td>**Column Name**</td><td>**Data Type** **Description**</td></tr><tr><td>feld_id</td><td>INT(11) PK Auto-increment primary key</td></tr><tr><td>user_id</td><td>INT(11) FK Foreign key to users table</td></tr><tr><td>feld_name</td><td>VARCHAR(100) Name/identifer of the feld</td></tr><tr><td>location_latitude</td><td>DECIMAL(10,8) GPS latitude coordinate</td></tr><tr><td>location_longitude</td><td>DECIMAL(11,8) GPS longitude coordinate</td></tr><tr><td>area_size</td><td>DECIMAL(10,2) Field area (in acres/hectares)</td></tr><tr><td>soil_type</td><td>VARCHAR(50) e.g., Loamy, Sandy, Clay</td></tr><tr><td>current_crop</td><td>VARCHAR(100) Currently planted crop</td></tr><tr><td>planting_date</td><td>DATE Crop planting date</td></tr><tr><td>expected_harvest_date</td><td>DATE Expected harvest date</td></tr><tr><td>is_active</td><td>TINYINT(1) Field status (1 = active)</td></tr><tr><td>**Column Name**</td><td>**Data Type** **Description**</td></tr><tr><td>sensor_id</td><td>INT(11) PK Auto-increment primary key</td></tr><tr><td>feld_id</td><td>INT(11) FK Foreign key to felds table</td></tr><tr><td>sensor_type</td><td>ENUM combined / soil_moisture / temperature</td></tr><tr><td>device_id</td><td>VARCHAR(100) UNIQUE ESP32 MAC address or identifer</td></tr><tr><td>sensor_model</td><td>VARCHAR(100) e.g., ESP32 + DHT11 + Soil Sensor</td></tr><tr><td>installation_date</td><td>DATE Sensor deployment date</td></tr><tr><td>battery_level</td><td>DECIMAL(5,2) Battery percentage (if applicable)</td></tr><tr><td>frmware_version</td><td>VARCHAR(20) Current frmware version</td></tr><tr><td>is_active</td><td>TINYINT(1) Sensor status (1 = active)</td></tr><tr><td>**Column Name**</td><td>**Data Type** **Description**</td></tr><tr><td>reading_id</td><td>BIGINT(20) PK Auto-increment primary key</td></tr><tr><td>sensor_id</td><td>INT(11) FK Foreign key to sensors table</td></tr><tr><td>reading_time</td><td>TIMESTAMP Timestamp of sensor reading</td></tr><tr><td>soil_moisture</td><td>DECIMAL(5,2) Soil moisture percentage (0-100)</td></tr><tr><td>temperature</td><td>DECIMAL(5,2) Temperature in Celsius</td></tr><tr><td>humidity</td><td>DECIMAL(5,2) Humidity percentage (0-100)</td></tr><tr><td>light_intensity</td><td>INT(11) Light intensity in Lux</td></tr><tr><td>created_at</td><td>TIMESTAMP Record creation timestamp</td></tr><tr><td>**Column Name**</td><td>**Data Type** **Description**</td></tr><tr><td>log_id</td><td>BIGINT(20) PK Auto-increment primary key</td></tr><tr><td>feld_id</td><td>INT(11) FK Foreign key to felds table</td></tr><tr><td>irrigation_type</td><td>ENUM automatic / manual / scheduled</td></tr><tr><td>start_time</td><td>TIMESTAMP Irrigation start timestamp</td></tr><tr><td>end_time</td><td>TIMESTAMP Irrigation end timestamp</td></tr><tr><td>duration_minutes</td><td>INT(11) Calculated duration</td></tr><tr><td>water_used_liters</td><td>DECIMAL(10,2) Water consumption</td></tr><tr><td>soil_moisture_before</td><td>DECIMAL(5,2) Pre-irrigation moisture</td></tr><tr><td>soil_moisture_after</td><td>DECIMAL(5,2) Post-irrigation moisture</td></tr><tr><td>pump_status</td><td>ENUM on / of / error</td></tr><tr><td>created_at</td><td>TIMESTAMP Log creation timestamp</td></tr><tr><td>**Column Name**</td><td>**Data Type** **Description**</td></tr><tr><td>alert_id</td><td>BIGINT(20) PK Auto-increment primary key</td></tr><tr><td>user_id</td><td>INT(11) FK Foreign key to users table</td></tr><tr><td>feld_id</td><td>INT(11) FK Foreign key to felds table</td></tr><tr><td>alert_type</td><td>ENUM critical / warning / info / success</td></tr><tr><td>alert_category</td><td>ENUM soil_moisture / temperature / irriga-<br>tion</td></tr><tr><td>title</td><td>VARCHAR(200) Alert title</td></tr><tr><td>message</td><td>TEXT Detailed alert message</td></tr><tr><td>threshold_value</td><td>DECIMAL(10,2) Confgured threshold</td></tr><tr><td>current_value</td><td>DECIMAL(10,2) Actual sensor value</td></tr><tr><td>is_read</td><td>TINYINT(1) Read status fag</td></tr><tr><td>is_resolved</td><td>TINYINT(1) Resolution status fag</td></tr><tr><td>push_notifcation_sent</td><td>TINYINT(1) FCM delivery fag</td></tr><tr><td>created_at</td><td>TIMESTAMP Alert generation timestamp</td></tr><tr><td>**Column Name**</td><td>**Data Type** **Description**</td></tr><tr><td>recommendation_id</td><td>INT(11) PK Auto-increment primary key</td></tr><tr><td>feld_id</td><td>INT(11) FK Foreign key to felds table</td></tr><tr><td>recommended_crop</td><td>VARCHAR(100) Suggested crop name</td></tr><tr><td>confdence_score</td><td>DECIMAL(5,2) AI model confdence (0-100)</td></tr><tr><td>soil_moisture_avg</td><td>DECIMAL(5,2) Average soil moisture</td></tr><tr><td>temperature_avg</td><td>DECIMAL(5,2) Average temperature</td></tr><tr><td>season</td><td>VARCHAR(20) e.g., Kharif, Rabi</td></tr><tr><td>expected_yield</td><td>DECIMAL(10,2) Expected yield (kg/acre)</td></tr><tr><td>water_requirement</td><td>VARCHAR(50) Low / Medium / High</td></tr><tr><td>growth_duration_days</td><td>INT(11) Days to harvest</td></tr><tr><td>**Column Name**</td><td>**Data Type** **Description**</td></tr><tr><td>recommendation_reason</td><td>TEXT AI explanation/justifcation</td></tr><tr><td>is_accepted</td><td>TINYINT(1) Farmer acceptance fag</td></tr><tr><td>created_at</td><td>TIMESTAMP Recommendation timestamp</td></tr><tr><td>ESP32 Powers On</td><td><br>fa ~<br> Connectto Wi-Fi <br>Fa ~ a ~<br> Read All Sensors Run Offline Pump Logic<br>‘ A (Local Threshold Only)<br>Turn Pump OFF Upload Sensor Data to Backend <br>(Rain Override) ‘. 4<br>[ce Activate Irrigation Pump ~ Fa Poll Backend for ~<br>lOcr =<br>k k<br>[ ‘<br> Log Irrigation Event ] YeS Command = on? Ne<br>a SF ~<br>Activate Pump Keep Pump OFF <br> Check Alert Conditions <br><i enn?MYes<br> Generate Alert <br> Send Push Notification <br> Wait 30 Seconds <br>a s,<br> Repeat Loop <br><!-- End of picture text --></td></tr>
+</table>
+
+    </div>
+  </div>
+</div>
+
+    
+  </div>
+
+  <div class="section-label" id="sectionLabel">Welcome</div>
+  <div class="nav-buttons">
+    <button class="nav-btn" onclick="previousSlide()">← Previous</button>
+    <button class="nav-btn" onclick="nextSlide()">Next →</button>
+  </div>
+  <div class="slide-counter"><span id="slideNumber">1</span> / <span id="totalSlides"></span></div>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 1;
+    let currentBlock = 0;
+
+    function initPresentation() {
+      document.getElementById('totalSlides').textContent = slides.length;
+      updateUI();
+    }
+
+    function updateUI() {
+      slides.forEach((slide, index) => {
+        if (index === currentSlide - 1) {
+          slide.classList.add('active');
+          let blocks = slide.querySelectorAll('.reveal-block');
+          blocks.forEach((b, i) => {
+            if (i <= currentBlock) b.classList.add('revealed');
+            else b.classList.remove('revealed');
+          });
+          document.getElementById('sectionLabel').textContent = slide.getAttribute('data-section') || 'Presentation';
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+      document.getElementById('slideNumber').textContent = currentSlide;
+      document.getElementById('progressBar').style.width = `${(currentSlide / slides.length) * 100}%`;
+    }
+
+    function nextSlide() {
+      const activeSlide = slides[currentSlide - 1];
+      const blocks = activeSlide.querySelectorAll('.reveal-block');
+      
+      if (currentBlock < blocks.length - 1) {
+        currentBlock++;
+        updateUI();
+        blocks[currentBlock].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (currentSlide < slides.length) {
+        currentSlide++;
+        currentBlock = 0;
+        updateUI();
+        slides[currentSlide - 1].scrollTop = 0;
+      }
+    }
+
+    function previousSlide() {
+      const activeSlide = slides[currentSlide - 1];
+      
+      if (currentBlock > 0) {
+        currentBlock--;
+        updateUI();
+      } else if (currentSlide > 1) {
+        currentSlide--;
+        const prevBlocks = slides[currentSlide - 1].querySelectorAll('.reveal-block');
+        currentBlock = prevBlocks.length - 1;
+        updateUI();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+      if (e.key === 'ArrowLeft') previousSlide();
+      if (e.key === 'Home') { currentSlide = 1; currentBlock=0; updateUI(); }
+      if (e.key === 'End') { currentSlide = slides.length; currentBlock=0; updateUI(); }
+    });
+
+    initPresentation();
+  </script>
+</body>
+</html>
