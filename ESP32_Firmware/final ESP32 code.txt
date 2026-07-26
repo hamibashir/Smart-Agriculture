@@ -3,6 +3,9 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <DHT.h>
+#include <Preferences.h>
+
+Preferences preferences;
 
 // ============================================
 // WiFi Configuration
@@ -14,14 +17,14 @@ const char* password = "hamza2004";
 // Backend API Configuration
 // ============================================
 // --- LOCAL TESTING ---
+// const char* BACKEND_HOST = "192.168.1.8";
+// const uint16_t BACKEND_PORT = 5000;
+// const bool BACKEND_USE_HTTPS = false;
+
+// --- PRODUCTION (comment out above, uncomment below) ---
 const char* BACKEND_HOST = "api.hamzabashir.online";
 const uint16_t BACKEND_PORT = 443;
 const bool BACKEND_USE_HTTPS = true;
-
-// --- PRODUCTION (comment out above, uncomment below) ---
-// const char* BACKEND_HOST = "api.hamzabashir.online";
-// const uint16_t BACKEND_PORT = 443;
-// const bool BACKEND_USE_HTTPS = true;
 
 const char* API_PATH     = "/api/sensors/reading/";   // Full upload
 const char* COMMAND_PATH = "/api/sensors/command/";   // Lightweight poll
@@ -46,10 +49,22 @@ DHT dht(DHT_PIN, DHT_TYPE);
 // ============================================
 // Sensor Thresholds
 // ============================================
-#define SOIL_DRY_THRESHOLD   2800  // ADC > this = dry  (~32% moisture)
-#define SOIL_WET_THRESHOLD   1200  // ADC < this = wet  (~70% moisture)
+int currentMoistureThresholdPct = 30; // Default 30%
+int soilDryThresholdADC = 2800; // Calculated based on pct
+int soilWetThresholdADC = 1200; // Calculated based on pct
+
 #define RAIN_THRESHOLD       2000  // ADC < this = raining
 #define LIGHT_DARK_THRESHOLD 3000
+
+void updateThresholdsFromPercentage(int percentage) {
+  // 0% = 4095 (dry), 100% = 0 (wet)
+  soilDryThresholdADC = map(percentage, 0, 100, 4095, 0);
+  
+  // Wet threshold is roughly +20% moisture
+  int wetPct = percentage + 20;
+  if (wetPct > 100) wetPct = 100;
+  soilWetThresholdADC = map(wetPct, 0, 100, 4095, 0);
+}
 
 // ============================================
 // Timing Configuration — 3-Tier System
@@ -130,6 +145,11 @@ static void  printWifiDiag();
 // ============================================
 void setup() {
   Serial.begin(115200);
+  
+  preferences.begin("smart-agri", false);
+  currentMoistureThresholdPct = preferences.getInt("threshold", 30);
+  updateThresholdsFromPercentage(currentMoistureThresholdPct);
+  
   delay(2000);
 
   Serial.println("\n====================================");
@@ -237,7 +257,7 @@ void loop() {
 // ============================================
 void applyLocalSafety(int rainValue, int soilValue) {
   bool raining = (rainValue < RAIN_THRESHOLD);
-  bool soilWet = (soilValue < SOIL_WET_THRESHOLD);
+  bool soilWet = (soilValue < soilWetThresholdADC);
 
   if (raining || soilWet) {
     if (!localSafetyOverrideActive) {
@@ -300,6 +320,17 @@ bool fetchPumpCommand() {
     if (!deserializeJson(doc, response) && doc.containsKey("pump_status")) {
       int commanded       = doc["pump_status"].as<int>();
       const char* reason  = doc["pump_reason"] | "unknown";
+      
+      if (doc.containsKey("moisture_threshold")) {
+        int newThresh = doc["moisture_threshold"].as<int>();
+        if (newThresh != currentMoistureThresholdPct) {
+          currentMoistureThresholdPct = newThresh;
+          updateThresholdsFromPercentage(newThresh);
+          preferences.putInt("threshold", newThresh);
+          Serial.printf("Updated Threshold to %d%%\n", newThresh);
+        }
+      }
+
       syncRelayToCommand(commanded, reason);
       success = true;
     }
@@ -376,8 +407,8 @@ void readAllSensors(int& soil, int& rain, int& light, float& tempC, float& humPc
 void displaySensorData(int soil, int rain, int light, float temp, float hum) {
   Serial.println("-------------------------------------");
   Serial.print("Soil ADC: "); Serial.print(soil);
-  if (soil > SOIL_DRY_THRESHOLD)   Serial.println("  (dry)");
-  else if (soil > 1500)             Serial.println("  (moderate)");
+  if (soil > soilDryThresholdADC)   Serial.println("  (dry)");
+  else if (soil > soilWetThresholdADC) Serial.println("  (moderate)");
   else                              Serial.println("  (wet)");
 
   Serial.print("Rain ADC: "); Serial.print(rain);
@@ -411,8 +442,8 @@ void displaySensorData(int soil, int rain, int light, float temp, float hum) {
 // ============================================
 void runOfflinePumpLogic(int soilValue, int rainValue) {
   bool raining = (rainValue < RAIN_THRESHOLD);
-  bool soilWet = (soilValue < SOIL_WET_THRESHOLD);
-  bool soilDry = (soilValue > SOIL_DRY_THRESHOLD);
+  bool soilWet = (soilValue < soilWetThresholdADC);
+  bool soilDry = (soilValue > soilDryThresholdADC);
 
   // Update requested state based on current sensors
   bool shouldPumpRun = requestedPumpState;
@@ -592,6 +623,17 @@ bool sendSensorDataToBackend(int soilRaw, int rainRaw, int lightRaw, float temp,
       if (!deserializeJson(respDoc, response) && respDoc.containsKey("pump_status")) {
         int commanded      = respDoc["pump_status"].as<int>();
         const char* reason = respDoc["pump_reason"] | "upload_sync";
+        
+        if (respDoc.containsKey("moisture_threshold")) {
+          int newThresh = respDoc["moisture_threshold"].as<int>();
+          if (newThresh != currentMoistureThresholdPct) {
+            currentMoistureThresholdPct = newThresh;
+            updateThresholdsFromPercentage(newThresh);
+            preferences.putInt("threshold", newThresh);
+            Serial.printf("Updated Threshold to %d%%\n", newThresh);
+          }
+        }
+        
         syncRelayToCommand(commanded, reason);
       }
     }

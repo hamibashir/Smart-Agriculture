@@ -445,13 +445,6 @@ class _ControlTab extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-
-          // Threshold Slider
-          if (selectedField != null)
-            _ThresholdSlider(
-              threshold: selectedField!.moistureThreshold,
-              onChanged: onThresholdChanged,
-            ),
           const SizedBox(height: 32),
 
           // Central Graphic
@@ -463,7 +456,7 @@ class _ControlTab extends StatelessWidget {
             children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: isActionInProgress ? null : onStart,
+                  onPressed: (isActionInProgress || isPumpRunning) ? null : onStart,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryGreen,
                     foregroundColor: Colors.white,
@@ -486,7 +479,7 @@ class _ControlTab extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: OutlinedButton(
-                  onPressed: isActionInProgress ? null : onStop,
+                  onPressed: (isActionInProgress || !isPumpRunning) ? null : onStop,
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     foregroundColor: AppTheme.errorColor,
@@ -520,6 +513,14 @@ class _ControlTab extends StatelessWidget {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
           ),
+          const SizedBox(height: 24),
+
+          // Threshold Slider
+          if (selectedField != null)
+            _ThresholdSlider(
+              threshold: selectedField!.moistureThreshold,
+              onChanged: onThresholdChanged,
+            ),
         ],
       ),
     );

@@ -30,8 +30,8 @@ dependencies:
   
   # Icons (REMOVED font_awesome - use built-in Icons or cupertino_icons)
   
-  # Loading (REMOVED lottie and shimmer - will use simple alternatives)
-  
+  # Loading
+  shimmer: ^3.0.0  
   # Utils
   url_launcher: ^6.3.0
 

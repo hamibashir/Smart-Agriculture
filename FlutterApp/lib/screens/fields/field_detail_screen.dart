@@ -267,7 +267,27 @@ class _SensorsTab extends StatelessWidget {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: sensors.length,
-      itemBuilder: (_, index) => _SensorCard(sensor: sensors[index]),
+      itemBuilder: (_, index) {
+        final sensor = sensors[index];
+        return Dismissible(
+          key: Key(sensor.sensorId.toString()),
+          direction: DismissDirection.endToStart,
+          background: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: AppTheme.errorColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: const Icon(Icons.delete, color: Colors.white),
+          ),
+          onDismissed: (direction) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${sensor.deviceId} removed')));
+          },
+          child: _SensorCard(sensor: sensor),
+        );
+      },
     );
   }
 }

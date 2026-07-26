@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/field_selection_provider.dart';
 import '../../services/api_service.dart';
@@ -106,6 +107,88 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  Widget _buildSkeletonUI() {
+    return SliverPadding(
+      padding: const EdgeInsets.all(16),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate([
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 24,
+              width: 150,
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 24,
+              width: 150,
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: List.generate(2, (index) => Expanded(
+              child: Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  height: 100,
+                  margin: EdgeInsets.only(right: index == 0 ? 12 : 0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+            )),
+          ),
+        ]),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final firstName = context.read<AuthProvider>().user?.fullName.split(' ').first ?? 'Farmer';
@@ -189,7 +272,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             if (_isLoading)
-              const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
+              _buildSkeletonUI()
             else if (_error != null)
               SliverFillRemaining(
                 child: Center(

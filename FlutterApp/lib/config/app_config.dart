@@ -1,4 +1,4 @@
-﻿class AppConfig {
+class AppConfig {
   AppConfig._();
 
   // ============================================================
@@ -9,7 +9,7 @@
   static const bool useProduction = true;
 
   // Development URL (local backend)
-  static const String developmentApiBaseUrl = 'http://192.168.18.73:5000/api';
+  static const String developmentApiBaseUrl = 'http://192.168.1.8:5000/api';
 
   // Production URL
   static const String productionApiBaseUrl = 'https://api.hamzabashir.online/api';

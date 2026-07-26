@@ -108,10 +108,28 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
           await _apiService.getRecommendations(_selectedField!.fieldId);
       if (!mounted) return;
       if (response['success'] == true) {
+        final rawRecs = (response['data'] as List)
+            .map((j) => CropRecommendation.fromJson(j))
+            .toList();
+            
+        List<CropRecommendation> filteredRecs = [];
+        for (var rec in rawRecs) {
+          if (filteredRecs.isEmpty) {
+            filteredRecs.add(rec);
+            continue;
+          }
+          final prev = filteredRecs.last;
+          bool isSameCrop = rec.recommendedCrop == prev.recommendedCrop;
+          bool isSameMetrics = rec.soilMoistureAvg == prev.soilMoistureAvg &&
+                               rec.temperatureAvg == prev.temperatureAvg &&
+                               rec.humidityAvg == prev.humidityAvg;
+          if (!isSameCrop || !isSameMetrics) {
+            filteredRecs.add(rec);
+          }
+        }
+
         setState(() {
-          _recommendations = (response['data'] as List)
-              .map((j) => CropRecommendation.fromJson(j))
-              .toList();
+          _recommendations = filteredRecs;
         });
       }
     } catch (_) {}
@@ -229,7 +247,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: const Text('AI Crop Recommendations'),
+        title: const Text('AI Crop Tips'),
         actions: [
           if (_isRefreshing)
             const Padding(
@@ -744,10 +762,60 @@ class _HeroCard extends StatelessWidget {
                             size: 20, color: Color(0xFF3b82f6)),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: Text(
-                            recommendation.recommendationReason!,
-                            style: const TextStyle(
-                                fontSize: 13, color: Color(0xFF1e40af)),
+                          child: Builder(
+                            builder: (context) {
+                              final reason = recommendation.recommendationReason!;
+                              final lower = reason.toLowerCase();
+                              int altIndex = lower.indexOf('alternates:');
+                              if (altIndex == -1) altIndex = lower.indexOf('alternatives:');
+                              
+                              if (altIndex == -1) {
+                                return Text(reason, style: const TextStyle(fontSize: 13, color: Color(0xFF1e40af)));
+                              }
+                              
+                              final mainText = reason.substring(0, altIndex).trim();
+                              final altTextRaw = reason.substring(altIndex);
+                              final colonIndex = altTextRaw.indexOf(':');
+                              final prefix = altTextRaw.substring(0, colonIndex + 1);
+                              final cropsStr = altTextRaw.substring(colonIndex + 1).trim();
+                              
+                              final crops = cropsStr.split(RegExp(r'[,|]')).map((e) => e.trim().replaceAll('.', '')).where((e) => e.isNotEmpty).toList();
+                              
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (mainText.isNotEmpty) ...[
+                                    Text(mainText, style: const TextStyle(fontSize: 13, color: Color(0xFF1e40af))),
+                                    const SizedBox(height: 8),
+                                  ],
+                                  Text(prefix, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1e40af))),
+                                  const SizedBox(height: 6),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: crops.map((c) {
+                                      final cropColor = _cropColor(c);
+                                      return Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: cropColor.withValues(alpha: 0.15),
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: cropColor.withValues(alpha: 0.3)),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(_cropEmoji(c), style: const TextStyle(fontSize: 14)),
+                                            const SizedBox(width: 4),
+                                            Text(_capitalize(c), style: TextStyle(color: cropColor, fontWeight: FontWeight.w700, fontSize: 12)),
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
+                              );
+                            }
                           ),
                         ),
                       ],

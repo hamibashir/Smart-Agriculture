@@ -240,7 +240,7 @@ export const getPumpCommand = async (req, res) => {
       pump_reason = 'auto_dry';
     }
 
-    res.json({ success: true, pump_status, pump_reason });
+    res.json({ success: true, pump_status, pump_reason, moisture_threshold: SOIL_DRY_LIMIT });
   } catch (error) {
     console.error('Get pump command error:', error);
     res.status(500).json({ success: false, message: 'Server error' });

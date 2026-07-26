@@ -107,6 +107,8 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
                       items: const [
                         DropdownMenuItem(value: 'acres', child: Text('Acres')),
                         DropdownMenuItem(value: 'hectares', child: Text('Hectares')),
+                        DropdownMenuItem(value: 'marla', child: Text('Marla')),
+                        DropdownMenuItem(value: 'square_feet', child: Text('Sq. Feet')),
                         DropdownMenuItem(value: 'square_meters', child: Text('Sq. Meters')),
                       ],
                       onChanged: (value) => setState(() => _areaUnit = value!),
