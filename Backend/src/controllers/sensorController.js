@@ -198,7 +198,7 @@ export const getPumpCommand = async (req, res) => {
     );
 
     // Get the latest irrigation log across ALL fields bound to this device.
-    // This is the source of truth — any user's ON/OFF command wins if it's the most recent.
+    // This is the source of truth    // Get the latest irrigation log across ALL fields bound to this device.
     const [[lastLog]] = await pool.query(
       `SELECT il.pump_status, il.trigger_reason
        FROM irrigation_logs il
@@ -210,9 +210,9 @@ export const getPumpCommand = async (req, res) => {
     );
 
     const SOIL_DRY_LIMIT = sensor?.moisture_threshold ?? 30;
-    const SOIL_WET_LIMIT = Math.max(70, SOIL_DRY_LIMIT + 20);
+    const SOIL_WET_LIMIT = SOIL_DRY_LIMIT;
     const soil = latest?.soil_moisture ?? null;
-    const rainDetected = latest?.rainfall === 1;
+    const rainDetected = latest?.rainfall === 1 || latest?.rainfall === true || latest?.rainfall === 'true';
 
     // Run priority chain (read-only — no DB writes)
     let pump_status = 0;
@@ -235,7 +235,7 @@ export const getPumpCommand = async (req, res) => {
     } else if (lastLog?.pump_status === 'off') {
       pump_status = 0;
       pump_reason = 'manual_off';
-    } else if (soil !== null && soil <= SOIL_DRY_LIMIT) {
+    } else if (soil !== null && soil < SOIL_DRY_LIMIT) {
       pump_status = 1;
       pump_reason = 'auto_dry';
     }
@@ -630,7 +630,7 @@ export const createSensorReadingSharedDemo = async (req, res) => {
     }
 
     const [boundSensors] = await pool.query(
-      `SELECT s.sensor_id, s.field_id, f.user_id
+      `SELECT s.sensor_id, s.field_id, f.user_id, f.moisture_threshold
        FROM sensors s
        JOIN fields f ON s.field_id = f.field_id
        WHERE s.device_id = ? AND s.is_active = TRUE
@@ -650,9 +650,6 @@ export const createSensorReadingSharedDemo = async (req, res) => {
     const rainInsert = rain != null ? rain : 0;
     const pump  = toTinyIntBool(pump_on);
     const basePump = pump != null ? pump : 0;
-
-    const SOIL_WET_LIMIT = 70;
-    const SOIL_DRY_LIMIT = 30;
 
     // ── ONE PUMP DECISION PER DEVICE ─────────────────────────────────────────
     // The PRIMARY sensor (lowest sensor_id = first registered) is the single
@@ -675,6 +672,9 @@ export const createSensorReadingSharedDemo = async (req, res) => {
         [device_id]
       );
 
+      const SOIL_DRY_LIMIT = primary.moisture_threshold ?? 30;
+      const SOIL_WET_LIMIT = SOIL_DRY_LIMIT;
+
       // P1 ── Rain detected → force relay OFF (temporary override)
       if (rainInsert === 1) {
         masterPumpInsert = 0;
@@ -695,7 +695,7 @@ export const createSensorReadingSharedDemo = async (req, res) => {
         masterPumpReason = 'manual_off';
       }
       // P4 ── Soil critically dry → auto-start
-      else if (soil !== null && soil <= SOIL_DRY_LIMIT) {
+      else if (soil !== null && soil < SOIL_DRY_LIMIT) {
         masterPumpInsert = 1;
         masterPumpReason = 'auto_dry';
         await pool.query(
