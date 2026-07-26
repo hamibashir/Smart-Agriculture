@@ -675,17 +675,34 @@ export const createSensorReadingSharedDemo = async (req, res) => {
       const SOIL_DRY_LIMIT = primary.moisture_threshold ?? 30;
       const SOIL_WET_LIMIT = SOIL_DRY_LIMIT;
 
-      // P1 ── Rain detected → force relay OFF (temporary override)
-      if (rainInsert === 1) {
+      const isForce = lastLog?.pump_status === 'on' && lastLog?.trigger_reason === 'Force Start by farmer';
+
+      // P1 ── Force Start (Highest Priority)
+      if (isForce) {
+        masterPumpInsert = 1;
+        masterPumpReason = 'force_on';
+      }
+      // P2 ── Rain detected → force relay OFF (temporary override)
+      else if (rainInsert === 1) {
         masterPumpInsert = 0;
         masterPumpReason = 'rain_override';
       }
-      // P2 ── Soil wet → force relay OFF (temporary override)
+      // P3 ── Soil wet → force relay OFF (temporary override)
       else if (soil !== null && soil >= SOIL_WET_LIMIT) {
         masterPumpInsert = 0;
         masterPumpReason = 'soil_wet_override';
+        
+        // Log auto-stop if it was previously ON
+        if (lastLog?.pump_status === 'on') {
+          await pool.query(
+            `INSERT INTO irrigation_logs
+               (field_id, sensor_id, irrigation_type, start_time, trigger_reason, soil_moisture_before, pump_status, initiated_by)
+             VALUES (?, ?, 'automatic', NOW(), 'Auto-stop: moisture threshold reached', ?, 'off', ?)`,
+            [primary.field_id, primary.sensor_id, soil, primary.user_id]
+          );
+        }
       }
-      // P3 ── Honor last manual app command from primary field
+      // P4 ── Honor last manual app command from primary field
       else if (lastLog?.pump_status === 'on') {
         masterPumpInsert = 1;
         masterPumpReason = 'manual_on';

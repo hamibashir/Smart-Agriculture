@@ -59,11 +59,7 @@ int soilWetThresholdADC = 1200; // Calculated based on pct
 void updateThresholdsFromPercentage(int percentage) {
   // 0% = 4095 (dry), 100% = 0 (wet)
   soilDryThresholdADC = map(percentage, 0, 100, 4095, 0);
-  
-  // Wet threshold is roughly +20% moisture
-  int wetPct = percentage + 20;
-  if (wetPct > 100) wetPct = 100;
-  soilWetThresholdADC = map(wetPct, 0, 100, 4095, 0);
+  soilWetThresholdADC = soilDryThresholdADC;
 }
 
 // ============================================
@@ -257,7 +253,7 @@ void loop() {
 // ============================================
 void applyLocalSafety(int rainValue, int soilValue) {
   bool raining = (rainValue < RAIN_THRESHOLD);
-  bool soilWet = (soilValue < soilWetThresholdADC);
+  bool soilWet = (soilValue <= soilWetThresholdADC);
 
   if (raining || soilWet) {
     if (!localSafetyOverrideActive) {
@@ -442,7 +438,7 @@ void displaySensorData(int soil, int rain, int light, float temp, float hum) {
 // ============================================
 void runOfflinePumpLogic(int soilValue, int rainValue) {
   bool raining = (rainValue < RAIN_THRESHOLD);
-  bool soilWet = (soilValue < soilWetThresholdADC);
+  bool soilWet = (soilValue <= soilWetThresholdADC);
   bool soilDry = (soilValue > soilDryThresholdADC);
 
   // Update requested state based on current sensors
