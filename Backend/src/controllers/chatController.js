@@ -45,7 +45,7 @@ export const chatWithAI = async (req, res) => {
     // ==========================================
     // AGRIBOT: Google Gemini AI Integration
     // ==========================================
-    const geminiApiKey = process.env.GEMINI_API_KEY || "AQ.Ab8RN6IWV4bdH7lxyVOIZvCySw0AdhbieMLyDOrqWkEJllx7KQ";
+    const geminiApiKey = process.env.GEMINI_API_KEY || "AQ.Ab8RN6LKqTi-9IJeQfze6FFUpRGW54C88zxjjmMtFZwLoAgrvg";
     
     if (!geminiApiKey) {
       // Graceful fallback if API key is missing
@@ -65,7 +65,7 @@ ${contextData}
 
 User Question: ${message}`;
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${geminiApiKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${geminiApiKey}`;
 
     try {
       const aiResponse = await axios.post(geminiUrl, {
