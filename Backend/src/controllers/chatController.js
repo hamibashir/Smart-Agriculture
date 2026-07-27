@@ -10,42 +10,48 @@ export const chatWithAI = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Message is required.' });
     }
 
-    // Fetch all active fields and their sensors for the user
-    const [fields] = await pool.query(`
-      SELECT f.field_id, f.field_name, f.soil_type, f.current_crop, s.sensor_id 
-      FROM fields f 
-      JOIN sensors s ON f.field_id = s.field_id 
+    // Fetch all active fields and their latest sensor readings in ONE optimized lightweight query
+    const [fieldsData] = await pool.query(`
+      SELECT 
+        f.field_name, 
+        f.soil_type, 
+        f.current_crop, 
+        sr.soil_moisture, 
+        sr.temperature, 
+        sr.humidity, 
+        sr.rainfall
+      FROM fields f
+      JOIN sensors s ON f.field_id = s.field_id
+      LEFT JOIN (
+        SELECT sensor_id, MAX(reading_time) as max_time
+        FROM sensor_readings
+        GROUP BY sensor_id
+      ) latest_time ON s.sensor_id = latest_time.sensor_id
+      LEFT JOIN sensor_readings sr ON sr.sensor_id = latest_time.sensor_id AND sr.reading_time = latest_time.max_time
       WHERE f.user_id = ? AND s.is_active = TRUE
     `, [userId]);
 
-    let contextData = "Here is the real-time data for all fields on the user's farm:\n\n";
+    let contextData = "Farm Live Context:\n";
     let hasData = false;
 
-    // Fetch the latest reading for each active field safely
-    for (const field of fields) {
-      const [readings] = await pool.query(`
-        SELECT soil_moisture, temperature, humidity, rainfall 
-        FROM sensor_readings 
-        WHERE sensor_id = ? 
-        ORDER BY reading_time DESC 
-        LIMIT 1
-      `, [field.sensor_id]);
-
-      if (readings.length > 0) {
-        hasData = true;
-        const data = readings[0];
-        contextData += `Field Name: ${field.field_name}\nCurrent Crop: ${field.current_crop || 'None'}\nSoil Type: ${field.soil_type || 'Unknown'}\nMoisture: ${parseFloat(data.soil_moisture).toFixed(1)}%\nTemperature: ${parseFloat(data.temperature).toFixed(1)}°C\nHumidity: ${parseFloat(data.humidity).toFixed(1)}%\nRainfall: ${parseFloat(data.rainfall).toFixed(1)}mm\n\n`;
+    for (const data of fieldsData) {
+      hasData = true;
+      contextData += `\n[Field: ${data.field_name}] - Crop: ${data.current_crop || 'None'}, Soil: ${data.soil_type || 'Unknown'}\n`;
+      if (data.soil_moisture !== null && data.soil_moisture !== undefined) {
+        contextData += `Sensors: Moisture ${parseFloat(data.soil_moisture).toFixed(1)}%, Temp ${parseFloat(data.temperature).toFixed(1)}°C, Humidity ${parseFloat(data.humidity).toFixed(1)}%, Rain ${parseFloat(data.rainfall).toFixed(1)}mm\n`;
+      } else {
+        contextData += `Sensors: No data available yet.\n`;
       }
     }
 
     if (!hasData) {
-      contextData = "No active sensor data is currently available for any fields.";
+      contextData = "No active fields or sensor data available for the user.";
     }
 
     // ==========================================
     // AGRIBOT: Google Gemini AI Integration
     // ==========================================
-    const geminiApiKey = process.env.GEMINI_API_KEY || "AQ.Ab8RN6LKqTi-9IJeQfze6FFUpRGW54C88zxjjmMtFZwLoAgrvg";
+    const geminiApiKey = process.env.GEMINI_API_KEY || "AQ.Ab8RN6LE2U3RmuNsZ1IMn6egKA52qqgRP8UZ_Ci3xURkKyH3yQ";
     
     if (!geminiApiKey) {
       // Graceful fallback if API key is missing
@@ -65,7 +71,7 @@ ${contextData}
 
 User Question: ${message}`;
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${geminiApiKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${geminiApiKey}`;
 
     try {
       const aiResponse = await axios.post(geminiUrl, {
