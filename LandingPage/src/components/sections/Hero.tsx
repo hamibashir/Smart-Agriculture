@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Download, Code2, PlayCircle } from "lucide-react";
+import { Download, Code2, PlayCircle, Smartphone } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 
 export function Hero() {
@@ -66,6 +66,18 @@ export function Hero() {
             })}
           >
             <Download size={20} /> Download APK
+          </a>
+          <a 
+            href="https://deploygate.com/distributions/c3532f4def5054757001b00626686210de9e1819"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ 
+              size: "lg", 
+              variant: "outline", 
+              className: "rounded-full gap-2 w-full sm:w-auto px-8 h-14 text-base font-medium bg-emerald-950/30 border-emerald-500/30 text-emerald-400 hover:bg-emerald-900/40 hover:text-emerald-300 hover:border-emerald-500/50 backdrop-blur-md transition-all duration-300" 
+            })}
+          >
+            <Smartphone size={20} /> Get on DeployGate
           </a>
           <a 
             href="https://github.com/hamibashir/Smart-Agriculture"

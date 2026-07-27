@@ -4,7 +4,6 @@ import {
   Radio,
   Smartphone,
   Cloud,
-  Shield,
   FileCode2,
   FileText,
   Presentation,
@@ -14,22 +13,22 @@ import {
 export const TEAM_MEMBERS = [
   {
     name: "Muhammad Awais",
-    role: "AI & Backend Engineer",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Awais&backgroundColor=10B981",
+    role: "Hardware Engineer",
+    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=10B981",
     linkedin: "#",
     github: "https://github.com/muhammadawais42",
   },
   {
     name: "Hamza Bashir",
-    role: "IoT & Hardware Engineer",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Hamza&backgroundColor=10B981",
+    role: "Software & AI Engineer",
+    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack&backgroundColor=10B981",
     linkedin: "#",
     github: "https://github.com/hamibashir",
   },
   {
-    name: "Junaid Ameen",
+    name: "Junaid Amin",
     role: "Mobile App Developer",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Junaid&backgroundColor=10B981",
+    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Leo&backgroundColor=10B981",
     linkedin: "#",
     github: "https://github.com/JunaidAminnn",
   },
@@ -60,11 +59,6 @@ export const FEATURES = [
     title: "Cloud Dashboard",
     description: "Centralized analytics and historical data visualization.",
     icon: Cloud,
-  },
-  {
-    title: "Blockchain Security",
-    description: "Ensuring data integrity and secure transactions for agricultural supply chains.",
-    icon: Shield,
   },
 ];
 

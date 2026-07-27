@@ -32,10 +32,11 @@ export function Downloads() {
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{item.title}</h3>
                 <p className="text-slate-600 mb-4">{item.description}</p>
                 <a 
-                  href={item.link} 
+                  href={item.title === "Android APK" ? `${import.meta.env.BASE_URL}SmartAgri.apk` : item.link} 
                   target={item.title === "Source Code" ? "_blank" : undefined}
                   rel={item.title === "Source Code" ? "noopener noreferrer" : undefined}
                   className={buttonVariants({ variant: "outline", className: "w-full sm:w-auto" })}
+                  download={item.title === "Android APK" ? true : undefined}
                 >
                   {item.title === "Source Code" ? "View GitHub" : "Download"}
                 </a>
