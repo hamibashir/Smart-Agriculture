@@ -51,7 +51,7 @@ export const chatWithAI = async (req, res) => {
     // ==========================================
     // AGRIBOT: Google Gemini AI Integration
     // ==========================================
-    const geminiApiKey = process.env.GEMINI_API_KEY || "AQ.Ab8RN6LE2U3RmuNsZ1IMn6egKA52qqgRP8UZ_Ci3xURkKyH3yQ";
+    const geminiApiKey = "AQ.Ab8RN6LE2U3RmuNsZ1IMn6egKA52qqgRP8UZ_Ci3xURkKyH3yQ";
     
     if (!geminiApiKey) {
       // Graceful fallback if API key is missing
