@@ -10,6 +10,13 @@ export const chatWithAI = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Message is required.' });
     }
 
+    // Fetch user profile details
+    const [[userProfile]] = await pool.query(`
+      SELECT full_name, phone, email, city, province 
+      FROM users 
+      WHERE user_id = ?
+    `, [userId]);
+
     // Fetch all active fields and their latest sensor readings in ONE optimized lightweight query
     const [fieldsData] = await pool.query(`
       SELECT 
@@ -31,21 +38,29 @@ export const chatWithAI = async (req, res) => {
       WHERE f.user_id = ? AND s.is_active = TRUE
     `, [userId]);
 
-    let contextData = "Farm Live Context:\n";
+    let contextData = "User Profile Context:\n";
+    if (userProfile) {
+      contextData += `- Name: ${userProfile.full_name}\n`;
+      contextData += `- Phone: ${userProfile.phone}\n`;
+      contextData += `- Email: ${userProfile.email}\n`;
+      contextData += `- Location: ${userProfile.city || 'Unknown'}, ${userProfile.province || 'Unknown'}\n\n`;
+    }
+
+    contextData += "Farm Live Context:\n";
     let hasData = false;
 
     for (const data of fieldsData) {
       hasData = true;
-      contextData += `\n[Field: ${data.field_name}] - Crop: ${data.current_crop || 'None'}, Soil: ${data.soil_type || 'Unknown'}\n`;
+      contextData += `[Field: ${data.field_name}] - Crop: ${data.current_crop || 'None'}, Soil: ${data.soil_type || 'Unknown'}\n`;
       if (data.soil_moisture !== null && data.soil_moisture !== undefined) {
-        contextData += `Sensors: Moisture ${parseFloat(data.soil_moisture).toFixed(1)}%, Temp ${parseFloat(data.temperature).toFixed(1)}°C, Humidity ${parseFloat(data.humidity).toFixed(1)}%, Rain ${parseFloat(data.rainfall).toFixed(1)}mm\n`;
+        contextData += `Sensors: Moisture ${parseFloat(data.soil_moisture).toFixed(1)}%, Temp ${parseFloat(data.temperature).toFixed(1)}°C, Humidity ${parseFloat(data.humidity).toFixed(1)}%, Raining: ${data.rainfall ? 'Yes' : 'No'}\n`;
       } else {
         contextData += `Sensors: No data available yet.\n`;
       }
     }
 
     if (!hasData) {
-      contextData = "No active fields or sensor data available for the user.";
+      contextData += "No active fields or sensor data available for the user.";
     }
 
     // ==========================================
