@@ -49,15 +49,15 @@ export const chatWithAI = async (req, res) => {
     }
 
     // ==========================================
-    // AGRIBOT: Google Gemini AI Integration
+    // AGRIBOT: Groq AI Integration
     // ==========================================
-    const geminiApiKey = "AQ.Ab8RN6LE2U3RmuNsZ1IMn6egKA52qqgRP8UZ_Ci3xURkKyH3yQ";
+    const groqApiKey = "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";
     
-    if (!geminiApiKey) {
+    if (!groqApiKey) {
       // Graceful fallback if API key is missing
       return res.json({ 
         success: true, 
-        reply: "AI is currently offline (API key is missing). Please set GEMINI_API_KEY in the environment." 
+        reply: "AI is currently offline (API key is missing)." 
       });
     }
 
@@ -67,18 +67,25 @@ Answer the user's question accurately based ONLY on this context.
 Be concise, helpful, and strictly related to agriculture. Do not hallucinate data.
 
 Context Data:
-${contextData}
+${contextData}`;
 
-User Question: ${message}`;
-
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${geminiApiKey}`;
+    const groqUrl = 'https://api.groq.com/openai/v1/chat/completions';
 
     try {
-      const aiResponse = await axios.post(geminiUrl, {
-        contents: [{ parts: [{ text: systemPrompt }] }]
+      const aiResponse = await axios.post(groqUrl, {
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message }
+        ]
+      }, {
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json'
+        }
       });
 
-      let reply = aiResponse.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      let reply = aiResponse.data?.choices?.[0]?.message?.content;
 
       if (!reply) {
         reply = "I'm sorry, I couldn't formulate a proper response at the moment.";
@@ -89,7 +96,7 @@ User Question: ${message}`;
     } catch (aiError) {
       // STRICT ERROR HANDLING for Digital Ocean App Platform
       // Never crash the server, gracefully fallback to a safe JSON response.
-      console.error('Gemini AI API Error:', aiError.response?.data || aiError.message);
+      console.error('Groq AI API Error:', aiError.response?.data || aiError.message);
       
       return res.json({ 
         success: true, 
