@@ -737,7 +737,7 @@ Requirement Specification and Analysis
 
 **Acceptance Criteria:** The acceptance criteria dictate that given the user is on the analytics screen, When the “Export” button is clicked, Then the system should generate a downloadable report (e.g., CSV or PDF). 
 
-**E6-US3: Compare Fields Description:** As a farmer, the user wants to compare the water usage of two different fields so that inefficiencies can be identified. 
+**E6-US3: Compare Fields Description:** As a farmer, the user wants to compare the field data of two different fields so that inefficiencies can be identified. 
 
 **Acceptance Criteria:** The acceptance criteria dictate that given the user selects two fields, When the “Compare” option is chosen, Then the system should display side-by-side statistics for both fields. 
 
@@ -1163,7 +1163,7 @@ _Table 2-18: Verify Field Comparison_
 |---|---|
 |**User Story ID**|E6-US3|
 |**Module**|Historical Analytics and Visualization|
-|**Test Case Description**|Verify that the system compares water usage and<br>sensor statistics of two diferent felds.|
+|**Test Case Description**|Verify that the system compares field data and<br>sensor statistics of two diferent felds.|
 
 
 
@@ -3054,7 +3054,7 @@ Device: ESP32-FIELD-006 (Sensor ID 14) Normal upload interval: 30 seconds ESP32 
 
 ### **6.4.9. TC-ST-09: Field Comparison End-to-End** 
 
-**Date:** 5th February 2026 **System:** Complete System — Field Comparison End-to-End Test **Objective:** Verify that the system **Test ID:** TC-ST-09 correctly retrieves and displays side-by-side statistics for two different fields, enabling the farmer to compare soil moisture trends and water usage across multiple farm plots. **Version:** 1 **Test Type:** System Testing **Input:** 
+**Date:** 5th February 2026 **System:** Complete System — Field Comparison End-to-End Test **Objective:** Verify that the system **Test ID:** TC-ST-09 correctly retrieves and displays side-by-side statistics for two different fields, enabling the farmer to compare soil moisture trends and field data across multiple farm plots. **Version:** 1 **Test Type:** System Testing **Input:** 
 
 Field A: Field ID 6 (Wheat, Loamy soil) Field B: Field ID 7 (Cotton, Sandy soil) Farmer selects both fields in Comparison View screen. 
 
