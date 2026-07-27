@@ -1,4 +1,4 @@
-package com.smartagriculture.app
+package com.apexbytelabs.agriculture
 
 import io.flutter.embedding.android.FlutterActivity
 

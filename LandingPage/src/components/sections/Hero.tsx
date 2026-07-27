@@ -68,6 +68,18 @@ export function Hero() {
             <Download size={20} /> Download APK
           </a>
           <a 
+            href="https://play.google.com/apps/testing/com.apexbytelabs.agriculture"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ 
+              size: "lg", 
+              variant: "outline", 
+              className: "rounded-full gap-2 w-full sm:w-auto px-8 h-14 text-base font-medium bg-blue-950/30 border-blue-500/30 text-blue-400 hover:bg-blue-900/40 hover:text-blue-300 hover:border-blue-500/50 backdrop-blur-md transition-all duration-300" 
+            })}
+          >
+            <PlayCircle size={20} /> Get on Play Store
+          </a>
+          <a 
             href="https://deploygate.com/distributions/c3532f4def5054757001b00626686210de9e1819"
             target="_blank"
             rel="noopener noreferrer"
